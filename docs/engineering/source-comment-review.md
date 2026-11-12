@@ -148,6 +148,12 @@ this review makes no performance-improvement claim.
 
 ## Existing implementation follow-ups
 
+**Subsequent resolution:** The behavioral change documented in
+[consent and cleanup verification](consent-cleanup-verification.md) implemented
+the deadline presentation and binding, reproduced the cleanup failure, and
+corrected its classification. The observations below retain the evidence
+available during this earlier comment-only review.
+
 The source review identified two boundaries that require separate behavioral
 work or live qualification. Neither was introduced or fixed by this change.
 

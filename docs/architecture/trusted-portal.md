@@ -114,13 +114,28 @@ same 512 KiB ceiling used by the MCP boundary.
 | `POST /auth/logout` | End the browser session and outstanding gestures |
 
 Consent preparation exposes terms and privacy versions and byte digests,
-purpose, recipient, exact actions, immutable generation, and the versioned
-content-eligibility declaration. Acceptance requires that exact displayed
-snapshot and four literal `true` declarations: accepted terms, acknowledged
-privacy, authorized scope, and eligible content. A material scope or policy
-change invalidates the challenge. Model-reported eligibility is not a substitute
-for this interaction. The service's actual eligibility policy still determines
-which material may be connected.
+purpose, recipient, exact actions, immutable generation, the fixed authorization
+deadline, and the versioned content-eligibility declaration. `expires_at` is the
+grant's integer Unix timestamp in seconds. The portal displays it explicitly in
+UTC and includes the same value in the challenge-bound declaration.
+
+Acceptance requires that exact displayed snapshot, including the integer
+`expires_at`, and four literal `true` declarations: accepted terms, acknowledged
+privacy, authorized scope, and eligible content. The handler compares the
+deadline with the current grant inside the acceptance transaction and records
+that same deadline on the receipt. Waiting before submission cannot extend it.
+A missing, modified, or non-integer deadline is refused. A material scope or
+policy change invalidates the challenge. Model-reported eligibility is not a
+substitute for this interaction. The service's actual eligibility policy still
+determines which material may be connected.
+
+The grant lasts one hour from preparation. This authorization deadline is
+separate from the challenge's five-minute maximum and the session's fifteen-minute
+maximum; the form or sign-in can expire earlier. A new deliberate preparation
+and acceptance is required for renewed authority. Previously accepted grants
+retain their recorded deadlines. Forms prepared before the deadline field was
+added cannot be submitted against the updated contract; reload and review a
+fresh scope.
 
 Operation review is independent of consent and start. The review challenge binds
 the immutable plan's canonical digest; changing the input handle, digest,

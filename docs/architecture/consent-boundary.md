@@ -77,8 +77,12 @@ objects: an administrative grant and a human acceptance of its selected action
 subset. Creating a grant alone does not authorize content access.
 
 Consent preparation presents the exact resource, immutable generation, actions,
-purpose, recipient, policy versions and byte digests, and versioned content
-eligibility declaration. Submission requires four deliberate choices: terms
+purpose, recipient, policy versions and byte digests, fixed authorization
+expiration, and versioned content eligibility declaration. The portal renders
+the deadline in UTC; the exact integer timestamp is challenge-bound and must
+match the current grant and resulting receipt. Delayed acceptance does not
+extend it. The review challenge and browser session can expire earlier.
+Submission requires four deliberate choices: terms
 agreement, privacy acknowledgment, scope authorization, and content eligibility.
 The server checks the displayed snapshot and atomically consumes its challenge,
 records acceptance, and retains the scope-digest and eligibility context. Replay,

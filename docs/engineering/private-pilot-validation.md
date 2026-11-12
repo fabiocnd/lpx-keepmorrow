@@ -21,10 +21,12 @@ An open-source transition is planned. The release license has not yet been
 selected or adopted, and the current source license remains in effect. Source
 publication is a separate decision from deploying or connecting the service.
 
-The later [source comment review](source-comment-review.md) records the current
-comment/docstring validation and regenerated distribution. Artifact hashes and
-executed results below remain evidence for their named earlier builds and runs;
-they are not silently reassigned to the new wheel or generated HTML.
+The [source comment review](source-comment-review.md) records the subsequent
+comment/docstring validation. The later
+[consent and cleanup verification](consent-cleanup-verification.md) records the
+behavioral corrections, new regression evidence, and updated installed wheel.
+Artifact hashes and executed results below remain evidence for their named
+earlier builds and runs.
 
 ## Complete hosted CI matrix
 

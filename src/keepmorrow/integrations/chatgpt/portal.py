@@ -269,10 +269,11 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
 
     def policy_scope(grant: Grant) -> dict[str, Any]:
         # Presentation and challenge hashing share this declaration, so the
-        # accepted actions, recipient, policy digests, and eligibility text cannot
-        # silently diverge from the values returned for human review.
+        # accepted deadline, actions, recipient, policy digests, and eligibility
+        # text cannot silently diverge from the values returned for human review.
         return {
             "grant_id": grant.grant_id, "grant_version": grant.grant_version,
+            "expires_at": grant.expires_at,
             "resource_id": grant.resource_id, "generation": grant.generation,
             "actions": sorted(grant.actions), "policies": service.policies.as_dict(),
             "purpose": grant.purpose, "recipient": grant.recipient,
@@ -420,7 +421,7 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
         principal, session, _ = await run_in_threadpool(identity, request, mutate=True)
         body = await _body(request)
         checks = {"accepted_terms", "acknowledged_privacy", "authorized_scope", "eligible_content"}
-        required = {"grant_id", "grant_version", "resource_id", "generation", "actions", "policies", "challenge"} | checks
+        required = {"grant_id", "grant_version", "expires_at", "resource_id", "generation", "actions", "policies", "challenge"} | checks
         _fields(body, required, {"purpose", "recipient", "eligibility_version", "eligibility_statement"})
         if any(body[name] is not True for name in checks):
             raise AccessDenied()
@@ -431,7 +432,7 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
             with service.database.transaction() as connection:
                 grant = service.access.get_grant(principal, grant_id=body["grant_id"], connection=connection)
                 expected = policy_scope(grant)
-                if (type(body["grant_version"]) is not int
+                if (type(body["grant_version"]) is not int or type(body["expires_at"]) is not int
                         or any(body[key] != expected[key] for key in required - checks - {"challenge"})
                         or any(body[key] != expected[key] for key in body.keys() - required)):
                     raise AccessDenied()
@@ -440,7 +441,7 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
                 receipt = service.access.accept_grant(
                     principal, grant_id=grant.grant_id, expected_grant_version=grant.grant_version,
                     policies=service.policies, actions=body["actions"], interaction_id=interaction,
-                    connection=connection,
+                    expires_at=body["expires_at"], connection=connection,
                 )
                 sessions.record_acceptance_context(
                     session, acceptance_id=receipt.acceptance_id, interaction_id=interaction,

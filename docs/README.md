@@ -46,6 +46,7 @@ Historical verification records retain the observations of their named release.
 
 - [Golden Coding Standard](engineering/golden-coding-standard.md)
 - [Source comment review and validation](engineering/source-comment-review.md)
+- [Consent deadline and cleanup failure verification](engineering/consent-cleanup-verification.md)
 - [Performance policy](engineering/performance-policy.md)
 - [Historical foundation performance and organization review](engineering/performance-review.md)
 - [Validation](engineering/validation.md)

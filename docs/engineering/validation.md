@@ -50,7 +50,8 @@ Review dependency and license changes with the application change they support.
 The behavioral suite includes byte preservation, bounded ZIP/JSON/catalog
 intake, explicit association uncertainty, selected recovery, identity isolation,
 human acceptance/review, idempotency, publication/revocation ordering, process
-interruption, cleanup ownership, binary transfer, authorization ancestry,
+interruption, cleanup ownership and ledger failures, displayed consent-expiry
+binding, binary transfer, authorization ancestry,
 retention, portal boundaries, and the SDK's MCP transport. Synthetic fixtures
 keep these checks reproducible without private customer material.
 
@@ -59,6 +60,8 @@ identity provider, public reverse proxy, or actual host file picker. Generated
 schema validation also does not replace the runtime's cross-record integrity
 checks. The current evidence is recorded in
 [Private Pilot Validation](private-pilot-validation.md).
+The subsequent [consent and cleanup record](consent-cleanup-verification.md)
+identifies the targeted regression evidence and its source boundary.
 
 ## 2. Policy assets and private wheel
 
@@ -112,7 +115,7 @@ The committed workflow defines these jobs:
 | Job group | Configured checks |
 | --- | --- |
 | Ubuntu and Windows, Python 3.11 and 3.14 | Four standard-library jobs: syntax and behavioral discovery; optional dependencies remain absent |
-| Authenticated service and MCP, Linux/Python 3.12 | Pinned optional dependencies, complete Python discovery, canonical policy comparison, private wheel build |
+| Authenticated service and MCP, Linux/Python 3.12 | Pinned optional dependencies, complete Python discovery, synthetic loopback HTTP workflow, canonical policy comparison, private wheel build |
 | MCP Apps interface, Linux/Node 24 | Locked dependencies, TypeScript/build consistency, interface tests, Playwright synthetic host, retained browser evidence |
 
 Actions are pinned to immutable commit identifiers. Workflow permissions are

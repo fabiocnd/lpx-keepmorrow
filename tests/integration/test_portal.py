@@ -76,7 +76,7 @@ class PortalTests(unittest.TestCase):
         self.headers["X-CSRF-Token"] = session.json()["csrf"]
         return response, session.json()
 
-    def consent(self, resource_id="collection", generation=None, actions=None):
+    def prepare_consent(self, resource_id="collection", generation=None, actions=None):
         prepared = self.client.post("/api/consent/prepare", json={
             "resource_id": resource_id, "generation": generation or self.generation,
             "actions": actions or ["browse", "read"],
@@ -84,9 +84,13 @@ class PortalTests(unittest.TestCase):
         self.assertEqual(prepared.status_code, 200, prepared.text)
         body = {**prepared.json(), "accepted_terms": True, "acknowledged_privacy": True,
                 "authorized_scope": True, "eligible_content": True}
+        return prepared.json(), body
+
+    def consent(self, resource_id="collection", generation=None, actions=None):
+        prepared, body = self.prepare_consent(resource_id, generation, actions)
         accepted = self.client.post("/api/consent/accept", json=body, headers=self.headers)
         self.assertEqual(accepted.status_code, 200, accepted.text)
-        return prepared.json(), body
+        return prepared, body
 
     def wait_operation(self, operation_id):
         deadline = time.monotonic() + 10
@@ -138,15 +142,102 @@ class PortalTests(unittest.TestCase):
         for changes in (
             {"eligible_content": False}, {"accepted_terms": 1}, {"generation": "d" * 64},
             {"actions": ["browse", "read", "recover"]}, {"policies": {**prepare["policies"], "terms_sha256": "e" * 64}},
+            {"expires_at": prepare["expires_at"] + 1}, {"expires_at": prepare["expires_at"] - 1},
+            {"expires_at": float(prepare["expires_at"])}, {"expires_at": str(prepare["expires_at"])},
+            {"expires_at": True}, {"expires_at": None},
         ):
             with self.subTest(changes=changes):
                 refused = self.client.post("/api/consent/accept", json={**base, **changes}, headers=self.headers)
                 self.assertEqual(refused.status_code, 403, refused.text)
+        missing_expiry = {key: value for key, value in base.items() if key != "expires_at"}
+        refused = self.client.post("/api/consent/accept", json=missing_expiry, headers=self.headers)
+        self.assertEqual(refused.status_code, 400, refused.text)
         self.assertEqual(self.service.access.list_grants(self.principal), ())
         accepted = self.client.post("/api/consent/accept", json=base, headers=self.headers)
         self.assertEqual(accepted.status_code, 200, accepted.text)
+        self.assertEqual(accepted.json()["expires_at"], prepare["expires_at"])
         replay = self.client.post("/api/consent/accept", json=base, headers=self.headers)
         self.assertEqual(replay.status_code, 403, replay.text)
+
+    def test_delayed_acceptance_retains_the_reviewed_deadline_and_scope_digest(self) -> None:
+        now = int(time.time())
+        sessions = self.app.state.human_sessions
+        with (patch("keepmorrow.application.service.time.time", side_effect=lambda: now),
+              patch.object(self.service.access, "_clock", side_effect=lambda: now),
+              patch.object(sessions, "clock", side_effect=lambda: now)):
+            self.login()
+            prepared, body = self.prepare_consent()
+            self.assertIs(type(prepared["expires_at"]), int)
+            self.assertEqual(prepared["expires_at"], now + 3600)
+            grant = self.service.access.get_grant(self.principal, grant_id=prepared["grant_id"])
+            self.assertEqual(grant.expires_at, prepared["expires_at"])
+            now += 120
+            accepted = self.client.post("/api/consent/accept", json=body, headers=self.headers)
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            self.assertEqual(accepted.json()["expires_at"], prepared["expires_at"])
+            snapshot = {key: value for key, value in prepared.items() if key != "challenge"}
+            digest = hashlib.sha256(json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            with self.service.database.transaction(immediate=False) as connection:
+                receipt = connection.execute("SELECT * FROM km_access_acceptances").fetchone()
+                context = connection.execute("SELECT * FROM km_human_acceptance_context").fetchone()
+            self.assertEqual(receipt["accepted_at"], now)
+            self.assertEqual(receipt["expires_at"], prepared["expires_at"])
+            self.assertLess(receipt["expires_at"] - receipt["accepted_at"], 3600)
+            self.assertEqual(context["scope_sha256"], digest)
+
+    def test_changed_grant_expiry_cannot_reuse_the_original_review_challenge(self) -> None:
+        self.login()
+        prepared, body = self.prepare_consent()
+        changed_expiry = prepared["expires_at"] + 60
+        # Simulate a changed authoritative deadline after presentation. Echoing
+        # the new value must not turn the old challenge into a fresh decision.
+        with self.service.database.transaction() as connection:
+            connection.execute("UPDATE km_access_grants SET expires_at = ? WHERE grant_id = ?",
+                               (changed_expiry, prepared["grant_id"]))
+        for submitted in (body, {**body, "expires_at": changed_expiry}):
+            refused = self.client.post("/api/consent/accept", json=submitted, headers=self.headers)
+            self.assertEqual(refused.status_code, 403, refused.text)
+        with self.service.database.transaction() as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM km_access_acceptances").fetchone()[0], 0)
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM km_human_acceptance_context").fetchone()[0], 0)
+            self.assertIsNone(connection.execute("SELECT consumed_at FROM km_human_challenges").fetchone()[0])
+            connection.execute("UPDATE km_access_grants SET expires_at = ? WHERE grant_id = ?",
+                               (prepared["expires_at"], prepared["grant_id"]))
+        accepted = self.client.post("/api/consent/accept", json=body, headers=self.headers)
+        self.assertEqual(accepted.status_code, 200, accepted.text)
+
+    def test_grant_and_review_challenge_expiration_refuse_partial_acceptance(self) -> None:
+        now = int(time.time())
+        sessions = self.app.state.human_sessions
+        with (patch("keepmorrow.application.service.time.time", side_effect=lambda: now),
+              patch.object(self.service.access, "_clock", side_effect=lambda: now),
+              patch.object(sessions, "clock", side_effect=lambda: now)):
+            for boundary, grant_lifetime, elapsed in (("grant", 30, 30), ("challenge", 3600, 300)):
+                with self.subTest(boundary=boundary):
+                    self.login()
+                    grant = self.service.access.create_grant(
+                        self.principal, resource_id="collection", generation=self.generation,
+                        actions=["read"], purpose="eligible_preservation", recipient="local_operator",
+                        expires_at=now + grant_lifetime,
+                    )
+                    with patch.object(self.service, "prepare_consent", return_value=grant):
+                        prepared, body = self.prepare_consent(actions=["read"])
+                    self.assertEqual(prepared["expires_at"], grant.expires_at)
+                    now += elapsed
+                    refused = self.client.post("/api/consent/accept", json=body, headers=self.headers)
+                    self.assertEqual(refused.status_code, 403, refused.text)
+                    with self.service.database.transaction(immediate=False) as connection:
+                        self.assertEqual(connection.execute("SELECT COUNT(*) FROM km_access_acceptances").fetchone()[0], 0)
+                        self.assertEqual(connection.execute("SELECT COUNT(*) FROM km_human_acceptance_context").fetchone()[0], 0)
+                        self.assertEqual(connection.execute("SELECT COUNT(*) FROM km_human_challenges WHERE consumed_at IS NOT NULL").fetchone()[0], 0)
+
+    def test_new_session_for_same_principal_cannot_submit_an_old_consent_challenge(self) -> None:
+        self.login()
+        _, body = self.prepare_consent()
+        self.login()
+        refused = self.client.post("/api/consent/accept", json=body, headers=self.headers)
+        self.assertEqual(refused.status_code, 403, refused.text)
+        self.assertEqual(self.service.access.list_grants(self.principal), ())
 
     def test_query_requires_current_scope_before_content_io_and_revocation_blocks_later_reads(self) -> None:
         self.login()

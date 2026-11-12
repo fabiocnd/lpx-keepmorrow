@@ -73,8 +73,9 @@ environment isolates each command's network: server and client stay in the same
 command. It does not expose a preview URL or leave a hosted service running.
 
 The runner accepts no source-content path. It builds its own synthetic export
-with a PNG and opaque binary fixtures. It checks upload authorization, exact
-review, idempotent start, queries, selected recovery, download integrity,
+with a PNG and opaque binary fixtures. It checks upload authorization, fixed
+consent deadlines and refusal of deadline edits, exact review, idempotent start,
+queries, selected recovery, download integrity,
 ancestor revocation, and logout. Its acceptance and review gestures are test
 fixtures, not actual human or legal acceptance. The JSON report excludes keys,
 cookies, runtime paths, and operation/resource handles.
@@ -200,7 +201,13 @@ marker merely to make a directory deletable. Global temporary directories are
 never swept by prefix.
 
 `workspace_cleanup_required` or `journal_unavailable` on the worker requires
-operator attention. Cleanup ambiguity retains capacity and stops new claims.
+operator attention. A classified workspace cleanup failure retains the worker's
+reservation and stops new claims, including a failure to read or retire its
+ownership ledger. If directory removal succeeded before the ledger transaction
+failed, the ledger can remain while the directory is already absent. Preserve
+that state for normal startup recovery; do not recreate a marker or manually
+clear the reservation. Persistent cleanup errors block startup before old
+operation holds are reconciled.
 After addressing the underlying problem, restart through the normal ownership
 and reconciliation path. A verified published output can remain completed while
 temporary cleanup is unresolved; publication and cleanup are separate facts.
@@ -212,6 +219,13 @@ retention. The default delivery-package lifetime is 24 hours; the configured
 pilot range is 60 seconds through seven days. Package expiration is measured
 from operation creation, so a delayed job can have less delivery time remaining.
 The human portal displays the configured limits.
+
+Before acceptance, the portal also displays the authorization deadline in UTC.
+It is fixed when the scope is prepared and is not extended by delayed
+submission. Sign-in and confirmation can expire sooner. After updating the
+service, reload the portal and prepare a fresh scope; older forms that lack the
+required deadline are refused. Existing accepted grants retain their recorded
+expiration.
 
 Maintenance runs on startup after reconciliation and periodically while the
 service is running. Active upload pins prevent cleanup of borrowed bytes.

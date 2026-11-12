@@ -12,7 +12,7 @@ const state = { session: null, config: null, resources: [], collections: [], con
 const pendingControls = new WeakSet();
 // Submit only the reviewed declaration fields. Additional display metadata from
 // a newer server must not silently become an accepted processing instruction.
-const CONSENT_FIELDS = ["grant_id", "grant_version", "resource_id", "generation", "actions", "policies", "challenge",
+const CONSENT_FIELDS = ["grant_id", "grant_version", "expires_at", "resource_id", "generation", "actions", "policies", "challenge",
   "purpose", "recipient", "eligibility_version", "eligibility_statement"];
 const CONSENT_CHECKS = ["accepted_terms", "acknowledged_privacy", "authorized_scope", "eligible_content"];
 
@@ -350,7 +350,15 @@ bind("scope-form", "submit", async () => {
   const prepared = await api("/api/consent/prepare", { method: "POST", body: { resource_id: selected.resource_id,
     generation: selected.generation, actions } });
   if (version !== state.consentVersion) throw new StaleSelection();
+  if (!Number.isSafeInteger(prepared.expires_at) || prepared.expires_at < 0 || prepared.expires_at > 253402300799) {
+    state.consent = null;
+    byId("consent-dialog").close();
+    throw new Error("The service did not provide a valid authorization expiration. Request a new scope review.");
+  }
+  // Format only the presentation; acceptance echoes the exact reviewed UTC seconds.
+  const expiration = new Date(prepared.expires_at * 1000).toISOString().replace("T", " ").replace(".000Z", " UTC");
   state.consent = prepared;
+  byId("consent-expiration").textContent = `Authorization expires at ${expiration}.`;
   const { challenge, ...display } = state.consent;
   byId("consent-details").replaceChildren(details(display));
   if (state.consent.eligibility_statement) byId("eligibility-copy").textContent = state.consent.eligibility_statement;

@@ -215,12 +215,22 @@ class PortalSmoke:
         prepared = self.document("POST", "/api/consent/prepare", json={
             "resource_id": resource, "generation": generation, "actions": actions,
         })
+        expires_at = prepared.get("expires_at")
+        require(type(expires_at) is int, "consent_deadline_missing_or_invalid")
         body = {**prepared, "accepted_terms": True, "acknowledged_privacy": True,
                 "authorized_scope": True, "eligible_content": True}
         self.request("POST", "/api/consent/accept", expected=403,
                      json={**body, "authorized_scope": False})
-        require(self.document("POST", "/api/consent/accept", json=body)["accepted"] is True,
-                "synthetic_acceptance_not_recorded")
+        # Refused deadline edits must not consume the challenge needed to accept
+        # the original displayed scope through the real HTTP boundary.
+        self.request("POST", "/api/consent/accept", expected=403,
+                     json={**body, "expires_at": expires_at + 1})
+        self.checks["changed_consent_deadline_refused"] = True
+        accepted = self.document("POST", "/api/consent/accept", json=body)
+        require(accepted["accepted"] is True, "synthetic_acceptance_not_recorded")
+        require(type(accepted.get("expires_at")) is int and accepted["expires_at"] == expires_at,
+                "accepted_consent_deadline_changed")
+        self.checks["consent_deadline_preserved_in_receipt"] = True
         self.request("POST", "/api/consent/accept", expected=403, json=body)
         self.checks["explicit_scope_and_single_use_acceptance"] = True
         return prepared

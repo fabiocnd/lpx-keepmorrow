@@ -91,7 +91,10 @@
   <!-- Keep every acceptance input unchecked in the source. JavaScript resets
        the form for each displayed scope; the server verifies the exact receipt. -->
   <dialog id="consent-dialog" aria-labelledby="consent-title">
-    <form id="consent-form"><p class="eyebrow">A deliberate choice</p><h2 id="consent-title">Review access and processing</h2><div id="consent-details"></div>
+    <form id="consent-form"><p class="eyebrow">A deliberate choice</p><h2 id="consent-title">Review access and processing</h2>
+      <p id="consent-expiration"></p>
+      <p class="help">Your sign-in or this review may expire earlier. Review the scope again if prompted.</p>
+      <div id="consent-details"></div>
       <p><a href="/policies/terms" target="_blank" rel="noopener">Read the Terms of Use</a> · <a href="/policies/privacy" target="_blank" rel="noopener">Read the Privacy Notice</a></p>
       <p class="help">Private information can remain in preserved bytes, names, and output copies. Native project relationships and files absent from the supplied material may not be recoverable. Mandatory legal rights remain applicable.</p>
       <label class="check"><input name="accepted_terms" type="checkbox"><span>I have had the opportunity to read and agree to the displayed Terms of Use.</span></label>

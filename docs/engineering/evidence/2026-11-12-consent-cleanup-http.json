@@ -1,0 +1,112 @@
+{
+  "acceptance": "Synthetic test gestures only; not human or legal acceptance.",
+  "chatgpt_connection_verified": false,
+  "checks": {
+    "changed_consent_deadline_refused": true,
+    "consent_deadline_preserved_in_receipt": true,
+    "download_matches_delivery_digest": true,
+    "download_requires_separate_consent": true,
+    "enclosed_manifest_and_files_verified": true,
+    "explicit_scope_and_single_use_acceptance": true,
+    "idempotent_start": true,
+    "logout_ends_http_session": true,
+    "review_is_single_use": true,
+    "revocation_blocks_source_reads_and_derived_download": true,
+    "scoped_browse_search_read_and_verify": true,
+    "selected_conversation_only": true,
+    "supplied_binary_and_image_bytes_preserved": true,
+    "unauthenticated_access_refused": true,
+    "unreviewed_start_refused": true,
+    "unselected_source_files_excluded": true,
+    "upload_digest_and_length_verified": true,
+    "upload_requires_prior_consent": true
+  },
+  "delivery": {
+    "binaries": [
+      {
+        "fixture": "assets/build.apk",
+        "sha256": "5879bebc2de816b3c6bb6c564b6b49ec86bd4e693c5881a8ae1d697b0b97cc24",
+        "size_bytes": 32
+      },
+      {
+        "fixture": "assets/character.glb",
+        "sha256": "6481a5eef6352ac588b9be8bc81251166e6f3c1c359a5284d76bc7be6366a51d",
+        "size_bytes": 29
+      },
+      {
+        "fixture": "assets/diagram.png",
+        "sha256": "ca9cf2a6ea27541264c4fc55257fd9ebb835f204d73e66bda409d02a7c4474e9",
+        "size_bytes": 70
+      }
+    ],
+    "manifest_sha256": "c3086b89c3717288327a700862897366b88ea527f4414cc40085febbcd045097",
+    "selected_conversations": 1,
+    "sha256": "d59e890ce5bd47c14dbdc1f9360f128a3f91cf62562444bf4136776e52990e84",
+    "size_bytes": 19903,
+    "verified_payload_files": 6
+  },
+  "distribution": {
+    "filename": "lpx_keepmorrow-0.3.0-py3-none-any.whl",
+    "installed_package_verified": true,
+    "python_version": "3.12.14",
+    "sha256": "4e2ac26765bd05fb811c5efa9da66560bd7f9a66bb52388285d909970372ed54",
+    "size_bytes": 356760,
+    "source_commit_before_changes": "18f1295831b4781185f027c4c6f77363cebdf087"
+  },
+  "elapsed_seconds": 0.562374,
+  "format": "lpx-keepmorrow.synthetic-http-smoke",
+  "http_status_counts": {
+    "200": 40,
+    "201": 1,
+    "400": 3,
+    "401": 2,
+    "403": 20
+  },
+  "input": {
+    "conversations": 4,
+    "sha256": "d763703d5f34cf75a56402954ee9feed16caa0739d3c2d60965dd7ba608c89b3",
+    "size_bytes": 3840
+  },
+  "live_oauth_verified": false,
+  "observed_at": "2026-11-12T18:42:33.450466+00:00",
+  "operations": [
+    {
+      "coverage_gaps": [
+        "association_unknown",
+        "unresolved_artifacts",
+        "unsupported_records"
+      ],
+      "kind": "import",
+      "state": "partial"
+    },
+    {
+      "coverage_gaps": [
+        "selection_omissions",
+        "unresolved_artifacts",
+        "unsupported_records"
+      ],
+      "kind": "recovery",
+      "state": "partial"
+    },
+    {
+      "coverage_gaps": [
+        "selection_omissions",
+        "unresolved_artifacts",
+        "unsupported_records"
+      ],
+      "kind": "package",
+      "state": "partial"
+    }
+  ],
+  "real_user_content_processed": false,
+  "runner_sha256": "ddd67c7d2179321528e905c0f0937025f9ecff92df12ee6da917909c4f3bcb9d",
+  "schema_version": 1,
+  "service_lifecycle": {
+    "exit_code": 0,
+    "graceful_shutdown": true,
+    "launched_by_runner": true,
+    "readiness_checked": true
+  },
+  "status": "passed",
+  "transport": "loopback_http_socket"
+}

@@ -18,7 +18,7 @@ import uuid
 from ..archive.filesystem import open_regular, safe_directory
 from ..archive.model import ArchiveError
 from ..operations.model import OperationBusy, OperationCleanupRequired, OperationError, require_opaque_id
-from ..persistence import SQLiteDatabase
+from ..persistence import PersistenceError, SQLiteDatabase
 
 _MARKER = ".keepmorrow-owner.json"
 _MAX_WORKSPACES = 1024
@@ -130,9 +130,9 @@ class OperationWorkspaces:
     def workspace(self, operation_id: str, output_id: str) -> Iterator[Path]:
         """Retain ownership through execution, verification, and handled cleanup.
 
-        Classified filesystem and ownership failures propagate as
-        OperationCleanupRequired, causing the worker to retain its reservation.
-        Metadata transaction errors propagate separately.
+        Filesystem, ownership, and database failures during discard propagate as
+        OperationCleanupRequired. When this reaches OperationWorker, it retains
+        the operation's reservation and stops further claims.
         """
         directory = self.create(operation_id, output_id)
         try:
@@ -141,15 +141,23 @@ class OperationWorkspaces:
             self.discard(operation_id, output_id)
 
     def discard(self, operation_id: str, output_id: str) -> None:
-        """Delete only a matching owned workspace after its I/O has stopped."""
+        """Delete an owned workspace and retire its ledger record after I/O stops.
+
+        Database failures leave cleanup unconfirmed even if the directory is
+        already absent. Preserve that distinction with OperationCleanupRequired
+        so callers cannot treat an uncertain ledger transition as completed cleanup.
+        """
         require_opaque_id(operation_id)
         require_opaque_id(output_id)
-        with self.database.transaction(immediate=False) as connection:
-            row = connection.execute(
-                "SELECT w.* FROM km_operation_workspaces AS w JOIN km_operations AS o "
-                "ON o.operation_id = w.operation_id AND o.output_id = w.output_id "
-                "WHERE w.operation_id = ? AND w.output_id = ?", (operation_id, output_id),
-            ).fetchone()
+        try:
+            with self.database.transaction(immediate=False) as connection:
+                row = connection.execute(
+                    "SELECT w.* FROM km_operation_workspaces AS w JOIN km_operations AS o "
+                    "ON o.operation_id = w.operation_id AND o.output_id = w.output_id "
+                    "WHERE w.operation_id = ? AND w.output_id = ?", (operation_id, output_id),
+                ).fetchone()
+        except (PersistenceError, sqlite3.Error) as error:
+            raise OperationCleanupRequired("The operation workspace ownership record is unavailable.") from error
         if row is None:
             raise OperationCleanupRequired("The operation workspace has no matching ownership record.")
         directory = self.scratch_root / output_id
@@ -163,11 +171,16 @@ class OperationWorkspaces:
                 shutil.rmtree(directory)
         except (OSError, ArchiveError, OperationError) as error:
             raise OperationCleanupRequired("The operation workspace could not be removed safely.") from error
-        with self.database.transaction() as connection:
-            connection.execute(
-                "DELETE FROM km_operation_workspaces WHERE operation_id = ? AND ownership_token = ?",
-                (operation_id, row["ownership_token"]),
-            )
+        try:
+            with self.database.transaction() as connection:
+                connection.execute(
+                    "DELETE FROM km_operation_workspaces WHERE operation_id = ? AND ownership_token = ?",
+                    (operation_id, row["ownership_token"]),
+                )
+        except (PersistenceError, sqlite3.Error) as error:
+            raise OperationCleanupRequired(
+                "The operation workspace cleanup record retirement could not be confirmed.",
+            ) from error
 
     def recover_interrupted(self) -> int:
         """Remove proven orphan workspaces before any new application admission.

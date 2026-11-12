@@ -33,6 +33,7 @@ async function fixture() {
   const policies = { terms: { version: "terms-v1", sha256: "f".repeat(64) }, privacy: { version: "privacy-v1", sha256: "1".repeat(64) } };
   const consent = { grant_id: "grant_1", grant_version: 1, resource_id: workspace.resource_id,
     generation: workspace.generation, actions: ["upload"], policies, challenge: "consent_challenge",
+    expires_at: 9_999_999_999,
     purpose: "eligible_preservation", recipient: "local_operator", eligibility_version: "eligible-content-v1",
     eligibility_statement: "I have authority to process this selection.", future_display_metadata: "ignored by strict submission" };
   const plan = { plan_id: "plan_1", kind: "package", state: "prepared", parameters: {}, scope: resources[0],
@@ -83,7 +84,7 @@ async function fixture() {
   };
   const openPlan = async () => { node("plan-id").value = "plan_1"; await submit("open-plan-form"); };
   const approvePlan = () => { node("approve-plan").checked = true; change(node("approve-plan")); };
-  return { dom, window, calls, overrides, node, click, submit, change, file, openPlan, approvePlan,
+  return { dom, window, calls, overrides, consent, node, click, submit, change, file, openPlan, approvePlan,
     callsTo: (path) => calls.filter((call) => call.path === path) };
 }
 
@@ -103,10 +104,13 @@ test("all consent decisions are required and only the displayed strict snapshot 
   selected.checked = true;
   await f.submit("scope-form");
   assert.equal(f.node("consent-dialog").open, true);
+  assert.equal(f.node("consent-expiration").textContent, "Authorization expires at 2286-11-20 17:46:39 UTC.");
+  assert.ok(f.node("consent-details").textContent.includes("9999999999"));
   assert.equal(f.node("accept-consent").disabled, true);
   await f.submit("consent-form");
   assert.equal(f.callsTo("/api/consent/accept").length, 0);
   const checks = [...f.node("consent-form").querySelectorAll('input[type="checkbox"]')];
+  assert.ok(checks.every((input) => !input.checked));
   for (const input of checks.slice(0, -1)) { input.checked = true; f.change(input); }
   assert.equal(f.node("accept-consent").disabled, true);
   checks.at(-1).checked = true;
@@ -116,10 +120,37 @@ test("all consent decisions are required and only the displayed strict snapshot 
   assert.equal(accepted.body.grant_id, "grant_1");
   assert.equal(accepted.body.challenge, "consent_challenge");
   assert.equal(accepted.body.generation, "workspace_v1");
+  assert.equal(accepted.body.expires_at, 9_999_999_999);
   for (const name of ["accepted_terms", "acknowledged_privacy", "authorized_scope", "eligible_content"]) assert.equal(accepted.body[name], true);
   assert.ok(!("future_display_metadata" in accepted.body));
   assert.equal(accepted.headers["X-CSRF-Token"], "synthetic_csrf");
   assert.equal(accepted.credentials, "same-origin");
+  f.dom.window.close();
+});
+
+test("missing or invalid consent expiration cannot leave an earlier scope available for acceptance", async () => {
+  const f = await fixture();
+  f.node("scope-actions").querySelector('input[value="upload"]').checked = true;
+  await f.submit("scope-form");
+  const checks = [...f.node("consent-form").querySelectorAll('input[type="checkbox"]')];
+  for (const input of checks) { input.checked = true; f.change(input); }
+  assert.equal(f.node("accept-consent").disabled, false);
+  for (const expiresAt of [undefined, null, true, "9999999999", 1.5, -1, 253402300800]) {
+    if (expiresAt === undefined) delete f.consent.expires_at;
+    else f.consent.expires_at = expiresAt;
+    await f.submit("scope-form");
+    assert.equal(f.node("consent-dialog").open, false);
+    assert.equal(f.node("accept-consent").disabled, true);
+    assert.match(f.node("notice").textContent, /valid authorization expiration/);
+    await f.submit("consent-form");
+    assert.equal(f.callsTo("/api/consent/accept").length, 0);
+  }
+  f.consent.expires_at = 9_999_999_999;
+  await f.submit("scope-form");
+  assert.equal(f.node("consent-dialog").open, true);
+  assert.equal(f.node("accept-consent").disabled, true);
+  assert.ok(checks.every((input) => !input.checked));
+  assert.equal(f.callsTo("/api/consent/accept").length, 0);
   f.dom.window.close();
 });
 

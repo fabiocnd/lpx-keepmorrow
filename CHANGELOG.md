@@ -12,6 +12,9 @@
 - A [source comment review record](docs/engineering/source-comment-review.md)
   covering authored files, interface preservation, local validation, regenerated
   distribution hashes, and separately identified implementation follow-ups.
+- A [consent and cleanup verification record](docs/engineering/consent-cleanup-verification.md)
+  with reproduced metadata-failure cases, fixed-deadline consent tests, and
+  installed-wheel HTTP evidence.
 
 ### Changed
 
@@ -26,6 +29,15 @@
 
 ### Fixed
 
+- Consent preparation now displays the grant's fixed expiration in UTC and
+  binds its exact integer timestamp to the review challenge, acceptance receipt,
+  and retained context. Missing, changed, or invalid deadlines are refused;
+  delayed submission cannot extend the reviewed authorization.
+- Workspace cleanup now classifies ownership-read and ledger-retirement database
+  errors as unresolved cleanup. Worker execution retains its reservation and
+  stops further claims until ordered recovery succeeds, including an error
+  reported after ledger deletion committed. Regression tests cover persistent
+  startup refusal and preservation of unrelated bytes.
 - The serial application-service fixture now waits for executor reservation
   release after terminal status, preventing a Windows scheduling race between
   workspace cleanup and the next content request. Service admission and cleanup

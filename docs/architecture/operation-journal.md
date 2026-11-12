@@ -210,13 +210,28 @@ both its database record and matching marker. Unknown directories are preserved.
 Missing, conflicting, or incomplete markers require operator review; the code
 never invents replacement ownership evidence to enable deletion.
 
-Filesystem and ownership cleanup failures are classified as
-`OperationCleanupRequired`. The initial cleanup-ledger read and final ledger
-deletion use transactions outside that classification boundary. A source review
-identified a possible early reservation release if the initial read fails
-transiently and subsequent worker database calls recover. This sequence has not
-been reproduced in a test; its failure-injection qualification is recorded in
-the [source comment review](../engineering/source-comment-review.md).
+Filesystem, ownership, and expected persistence failures during workspace
+discard are classified as `OperationCleanupRequired`. The classification covers
+the initial ownership-ledger read and the final ledger deletion transaction,
+including commit failure. When this exception leaves a live worker executor,
+the worker retains `worker_released = 0`, stops new claims, and closes its
+ownership session after execution unwinds. A previously recorded completed or
+partial result remains distinct from unresolved temporary cleanup.
+
+The final ledger transaction follows directory removal. If that transaction
+fails, the directory may already be absent while its ledger record remains.
+Startup can retire that record without recreating a marker or adopting another
+directory. A finalization error can also follow a successful commit, leaving
+both directory and ledger absent; startup then proceeds to normal operation
+reconciliation after cleanup recovery succeeds. A persistent recovery failure
+stops startup before reconciliation can release old holds. Unknown directories
+remain untouched.
+
+The worker reservation guarantee applies to worker execution and its startup
+reconciliation. Other callers, including download verification, receive the
+cleanup exception at their own boundary; the workspace helper itself does not
+own a worker reservation. Regression evidence is recorded in
+[consent and cleanup verification](../engineering/consent-cleanup-verification.md).
 
 The output inspector runs outside the SQLite transaction while the exclusive
 worker lock remains held. It returns `None` only after establishing that the

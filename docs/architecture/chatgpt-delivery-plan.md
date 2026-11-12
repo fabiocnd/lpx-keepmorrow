@@ -65,9 +65,10 @@ for the implemented pilot.
 Account linking, policy acceptance, processing scope, and exact operation review
 are separate decisions. The consent preparation view displays the current
 version and digest of each policy, resource/generation, actions, purpose,
-recipient, and eligibility declaration. The service enforces grant expiration,
-but the preparation response does not currently include its timestamp; that
-presentation gap remains part of live consent qualification. No checkbox is
+recipient, eligibility declaration, and fixed authorization deadline in UTC.
+The exact integer deadline participates in the displayed-scope digest and must
+match the current grant when accepted; submission does not extend it. The
+shorter confirmation and browser-session lifetimes still apply. No checkbox is
 preselected. No MCP tool can record acceptance or approve a plan.
 
 An active operation remains bound to its exact reviewed grant/version/receipt.
@@ -115,10 +116,11 @@ returns the existing operation; changing intent under that key fails.
 The exclusive worker holds its OS lock during live executor work. Terminal
 status can precede cleanup and reservation release. A failure classified as
 `OperationCleanupRequired` retains the reservation and stops new claims; the
-[operation protocol](operation-journal.md) explains the separate metadata-error
-boundary. Cancellation is cooperative. Metadata status/cancellation remain
-outside the heavy-content slot. Startup recovers proven owned scratch and upload
-pins, reconciles publication, and only then performs retention cleanup.
+[operation protocol](operation-journal.md) includes cleanup-ledger transaction
+failures in that boundary. Cancellation is cooperative. Metadata status and
+cancellation remain outside the heavy-content slot. Startup recovers proven
+owned scratch and upload pins, reconciles publication, and only then performs
+retention cleanup.
 
 Default limits include 128 MiB uploads, a 512 MiB collection payload, independent
 1 GiB encoded/expanded package ceilings, a 2 GiB job reservation, and 4 GiB managed
