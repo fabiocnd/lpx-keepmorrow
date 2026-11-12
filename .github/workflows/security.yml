@@ -43,13 +43,22 @@ jobs:
           mkdir "$RUNNER_TEMP/source-snapshot"
           git archive HEAD | tar -x -C "$RUNNER_TEMP/source-snapshot"
           status=0
-          "$RUNNER_TEMP/gitleaks-bin/gitleaks" dir "$RUNNER_TEMP/source-snapshot" --redact=100 --no-banner --report-format=json --report-path="$RUNNER_TEMP/gitleaks-source.json" || status=$?
+          "$RUNNER_TEMP/gitleaks-bin/gitleaks" dir "$RUNNER_TEMP/source-snapshot" --config="$GITHUB_WORKSPACE/.gitleaks.toml" --redact=100 --no-banner --report-format=json --report-path="$RUNNER_TEMP/gitleaks-source.json" || status=$?
           # Never print source lines, matches, credential values, or the full report.
           python -c 'import json,sys; from pathlib import Path; p=Path(sys.argv[1]); items=json.loads(p.read_text()) if p.exists() else []; print(json.dumps([{k:x.get(k) for k in ("RuleID","File","StartLine","EndLine")} for x in items],indent=2))' "$RUNNER_TEMP/gitleaks-source.json"
           exit "$status"
+      - name: Validate the fresh-root publication history in isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This temporary repository has no remote and never imports private refs.
+          git -C "$RUNNER_TEMP/source-snapshot" init --quiet --initial-branch=main
+          git -C "$RUNNER_TEMP/source-snapshot" add .
+          git -C "$RUNNER_TEMP/source-snapshot" -c user.name='Synthetic source validation' -c user.email='synthetic@example.test' commit --quiet -m 'Validate the reviewed source snapshot'
+          "$RUNNER_TEMP/gitleaks-bin/gitleaks" git "$RUNNER_TEMP/source-snapshot" --config="$GITHUB_WORKSPACE/.gitleaks.toml" --log-opts="--all" --redact=100 --no-banner
       - name: Scan the complete public history
         if: github.event.repository.private == false
-        run: '"$RUNNER_TEMP/gitleaks-bin/gitleaks" git --log-opts="--all" --redact=100 --no-banner'
+        run: '"$RUNNER_TEMP/gitleaks-bin/gitleaks" git --config=.gitleaks.toml --log-opts="--all" --redact=100 --no-banner'
 
   codeql:
     name: CodeQL / ${{ matrix.language }}
