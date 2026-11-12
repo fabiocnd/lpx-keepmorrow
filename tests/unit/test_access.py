@@ -1,5 +1,6 @@
 """Challenge identity isolation, scoped consent, policy freshness, and metadata safety."""
 
+from contextlib import closing
 from dataclasses import replace
 import os
 from pathlib import Path
@@ -362,8 +363,9 @@ class AccessPersistenceTests(unittest.TestCase):
 
     def test_unknown_database_is_never_adopted_or_overwritten(self) -> None:
         unknown = Path(self.temporary.name) / "foreign.sqlite3"
-        with sqlite3.connect(unknown) as connection:
+        with closing(sqlite3.connect(unknown)) as connection:
             connection.execute("CREATE TABLE other_application (value TEXT)")
+            connection.commit()
         unknown.chmod(0o600)
         before = unknown.read_bytes()
         with self.assertRaises(PersistenceError):

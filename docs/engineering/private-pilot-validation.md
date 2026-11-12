@@ -10,7 +10,7 @@
 
 **Release:** 0.3.0 reference service
 
-**Status:** Local reference validation; live release gates remain open
+**Status:** Local validation and initial hosted CI; corrected Windows rerun pending
 
 This record separates implemented and locally exercised behavior from evidence
 that requires the intended deployment host, identity provider, ChatGPT account,
@@ -55,8 +55,44 @@ PYTHONPATH=src .venv-core/bin/python -m unittest discover -s tests -q
 The 55 skips are part of the result; optional integration tests did not execute
 without their dependencies. Run `npm test` from `ui/chatgpt` for the UI suite and
 follow its [build and validation instructions](../../ui/chatgpt/README.md).
-Browser visual execution was not completed locally. No remote CI outcome for
-this release is claimed in this record.
+Browser execution was not completed locally. Hosted synthetic browser evidence
+is recorded separately below.
+
+## Initial hosted CI and fixture correction
+
+[Workflow run 43244942226](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43244942226)
+executed source commit `fed82b5eddd4cd6235187d6fd688ac3d079aa5d4`. The job logs
+establish these results:
+
+| Job | Recorded outcome |
+| --- | --- |
+| Ubuntu, CPython 3.11.18 | 331 discovered; 55 skipped; successful in 5.456 seconds |
+| Ubuntu, CPython 3.14.10 | 331 discovered; 55 skipped; successful in 3.310 seconds |
+| Complete optional service, CPython 3.12.16 | 331 passed; zero skips; 8.078 seconds; policy comparison and wheel build passed |
+| MCP Apps interface, Node 24 | Type checking and bundle comparison passed; 28 interface tests passed with zero skips; eight Playwright synthetic-host tests passed in 28.1 seconds |
+| Windows Server 2025, CPython 3.11.9 | 331 discovered; 58 skipped; one fixture-cleanup error; 35.003 seconds |
+| Windows Server 2025, CPython 3.14.10 | 331 discovered; 58 skipped; the same fixture-cleanup error; 39.718 seconds |
+
+Both Windows jobs exposed an open connection in the foreign-database rejection
+test. Python's SQLite connection context commits or rolls back a transaction;
+it does not close the connection. Windows therefore refused to delete the
+fixture file during temporary-directory cleanup. Python 3.14 also reported the
+unclosed connection as a resource warning.
+
+The test now explicitly commits and closes its independent fixture connection
+before the existing refusal and byte-preservation assertions. The five access
+persistence tests passed locally after this correction. Production modules and
+the benchmark source remain unchanged. A corrected hosted run is required before
+the Windows matrix can be reported as passing.
+
+All 49 operation and workspace tests passed in each original Windows job. The
+58 skips comprise 55 optional-dependency checks and three platform conditions:
+unavailable named pipes, a case-insensitive filesystem that cannot construct the
+collision fixture, and the POSIX permission/link contract.
+
+The hosted browser result exercises a synthetic host. It does not establish a
+live ChatGPT connection, external identity-provider configuration, or visual
+review of a particular deployment.
 
 ## Operation and workspace evidence
 
@@ -187,7 +223,7 @@ claiming a universal cancellation deadline.
 | Live identity provider | Registered clients, PKCE/browser flow, issuer/audience/JWKS validation, token expiry/rotation, session behavior | Synthetic verifier and protocol tests do not prove a deployed provider configuration |
 | Actual binary transfer | Host-supported upload selection and one authenticated output downloaded and independently verified | Local byte round trips are available; host-specific delivery must be observed |
 | Representative export | Explicit intake/review consent, inventory, actual images/binaries and missing-artifact report, branch/association findings | No user-authorized representative archive was supplied for this validation |
-| Browser visual review | Desktop/mobile screenshots, consent readability, keyboard/focus behavior, host iframe behavior | See the UI package's current validation record; DOM tests alone do not establish visual quality |
+| Browser visual review | Desktop/mobile screenshots, consent readability, keyboard/focus behavior, host iframe behavior | Eight hosted synthetic browser tests passed; artifact review and actual host behavior remain separate evidence in the UI package's validation record |
 | Deployment envelope | Measured RSS/storage/I/O, load rejection, dependency failures, retention, restart, backup/rollback on selected host | No production host or load envelope has been qualified |
 | Legal release review | Correct entity/jurisdiction facts, operative privacy/retention disclosures, review of mandatory rights and liability limitations | Draft policy text and enforced acceptance do not establish legal enforceability |
 | Open-source publication | Adopted release and contribution terms, complete third-party attribution, reviewed release contents, and an explicit publication decision | The transition is planned; no replacement source license or public release is established by this validation |

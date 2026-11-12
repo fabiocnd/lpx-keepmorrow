@@ -3,7 +3,7 @@
 **Publisher:** Lopix Neural Inc.
 **Engineering lead:** Fabio de Sousa Lopes
 **Contact:** fabio@lopixneural.com
-**Status:** Implemented interface and local protocol/DOM tests; actual browser and ChatGPT host validation pending
+**Status:** Implemented interface; local protocol/DOM tests and remote Chromium synthetic-host tests passed; actual ChatGPT host validation pending
 
 This optional TypeScript interface accompanies the authenticated Keepmorrow
 service. It uses the official `@modelcontextprotocol/ext-apps` `App` class for
@@ -147,7 +147,7 @@ configured `KEEPMORROW_CHROMIUM`, a local `/usr/bin/chromium`, or Playwright's
 installed browser. On other machines, install the supported browser using
 `npx playwright install chromium` before running the gate.
 
-Observed on 2026-11-12 with Node.js 24.22.1:
+Observed locally on 2026-11-12 with Node.js 24.22.1:
 
 | Check | Observed result |
 | --- | --- |
@@ -158,11 +158,40 @@ Observed on 2026-11-12 with Node.js 24.22.1:
 | Managed browser preview | The browser could not reach the executor's local preview; the resulting error page was then blocked by browser URL policy |
 | Actual authenticated ChatGPT host | Not tested in this implementation environment |
 
-The blocked browser suite is not represented as a passing or skipped result.
-The DOM tests establish behavior without establishing layout quality, real
-browser transport, host compatibility, focus appearance, or measured rendering
-performance. Release review must complete those browser cases and the actual
-authenticated ChatGPT upload/download and interface checks.
+The local launch restriction remains a recorded environment limitation. It is
+not represented as a passing or skipped local run. The later remote execution
+below establishes a separate browser result.
+
+### Remote browser qualification
+
+The [MCP Apps interface CI job](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43244942226/job/131274965761)
+completed on November 12, 2026, for commit
+`fed82b5eddd4cd6235187d6fd688ac3d079aa5d4`. The Ubuntu 24.04 runner used
+Node.js 24.22.2 and Chrome for Testing 158.0.8127.18 through Playwright 1.65.0.
+Inspected logs recorded:
+
+- A successful strict TypeScript build and a byte-identical 689,499-byte packaged
+  HTML resource.
+- All 28 contract, DOM, portal, and SDK protocol checks passed.
+- All eight real-Chromium Playwright cases passed in 28.1 seconds using the
+  official SDK synthetic host.
+- Two synthetic screenshots were uploaded as
+  `keepmorrow-synthetic-browser-evidence`, artifact ID `13954849464`.
+
+The 184,926-byte artifact ZIP was downloaded and checked against GitHub's SHA-256:
+`77e00e4d000c4ff9f000c5f7d791fc20dd02497252f9f5bb6250077f737fd781`.
+The 1280 × 1600 desktop and 320 × 1600 narrow screenshots were visually reviewed.
+The captured controls remained separated and readable; the narrow view wrapped
+the deliberately long source title and stacked controls without horizontal
+overflow. These captures are synthetic examples, not account data. The CI
+artifact has the workflow's 14-day retention period.
+
+This result qualifies the tested companion interactions and synthetic browser
+transport on that runner. It does not establish an actual ChatGPT connection,
+all-browser support, a complete accessibility audit, or rendering-performance
+targets. The trusted portal's real-browser authentication and file-transfer flow,
+plus the actual authenticated ChatGPT interface and delivery path, remain release
+evidence to collect in the selected deployment.
 
 ## Contract and integration notes
 
