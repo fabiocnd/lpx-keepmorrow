@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- A reproducible synthetic portal smoke runner over a real loopback HTTP socket,
+  with a bounded Linux child-service lifecycle, fresh-instance guards, exact
+  authorization/review checks, selected binary recovery, and revocation checks.
+- A CI step that runs this isolated workflow and retains only sanitized JSON
+  evidence, together with operating instructions and observed pilot results.
+
 ## 0.3.0 — Authenticated Preservation Service — 2026-11-12
 
 ### Added

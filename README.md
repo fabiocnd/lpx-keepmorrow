@@ -177,7 +177,7 @@ inference, and model training are not implemented.
 ## Run the local application
 
 Use Python 3.11 or later. Local development validation runs on Linux; the
-[collection verification record](docs/engineering/collection-verification.md)
+[private pilot validation record](docs/engineering/private-pilot-validation.md)
 records the actual Linux and Windows CI results and their limits. Other platforms
 currently refuse archive creation and restoration. The local preservation core
 has no third-party runtime dependencies. The optional private service uses separately pinned MCP, HTTP, and JWT
@@ -279,6 +279,10 @@ npm --prefix ui/chatgpt test
 
 The [private pilot validation record](docs/engineering/private-pilot-validation.md)
 records current test results, inspected CI outcomes, and the measured synthetic workload.
+The [synthetic HTTP pilot](docs/operations/private-service-runbook.md#reproduce-the-synthetic-http-pilot)
+starts a Linux child service and verifies the portal workflow over an actual
+loopback socket using only generated fixtures. It records no actual human
+acceptance and does not establish OAuth or a ChatGPT account connection.
 See [validation](docs/engineering/validation.md) and
 [performance policy](docs/engineering/performance-policy.md) for evidence
 requirements. The GitHub Actions workflow is configured for Linux and Windows;

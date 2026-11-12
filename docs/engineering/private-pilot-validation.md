@@ -87,6 +87,58 @@ follow its [build and validation instructions](../../ui/chatgpt/README.md).
 Browser execution was not completed locally. Hosted synthetic browser evidence
 is recorded separately below.
 
+## Synthetic HTTP pilot
+
+On **November 12, 2026**, the installed 0.3.0 wheel was started on Linux with
+CPython **3.12.14** in a newly initialized synthetic operator instance. The
+[HTTP smoke runner](../../tests/smoke/run_private_portal.py) completed **16
+behavioral checks** over a real loopback TCP socket, then shut down its owned
+service with exit code **0**. The complete
+[sanitized result](evidence/2026-11-12-loopback-pilot.json) records the runner
+digest, distribution digest, exact fixture hashes, outcomes, and limitations.
+
+The workflow exercised the public portal HTTP contracts for login, scoped
+acceptance, upload, exact-plan review, idempotent start, import, browse/search/read,
+verification, selected recovery, packaging, download, ancestor revocation, and
+logout. It used no database shortcuts. Acceptance and review gestures were
+synthetic fixtures; they do not represent the owner's human or legal acceptance.
+
+| Observation | Recorded result |
+| --- | --- |
+| Workflow HTTP responses | 62: 40 HTTP 200, one 201, three 400, two 401, and sixteen 403 |
+| Refusal cases | Anonymous session, missing upload/download scope, false acceptance, reused challenges, unreviewed start, revoked ancestor, and ended session |
+| Input | Four synthetic conversations in a 3,840-byte ZIP |
+| Selected recovery | One conversation, six verified payload files, 19,903-byte delivery ZIP |
+| Binary evidence | Exact 70-byte PNG and two opaque binary fixtures of 29 and 32 bytes |
+| Service lifecycle | Bounded readiness check, real HTTP transport, graceful owned-child shutdown |
+| Existing-state guard | A repeat invocation was refused before launching the service or running maintenance |
+| Observed workflow duration | 0.493393 seconds; a functional smoke observation, not a performance benchmark |
+
+The input SHA-256 was
+`d763703d5f34cf75a56402954ee9feed16caa0739d3c2d60965dd7ba608c89b3`.
+The delivery SHA-256 was
+`d59e890ce5bd47c14dbdc1f9360f128a3f91cf62562444bf4136776e52990e84`.
+Every enclosed file was checked against the enclosed manifest, and the selected
+image/binary payloads were compared directly with their generated inputs. The
+GLB/APK-named fixtures are opaque test bytes, not functional models or applications.
+
+Import, recovery, and packaging correctly reported `partial` for intentional
+fixture coverage gaps: unknown associations, unresolved artifacts, unsupported
+records, and selected omissions as applicable. These outcomes preserve the
+distinction between successful byte handling and complete semantic coverage.
+
+The installed wheel digest was
+`2fb3b7552a93b728e95b8d928a160e60118c881c8e90f60bb7d4064faf765c0b`;
+57 packaged files matched the maintained source with zero mismatches. Production
+modules, policies, and UI assets were unchanged by this pilot. The new CI step
+initializes a separate instance and retains only its sanitized JSON result.
+
+The child service was stopped after verification. This test does not leave a
+public endpoint or persistent deployment running. It does not exercise a browser,
+live OAuth, the actual ChatGPT host, or real user content. The
+[runbook](../operations/private-service-runbook.md#reproduce-the-synthetic-http-pilot)
+contains the reproducible commands and the Linux child-launch restriction.
+
 ## Historical initial CI and fixture correction
 
 [Workflow run 43244942226](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43244942226)

@@ -56,6 +56,35 @@ The configured identity and its exact grants determine access.
 that an identity provider is reachable, a ChatGPT connection works, or a source
 collection has been verified.
 
+### Reproduce the synthetic HTTP pilot
+
+The [HTTP smoke runner](../../tests/smoke/run_private_portal.py) exercises a real
+loopback socket and the portal's published HTTP endpoints. On Linux, initialize
+a separate, new service directory with the exact test identity:
+
+```sh
+python -m keepmorrow.application.cli init /absolute/new-synthetic-pilot --operator synthetic-pilot
+python tests/smoke/run_private_portal.py --configuration /absolute/new-synthetic-pilot/service.json --launch-service
+```
+
+The Linux child launcher starts the service, waits for readiness, runs the
+workflow, and shuts down its own process. It also works when an execution
+environment isolates each command's network: server and client stay in the same
+command. It does not expose a preview URL or leave a hosted service running.
+
+The runner accepts no source-content path. It builds its own synthetic export
+with a PNG and opaque binary fixtures. It checks upload authorization, exact
+review, idempotent start, queries, selected recovery, download integrity,
+ancestor revocation, and logout. Its acceptance and review gestures are test
+fixtures, not actual human or legal acceptance. The JSON report excludes keys,
+cookies, runtime paths, and operation/resource handles.
+
+Each run requires a fresh instance. The child launcher rejects an initialized
+directory containing runtime state before starting maintenance. Never reuse a
+personal or customer service for this test. Keep the resulting test state out
+of Git; the CI artifact includes only the sanitized JSON report. See the
+[recorded evidence](../engineering/private-pilot-validation.md#synthetic-http-pilot).
+
 ## 2. Register an existing selected collection
 
 The preferred normal flow receives an explicitly selected upload through the
