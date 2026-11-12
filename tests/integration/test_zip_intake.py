@@ -115,7 +115,18 @@ class ZipIntakeTests(unittest.TestCase):
         for name in ("../escaped", "/absolute", "C:/drive", "nested\\file", "./file", "a//file",
                      "CON.txt", "folder./file", "cafe\u0301.txt", "a/../../escaped"):
             with self.subTest(name=name):
-                self.write_zip([(name, b"must stay inside")])
+                writer_name = name.replace("\\", "/")
+                self.write_zip([(writer_name, b"must stay inside")])
+                if writer_name != name:
+                    # Windows ZIP writers normalize backslashes before serialization.
+                    # Replace both equal-length header names so every platform tests
+                    # the same invalid wire representation, not a corrected fixture.
+                    data = self.source.read_bytes()
+                    encoded_name = writer_name.encode("utf-8")
+                    self.assertEqual(data.count(encoded_name), 2)
+                    self.source.write_bytes(data.replace(encoded_name, name.encode("utf-8")))
+                with zipfile.ZipFile(self.source) as archive:
+                    self.assertEqual(archive.infolist()[0].orig_filename, name)
                 self.assert_refused()
                 self.assertFalse((self.root / "escaped").exists())
 
