@@ -8,7 +8,7 @@ and lets you recover the complete payload or a selected part into ordinary files
 **Publisher and maintainer:** Lopix Neural Inc.
 **Creator and lead developer:** Fabio de Sousa Lopes — Senior Software Engineer
 **Contact:** [fabio@lopixneural.com](mailto:fabio@lopixneural.com)
-**Source:** Currently private and proprietary; [open-source transition planned](docs/governance/open-source-transition.md), with release license pending · **Project language:** US English
+**Source license:** [Apache-2.0](LICENSE) · **Release stage:** Experimental · **Project language:** US English
 **Product direction:** Free to use, with no monetization or advertising
 
 ## What the project does
@@ -147,21 +147,21 @@ Read the [terms of use](legal/terms-of-use.md),
 [privacy notice](legal/privacy-notice.md), and
 [operation authorization](legal/consent-and-operation-authorization.md) first.
 The following commands are for the repository's synthetic example and internal
-review of draft version `2026-11-12-draft.3`.
+review of terms `2026-11-12-draft.4` and privacy notice `2026-11-12-draft.3`.
 
 ```bash
 export PYTHONPATH=src
 
 python -m keepmorrow create examples/synthetic-input ../keepmorrow-demo-archive \
-  --accept-terms 2026-11-12-draft.3 \
+  --accept-terms 2026-11-12-draft.4 \
   --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow verify ../keepmorrow-demo-archive \
-  --accept-terms 2026-11-12-draft.3 \
+  --accept-terms 2026-11-12-draft.4 \
   --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow restore ../keepmorrow-demo-archive ../keepmorrow-demo-restore \
-  --accept-terms 2026-11-12-draft.3 \
+  --accept-terms 2026-11-12-draft.4 \
   --accept-privacy 2026-11-12-draft.3
 ```
 
@@ -178,10 +178,10 @@ To build a conversation collection from explicitly selected exports:
 ```bash
 python -m keepmorrow import ./export-first.zip ./export-second \
   --destination ../keepmorrow-collection --account-namespace my-local-account \
-  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
+  --accept-terms 2026-11-12-draft.4 --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow catalog ../keepmorrow-collection \
-  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
+  --accept-terms 2026-11-12-draft.4 --accept-privacy 2026-11-12-draft.3
 ```
 
 Open `payload/index.html` inside the resulting archive for the standalone derived
@@ -286,22 +286,22 @@ synthetic demonstration data is committed.
 
 ## Ownership and release status
 
-Copyright (c) 2026 Lopix Neural Inc. All rights reserved. See [LICENSE](LICENSE)
-and [NOTICE](NOTICE).
+Copyright (c) 2026 Lopix Neural Inc. Project-owned source and documentation in
+this revision use [Apache License 2.0](LICENSE). [NOTICE](NOTICE) and the bundled
+third-party notices preserve professional attribution and upstream terms.
 
-The owner intends an [open-source transition](docs/governance/open-source-transition.md).
-The exact release license and publication decision remain pending; the current
-proprietary license and private visibility continue to apply. The transition
-includes reviewing material suitable for public distribution and excluding
-private development records or user data. Legal documents remain drafts for
-owner and qualified legal review. No hosting, model provider, or public launch
-is implied by the planned license change.
+The maintained project is free and nonmonetized; downstream license rights are
+not restricted by that choice. The UI package remains `private: true` only to
+prevent accidental npm publication. Imported content retains its original rights.
 
-The [private pilot validation record](docs/engineering/private-pilot-validation.md)
-separates implementation, synthetic verification, remote CI, measured workloads,
-and the remaining live account, export, identity-provider, browser, and legal gates.
+Publish only a reviewed source snapshot with a new root commit. The existing
+private development history must remain private. License adoption does not mean
+that a public repository was created, repository protections were configured,
+or a production service was deployed. Follow the [publication runbook](docs/operations/public-source-release.md)
+and [transition record](docs/governance/open-source-transition.md).
 
-A reviewed source archive excludes Git history and local operational state.
-Earlier private commits remain in the development repository; changing its
-visibility would require a separate history and artifact review. The recommended
-public-release path starts from the sanitized source snapshot after license adoption.
+The source is experimental. Real ChatGPT integration, representative real-export
+validation, deployment qualification, and final processing terms remain separate
+gates. The [historical pilot record](docs/engineering/private-pilot-validation.md)
+retains evidence for its exact earlier revisions. Updated terms require new
+acceptance; old receipts are not silently migrated.

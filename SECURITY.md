@@ -1,6 +1,6 @@
 # Security and Data Handling
 
-**Applies to:** The private 0.3.0 reference implementation
+**Applies to:** The experimental 0.3.0 reference implementation
 
 **Review date:** 2026-11-12
 
@@ -12,10 +12,13 @@ reproduction steps using synthetic data, expected behavior, and observed impact.
 Do not send passwords, access tokens, private conversation exports, or unrelated
 personal information. No response-time or remediation SLA is promised.
 
-Lopix Neural Inc. maintains LPX Keepmorrow. This repository is private and
-proprietary under the current license. The owner plans an open-source transition;
-the release license has not yet been selected or adopted, and visibility has
-not changed. No public bug bounty is currently operated.
+Lopix Neural Inc. maintains this source revision under Apache License 2.0.
+Earlier private history is excluded from public distribution. No public bug
+bounty or remediation SLA is operated. Only the current development line is
+actively maintained; it is not certified for production processing. Use GitHub
+private vulnerability reporting only after it is enabled, or the email above.
+Do not post sensitive reports publicly. Rotate confirmed leaked credentials
+rather than suppressing scanner findings to obtain a passing build.
 
 ## Current implementation and evidence
 

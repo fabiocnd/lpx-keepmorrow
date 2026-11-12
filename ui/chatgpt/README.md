@@ -83,16 +83,12 @@ and styles. No CDN, runtime module download, external font, or image request is
 needed. The production resource does not include the synthetic host, fixtures,
 or browser test controls.
 
-An open-source transition is planned. The owner has not yet selected the exact
-release license or authorized the visibility change; the current repository
-license remains proprietary, and the UI package remains `private: true` with
-`license: "UNLICENSED"`. This planned transition does not grant redistribution
-rights to the project before that decision. Upstream packages retain their
-respective licenses. `THIRD-PARTY-NOTICES.txt` is generated from packages that contribute
-bytes to the production bundle and preserves their installed license texts,
-including the MCP TypeScript packages' recorded licensing-transition notice.
-Development tools are identified in the lockfile and are not included in the
-production HTML.
+Project-owned source uses Apache License 2.0. The UI package keeps `private: true`
+to prevent accidental npm publication, not to restrict source rights. Its manifest
+and lockfile declare `Apache-2.0`. THIRD-PARTY-NOTICES.txt is generated from the
+packages that contribute bytes to the bundle and retains their complete installed
+license texts, including the MCP transition notices. Development dependencies
+remain identified in the lockfile, not included in the production HTML.
 
 The November 12, 2026 bundle audit found five contributing packages. Their
 installed versions matched the lockfile, and the notice file contained the

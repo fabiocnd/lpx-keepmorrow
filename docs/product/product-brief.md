@@ -75,10 +75,11 @@ to their recorded workload and environment; they are not capacity guarantees.
 
 ## Product and licensing direction
 
-The maintained product is intended to remain free and nonmonetized. An open-source
-transition is planned. The current repository remains private under its existing
-proprietary license until the release license and publication scope are adopted.
-See [open-source transition](../governance/open-source-transition.md).
+Project-owned source in this revision uses Apache License 2.0. The historical
+development repository stays private; public distribution uses a reviewed source
+snapshot with a fresh root commit. Source licensing, actual public publication,
+and hosted-service qualification are separate decisions and evidence gates.
+The maintained product's free direction does not restrict downstream rights.
 
 Professional attribution belongs in product information and documentation, never
 inside preserved source records. Source licensing does not transfer ownership of

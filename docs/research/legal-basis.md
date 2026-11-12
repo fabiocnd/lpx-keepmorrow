@@ -100,7 +100,7 @@ reconstruction. An unlimited waiver does not establish those controls.
   destructive operation before enabling it. No GDPR or worldwide compliance
   claim is established by this Ontario/Canada baseline.
 - Evaluate the owner's planned open-source transition separately from user-data
-  processing terms. The exact license and publication decision remain pending;
+  processing terms. Apache-2.0 is subsequently adopted for the new revision; public publication remains separate;
   neither an intended source release nor a source license establishes privacy
   compliance or authorization to operate a hosted service.
 

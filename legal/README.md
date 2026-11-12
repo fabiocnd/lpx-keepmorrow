@@ -1,7 +1,7 @@
 # Legal Documents and Release Status
 
 **DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
-**Document set version:** `2026-11-12-draft.3`
+**Terms version:** `2026-11-12-draft.4` · **Privacy version:** `2026-11-12-draft.3`
 **Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
@@ -11,13 +11,11 @@ or authorization to launch a public service. The local acceptance flags and
 private portal exercise technical controls against these drafts; they do not
 establish counsel approval or the enforceability of a particular contract.
 
-The owner intends to transition the project to open source. The exact source
-license and publication decision remain pending; the repository and current
-license remain private and proprietary until those decisions are implemented.
-A software source license and the terms governing processing of user information
-serve different purposes. Neither transition planning nor acceptance of these
-drafts changes repository visibility or grants rights absent from the current
-license. This document does not assign a permanent licensing model.
+Project-owned source in this revision uses Apache License 2.0. These processing
+drafts do not restrict or condition the rights that license grants. Source
+licensing does not establish privacy compliance, approve hosting, or grant access
+to user accounts. Terms draft.4 corrects the source-license disclosure; privacy
+remains draft.3. Changed policy bytes and versions require fresh acceptance.
 
 ## Documents
 
@@ -56,7 +54,7 @@ Every CLI operation that inspects selected content requires both exact options,
 including import, catalog queries, association review, and selected recovery:
 
 ```text
---accept-terms 2026-11-12-draft.3
+--accept-terms 2026-11-12-draft.4
 --accept-privacy 2026-11-12-draft.3
 ```
 

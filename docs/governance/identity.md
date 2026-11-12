@@ -12,7 +12,7 @@
 | Professional contact | [fabio@lopixneural.com](mailto:fabio@lopixneural.com) |
 | Source repository | [fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow) |
 | Authoring language | US English |
-| Current distribution | Private repository under the existing proprietary license |
+| Current distribution | Apache-2.0 source revision; private history excluded from publication |
 | Planned distribution | Open-source release after license selection and release review |
 
 ## Attribution

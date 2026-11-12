@@ -8,8 +8,8 @@ version = "0.3.0"
 description = "Verifiable preservation with scoped consent, durable operations, and a private ChatGPT integration"
 requires-python = ">=3.11"
 authors = [{name = "Fabio de Sousa Lopes", email = "fabio@lopixneural.com"}]
-# Keep release metadata consistent with LICENSE when a source license is adopted.
-license = {text = "Proprietary. Copyright 2026 Lopix Neural Inc. All rights reserved."}
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 dependencies = []
 
 [project.optional-dependencies]

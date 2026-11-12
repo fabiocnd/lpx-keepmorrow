@@ -134,13 +134,11 @@ spreadsheet whose bytes were never supplied remains unresolved. This is useful
 traceability within the supported profile; it does not establish that the
 platform exported every item or that local structure recreates native Projects.
 
-An open-source transition is planned. Subject to the owner's license and release
-decision, published code could make these contracts, test fixtures, and limitations
-easier to inspect independently and allow contributors to propose compatibility
-improvements. Those are prospective benefits of a completed release. The source
-remains private/proprietary until the decision recorded in the
-[open-source transition plan][open-source-transition] is executed; public source
-would not make imported user archives public or remove consent requirements.
+Project-owned source in this revision uses Apache License 2.0. The historical
+development repository stays private; public distribution uses a reviewed source
+snapshot with a fresh root commit. Source licensing, actual public publication,
+and hosted-service qualification are separate decisions and evidence gates.
+The maintained product's free direction does not restrict downstream rights.
 
 The useful test is whether someone can preserve and recover an evolving body of
 work with less ambiguity and less manual effort. A representative validation

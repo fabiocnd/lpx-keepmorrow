@@ -151,7 +151,7 @@ local service workflow and does not establish HTTP, IdP, tunnel, or ChatGPT late
 | Real content eligibility | Reviewed selection and all reachable derivatives satisfy applicable platform requirements | Actual content and policy review; private installation is not an exemption |
 | Operating qualification | Backup/restore, revocation, capacity, incident response, and rollback evidence on the selected host | Running deployment and approved operating procedures |
 | Legal release | Approved final terms, privacy notices, retention, and support obligations | Owner and qualified counsel review |
-| Open-source release | Exact license, current dependency notices, sanitized source artifact, and reviewed publication history | License adoption and public destination decision |
+| Open-source release | Exact license, current dependency notices, sanitized source artifact, and reviewed publication history | Exact-candidate validation, public destination creation, and administrative settings |
 
 The authenticated ChatGPT account exposed the custom-MCP creation form on
 November 12, 2026. A local form draft contains the product name, description,

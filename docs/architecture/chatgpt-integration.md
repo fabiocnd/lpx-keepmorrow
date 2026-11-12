@@ -73,7 +73,7 @@ The local preservation core remains standard-library-only. The optional dependen
 is pinned to `mcp==1.29.0`, the SDK version exercised here. Its upstream license is
 MIT; see [package metadata](https://pypi.org/project/mcp/1.29.0/) and the
 [upstream repository](https://github.com/modelcontextprotocol/python-sdk).
-This dependency does not change the proprietary license of Keepmorrow.
+This dependency retains its own license; project-owned Keepmorrow source uses Apache-2.0.
 
 The observed Linux/Python 3.12 dependency closure is constrained for the dedicated
 CI job in `requirements/chatgpt-dev-py312.constraints.txt`. It is not a universal

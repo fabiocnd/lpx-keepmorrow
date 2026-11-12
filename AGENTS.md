@@ -6,11 +6,12 @@ This repository contains LPX Keepmorrow. Lopix Neural Inc. is the publisher and 
 is the creator and lead developer. Use `fabio@lopixneural.com` as the project
 contact and the author email when creating commits on Fabio's behalf.
 
-The current repository is private under its existing proprietary license. An
-open-source transition is planned; the exact license and public destination must
-be adopted before publication. The maintained product is intended to remain free
-and nonmonetized. That choice is separate from downstream open-source rights. Apply the user's current, explicit authorization; do not
-request the same permission again for work already authorized.
+Project-owned source in this revision uses Apache License 2.0. The existing
+private development history must remain private. Publish only an approved source
+snapshot with a new root commit, never the existing refs or CI history. The
+maintained product's free, nonmonetized direction does not restrict downstream
+license rights. Apply the user's explicit authorization without asking again
+for the same approved work. Source licensing never authorizes user-data sharing.
 
 ## Language and source fidelity
 
@@ -58,8 +59,8 @@ Keep archive behavior cohesive under `src/keepmorrow/archive/`. A CLI should
 parse arguments, invoke the core, and format results without duplicating domain
 rules. Avoid generic `utils` or `common` buckets and empty directories for
 speculative services. Add a new module when it provides a meaningful boundary,
-not merely to reduce a file's line count. Keep historical source material under
-`docs/provenance/` and identify its retrieval date.
+not merely to reduce a file's line count. Keep private historical source material outside the distributable tree.
+Do not restore removed private provenance or biographical research.
 
 ## Preservation invariants
 

@@ -14,7 +14,7 @@ not a substitute for operational or legal acceptance.
 | D002 | Author code, documentation, comments, and UI in US English | Adopted | One maintained technical vocabulary; original imported bytes retain their language |
 | D003 | Keep the maintained product free and nonmonetized | Product direction | Separate from downstream rights under a future open-source license |
 | D004 | Attribute Lopix Neural Inc. and Fabio de Sousa Lopes | Adopted | Proportionate professional attribution without modifying preserved originals |
-| D005 | Retain the current private proprietary repository during release preparation | Current state | Open-source transition is planned under D035; no public license has yet been adopted |
+| D005 | Preserve the private development history | Historical license superseded by D037 | Do not publish old refs, logs, or private development records |
 | D006 | Use fabio@lopixneural.com as professional contact | Adopted | Consistent package, security, and maintainer contact |
 | D007 | Apply the project Golden Coding Standard | Adopted | Typed boundaries, explicit invariants, meaningful tests, measured claims; no external certification implied |
 | D008 | Group files by responsibility | Implemented | Cohesive domain, integration, documentation, and operational boundaries; ADR 0001 |
@@ -44,8 +44,12 @@ not a substitute for operational or legal acceptance.
 | D032 | Use policy version 2026-11-12-draft.3 for the current private service | Draft implementation policy | Accurate disclosure of service identity, consent, temporary storage, operations, and unresolved deployment choices |
 | D033 | Keep active-plan fencing strict while allowing explicit completed-ancestor renewal | Implemented | Fresh child permission alone cannot override ancestor withdrawal; historical plans remain immutable |
 | D034 | Validate storage budgets before startup | Implemented | Require the full upload pool plus one 2 GiB operation reservation; admission still checks retained outputs and free space |
-| D035 | Prepare an open-source transition | Planned release | Apache-2.0 is the engineering recommendation; exact adoption and public publication remain pending |
+| D035 | Prepare an open-source transition | License decision completed by D037 | Public repository creation remains a separately verified action |
 | D036 | Publish only reviewed source with an appropriate history boundary | Release requirement | Deleting current files does not remove earlier commits, CI logs, or artifacts |
+
+| D037 | Adopt Apache-2.0 for this source revision | Owner-authorized | Align root license, metadata, notices, and current guidance; exclude private records and user content |
+| D038 | Publish a fresh source snapshot to `fabiocnd/keepmorrow` | Authorized destination; administrative execution pending | Preserve the LPX Keepmorrow product/package identity and keep `fabiocnd/lpx-keepmorrow` private |
+| D039 | Advance terms to draft.4 and retain privacy draft.3 | Draft policy | Correct source-license disclosure without broadening processing permissions; require new acceptance |
 
 ## Change discipline
 

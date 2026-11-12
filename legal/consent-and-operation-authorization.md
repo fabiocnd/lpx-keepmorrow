@@ -1,7 +1,7 @@
 # Consent and Operation Authorization
 
 **DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
-**Document version:** `2026-11-12-draft.3`
+**Document version:** `2026-11-12-draft.4`
 **Prepared:** 2026-11-12
 **Production approval:** Not granted by this document
 
@@ -32,7 +32,7 @@ the mere presence of files, a previous operation, or continuation after an error
 Each operation requires these exact values:
 
 ```text
---accept-terms 2026-11-12-draft.3
+--accept-terms 2026-11-12-draft.4
 --accept-privacy 2026-11-12-draft.3
 ```
 
@@ -45,7 +45,7 @@ For an internal synthetic-data evaluation, an explicit command takes this form:
 
 ```bash
 python -m keepmorrow create ./synthetic-source ./new-archive \
-  --accept-terms 2026-11-12-draft.3 \
+  --accept-terms 2026-11-12-draft.4 \
   --accept-privacy 2026-11-12-draft.3
 ```
 
