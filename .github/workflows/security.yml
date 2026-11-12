@@ -1,0 +1,107 @@
+name: Security analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+  schedule:
+    - cron: '23 8 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Source secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install the verified scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --max-time 120 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            -o "$RUNNER_TEMP/gitleaks.tar.gz"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check --strict
+          mkdir "$RUNNER_TEMP/gitleaks-bin"
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks-bin" gitleaks
+      - name: Scan every file in the publication snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/source-snapshot"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/source-snapshot"
+          status=0
+          "$RUNNER_TEMP/gitleaks-bin/gitleaks" dir "$RUNNER_TEMP/source-snapshot" --config="$GITHUB_WORKSPACE/.gitleaks.toml" --redact=100 --no-banner --report-format=json --report-path="$RUNNER_TEMP/gitleaks-source.json" || status=$?
+          # Never print source lines, matches, credential values, or the full report.
+          python -c 'import json,sys; from pathlib import Path; p=Path(sys.argv[1]); items=json.loads(p.read_text()) if p.exists() else []; print(json.dumps([{k:x.get(k) for k in ("RuleID","File","StartLine","EndLine")} for x in items],indent=2))' "$RUNNER_TEMP/gitleaks-source.json"
+          exit "$status"
+      - name: Validate the fresh-root publication history in isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This temporary repository has no remote and never imports private refs.
+          git -C "$RUNNER_TEMP/source-snapshot" init --quiet --initial-branch=main
+          git -C "$RUNNER_TEMP/source-snapshot" add .
+          git -C "$RUNNER_TEMP/source-snapshot" -c user.name='Synthetic source validation' -c user.email='synthetic@example.test' commit --quiet -m 'Validate the reviewed source snapshot'
+          "$RUNNER_TEMP/gitleaks-bin/gitleaks" git "$RUNNER_TEMP/source-snapshot" --config="$GITHUB_WORKSPACE/.gitleaks.toml" --log-opts="--all" --redact=100 --no-banner
+      - name: Scan the complete public history
+        if: github.event.repository.private == false
+        run: '"$RUNNER_TEMP/gitleaks-bin/gitleaks" git --config=.gitleaks.toml --log-opts="--all" --redact=100 --no-banner'
+
+  codeql:
+    name: CodeQL / ${{ matrix.language }}
+    # Private development does not imply entitlement to paid code scanning.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          category: /language:${{ matrix.language }}
+
+  required:
+    name: Security required
+    if: always()
+    needs: [secrets, codeql]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      SECRETS_RESULT: ${{ needs.secrets.result }}
+      CODEQL_RESULT: ${{ needs.codeql.result }}
+      PRIVATE_REPOSITORY: ${{ github.event.repository.private }}
+    steps:
+      - name: Fail closed when a required scan did not complete
+        run: |
+          test "$SECRETS_RESULT" = success
+          if [ "$PRIVATE_REPOSITORY" = false ]; then
+            test "$CODEQL_RESULT" = success
+          else
+            test "$CODEQL_RESULT" = skipped
+          fi

@@ -31,7 +31,7 @@ await mkdir(assets, { recursive: true });
 await writeFile(resolve(assets, "keepmorrow.html"), html);
 
 // Record the licenses of actual bundled packages, not development dependencies.
-// The private project's license does not supersede these upstream notices.
+// The project license does not supersede these upstream notices.
 const includedInputs = new Set(Object.values(result.metafile.outputs).flatMap((output) =>
   Object.entries(output.inputs).filter(([, value]) => value.bytesInOutput > 0).map(([path]) => path)));
 const packageNames = new Set([...includedInputs].flatMap((path) => {
@@ -39,7 +39,7 @@ const packageNames = new Set([...includedInputs].flatMap((path) => {
   return match ? [match[1]] : [];
 }));
 let notices = "LPX Keepmorrow ChatGPT Interface — Third-Party Notices\n\n";
-notices += "Project source: proprietary, Copyright 2026 Lopix Neural Inc. All rights reserved.\n";
+notices += "Project source: Apache-2.0, Copyright 2026 Lopix Neural Inc.\n";
 notices += "The generated interface includes the following separately licensed packages.\n";
 for (const name of [...packageNames].sort()) {
   const directory = resolve(root, "node_modules", name);

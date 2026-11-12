@@ -14,14 +14,15 @@ service, a connected ChatGPT account, or a completed live identity-provider
 exercise. Those gates remain separate in the
 [private pilot validation record](../engineering/private-pilot-validation.md).
 
-An open-source transition is planned. The release license has not yet been
-selected or adopted; the current source license and private visibility remain
-in effect. Source publication, operational deployment, and live account
-connection are separate decisions and evidence gates.
+Project-owned source in this revision uses Apache License 2.0. The historical
+development repository stays private; public distribution uses a reviewed source
+snapshot with a fresh root commit. Source licensing, actual public publication,
+and hosted-service qualification are separate decisions and evidence gates.
+The maintained product's free direction does not restrict downstream rights.
 
 ## 1. Install and initialize a local operator instance
 
-Use a private checkout and the tested Python environment for the release.
+Use a reviewed checkout and the tested Python environment for the release.
 Install the optional service dependencies from the pinned project extra:
 
 ```sh
@@ -99,7 +100,7 @@ python -m keepmorrow.application.cli register \
   --identifier selected_collection \
   --subject local-owner \
   --output /absolute/new-service/service-with-collection.json \
-  --accept-terms 2026-11-12-draft.3 \
+  --accept-terms 2026-11-12-draft.4 \
   --accept-privacy 2026-11-12-draft.3
 ```
 

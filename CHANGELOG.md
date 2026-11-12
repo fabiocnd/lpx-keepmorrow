@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — open-source preparation
+
+- Adopt Apache-2.0 for project-owned source and align package metadata/notices.
+- Preserve private history and third-party attribution; publish a fresh snapshot.
+- Advance draft terms to draft.4 while retaining privacy draft.3 and fresh consent.
+- Add release-contract checks, security scanning, Dependabot, issue forms, and
+  draft-release packaging. Server-side GitHub settings remain separately verified.
+
+
 ## Unreleased
 
 ### Added

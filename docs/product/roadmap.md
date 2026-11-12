@@ -40,15 +40,16 @@ its current evidence and external dependencies.
 - [x] Record the intended transition and retain professional project attribution.
 - [x] Separate source licensing from processing consent and user-data ownership.
 - [x] Inspect bundled UI license texts and preserve third-party notices.
-- [ ] Adopt the exact release license and update all corresponding package metadata.
+- [x] Adopt Apache-2.0 for the source revision and align package metadata.
 - [x] Inspect a sanitized source artifact with no private development history.
   Rebuild and recheck the exact public artifact after license adoption.
 - [ ] Approve and create the public distribution destination and publication history.
-- [ ] Establish public contribution, issue-reporting, security, and release procedures.
+- [x] Establish contribution, issue-reporting, security, and draft-release procedures.
+- [ ] Apply and verify branch protections and native GitHub security settings.
 
-The current repository remains private under its existing license. The
-[transition record](../governance/open-source-transition.md) recommends a release
-path and identifies the decisions needed before public distribution.
+The historical repository stays private. Apache-2.0 is adopted for the new source
+revision; public destination creation, administrative settings, and final source
+validation remain separately verifiable steps in the publication runbook.
 
 ## Operational release gates
 

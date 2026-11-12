@@ -1,115 +1,75 @@
-# Open-Source Transition and Source Release Boundary
+# Source License and Public Distribution Boundary
 
 **Reviewed:** November 12, 2026
-**Status:** Release preparation; the existing private proprietary license remains in force
 **Maintainer:** Lopix Neural Inc.
+**Creator:** Fabio de Sousa Lopes
 **Contact:** fabio@lopixneural.com
 
-## 1. Intended outcome
+## Adopted source license
 
-Prepare LPX Keepmorrow for a public source release that includes reusable code,
-professional documentation, synthetic tests, reproducible builds, and accurate
-operating limits. Retain project attribution while excluding private development
-conversations, personal research, credentials, account records, and operational
-user data.
+Project-owned source and documentation in this revision use Apache License 2.0.
+The owner authorized the source-release preparation and license adoption.
+`LICENSE`, `NOTICE`, Python metadata, UI metadata, and generated notices must
+agree. Upstream components retain their applicable licenses and full notices.
+The MCP packages' licensing-transition text is preserved, not simplified to a
+single manifest label. The source grant does not relicense private development
+records or user-supplied archives.
 
-Source publication and a hosted-service launch are separate actions. A source
-license does not transfer user-data rights, authorize account access, establish
-processing consent, or approve the service's draft legal terms.
+The maintained product is intended to remain free and nonmonetized. That product
+choice does not restrict commercial uses or redistribution permitted by the
+license. The company and creator attribution is informational and must not imply
+trademark rights, platform affiliation, endorsement, or certification.
 
-## 2. License recommendation
+Source rights are separate from processing consent. Terms draft.4 corrects the
+source-license disclosure; privacy remains draft.3. Changed policy bytes require
+fresh acceptance. Production legal review and hosted-service qualification
+remain open; the source license is not evidence that they have occurred.
 
-**Engineering recommendation: Apache License 2.0.** It provides broad reuse and
-redistribution rights, an explicit contributor patent grant, and defined notice
-requirements. Its patent terms and attribution obligations make it a reasonable
-candidate for a company-maintained software project. This recommendation has not
-been adopted as the repository's effective license. [L1]
+## Publication boundary
 
-| Candidate | Practical consideration | Proposed fit |
-| --- | --- | --- |
-| Apache-2.0 | Explicit patent grant and redistribution/notice rules; includes conditions that maintainers must preserve | Recommended for the planned release |
-| MIT | Short permissive grant requiring preservation of its copyright and permission notice; no equivalent express patent section | Alternative if licensing simplicity is the overriding preference |
+Keep `fabiocnd/lpx-keepmorrow` private. Its earlier Git objects, branches, Actions
+logs, and artifacts are not approved public history. Removing a file from the
+current tree does not remove historical copies. Do not change this repository's
+visibility or push its refs to a public remote.
 
-Both allow downstream commercial use. The maintained project's free,
-nonmonetized direction can remain its own operating choice, but an open-source
-license must not prohibit business use or redistribution merely to enforce that
-choice. Source visibility alone does not create open-source rights. [L2][L3]
+The authorized public destination is `fabiocnd/keepmorrow`. The product and Python
+package remain LPX Keepmorrow and `lpx-keepmorrow`. Initialize the public repository
+from the reviewed source ZIP with a new root commit. Do not use a fork, mirror,
+bundle, or push of the private repository's branches. The public `main` and
+`develop` start from that same reviewed root.
 
-The selected license must be adopted consistently in `LICENSE`, package metadata,
-source headers where appropriate, notice generation, contribution guidance,
-distribution artifacts, and release notes. Do not combine an open-source claim
-with a contradictory proprietary or `UNLICENSED` project declaration.
+Only maintained code, synthetic tests, reusable documentation, build metadata,
+third-party notices, and relevant technical measurements belong in the snapshot.
+Exclude real exports, account records, private research, conversation transcripts,
+credentials, operational databases, logs, caches, and local environments.
+Professional project attribution and the designated business contact remain.
 
-## 3. Materials included and excluded
+## Verification and remaining administrative steps
 
-| Include in the reviewed source snapshot | Exclude from distribution |
-| --- | --- |
-| Maintained source, schemas, synthetic fixtures, and tests | Real exports, user collections, uploaded files, and recovery outputs |
-| Current architecture, requirements, runbook, and engineering standards | Private conversation transcripts, session links, and internal source snapshots |
-| Public professional project attribution and designated business contact | Personal account records, biographical research, and unrelated identity details |
-| Reproducible workload descriptions and measured technical evidence | Credentials, cookies, operator keys, IdP subjects, live service databases, and private host configuration |
-| Dependency locks, exact bundled notices, and release instructions | Local virtual environments, installed packages, caches, temporary scratch, and browser profiles |
+The source-contract checker validates declared metadata, packaged policy bytes,
+known forbidden paths, regular-file entries, and immutable Action references.
+Gitleaks scans the complete exported source tree. The public security workflow
+also scans the complete public Git history and runs CodeQL for Python and
+TypeScript. Passing a scanner is not a guarantee that no sensitive material or
+vulnerability exists; inspect the exact source inventory and findings manually.
 
-Synthetic tests can use clearly artificial identities and private-path examples
-to verify error redaction. Such fixtures are test data, not actual account records.
-Technical hashes identify tested source and artifacts; they do not disclose user
-archives when their inputs are the committed synthetic workload.
+The CI aggregate requires the existing Python OS/version matrix, optional
+service integration, UI/browser tests, and source contract. Release tags must
+match package metadata and be contained in `main`. Release automation creates a
+draft prerelease with source/wheel artifacts and SHA-256 checksums; it does not
+publish to PyPI or deploy a service.
 
-## 4. History and publication boundary
-
-Removing files from the current tree does not remove their earlier Git objects.
-The existing private development history therefore must not be treated as a
-reviewed public history. GitHub also makes Actions history and logs visible when
-a repository becomes public. [L4]
-
-The recommended publication path is a fresh repository initialized from the
-reviewed source snapshot after license adoption. That boundary transfers approved
-files without carrying earlier private commits, branches, tags, or CI artifacts.
-Keep the original development repository private. A branch in the same repository
-is not an equivalent privacy boundary when the whole repository becomes public.
-
-An alternative history rewrite would require its own complete review of all
-reachable refs, logs, artifacts, existing clones, and publication effects. No
-history purge or visibility change is represented as completed here.
-
-The review ZIP produced with `git archive` contains tracked source files from one
-commit, without the `.git` database or untracked local state. Its current license
-remains proprietary until a selected open-source license is adopted. Review and
-rebuild the exact artifact before public publication.
-
-## 5. Dependency and contribution review
-
-The current bundled MCP Apps resource includes five dependency packages. Full
-installed license texts are retained in
-[`ui/chatgpt/THIRD-PARTY-NOTICES.txt`](../../ui/chatgpt/THIRD-PARTY-NOTICES.txt)
-and the packaged asset copy. Some package metadata labels differ from the supplied
-MCP Apache/MIT transition text. Preserve the actual license text and resolve its
-application before a public distribution; do not simplify the evidence to a
-single manifest label. Dependency notices must match the actual distribution. [L5]
-
-Confirm the right to license all contributed code and assets. Establish a clear
-inbound contribution policy consistent with the chosen outbound license before
-accepting public contributions. Contribution review must keep real user archives,
-secrets, and privately copied code out of issues, patches, fixtures, and logs.
-
-## 6. Release acceptance
-
-A public release requires a concrete source commit and artifact, the adopted
-license and matching metadata, complete applicable third-party notices, passing
-release CI, a reviewed history boundary, and maintainer approval of the public
-destination. The source remains experimental where the compatibility record says
-so. Public availability must not be described as a completed ChatGPT deployment
-or a production privacy/legal certification.
-
-Current technical evidence is recorded in
-[private pilot validation](../engineering/private-pilot-validation.md).
-The [roadmap](../product/roadmap.md) keeps live integration and source release
-milestones independently visible.
+Repository creation, visibility, branch protection, native secret scanning,
+push protection, vulnerability reporting, and Dependabot security settings are
+administrative controls. Their presence in a script is not evidence of execution.
+The connected editing interface did not expose those write operations during
+preparation. Follow the [publication runbook](../operations/public-source-release.md)
+and verify actual results before claiming them enabled.
 
 ## Primary references
 
-- [L1 — Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
-- [L2 — MIT License](https://opensource.org/license/mit)
-- [L3 — Open Source Definition](https://opensource.org/osd)
-- [L4 — GitHub: Setting repository visibility](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility)
-- [L5 — Apache: Assembling LICENSE and NOTICE files](https://infra.apache.org/licensing-howto.html)
+- Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0.html
+- Applying Apache License 2.0: https://www.apache.org/legal/apply-license
+- GitHub licensing: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
+- GitHub visibility effects: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility
+- GitHub Actions secure use: https://docs.github.com/en/actions/reference/security/secure-use

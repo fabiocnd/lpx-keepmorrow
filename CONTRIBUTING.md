@@ -3,14 +3,15 @@
 LPX Keepmorrow is maintained by **Lopix Neural Inc.** and led by **Fabio de Sousa
 Lopes**. Contact: **fabio@lopixneural.com**.
 
-This is a private, proprietary repository. Access permits only the work
-authorized by its owner; it does not grant a public redistribution license. The
-product's intended free, nonmonetized use is a separate product decision.
+Project-owned source in this revision uses [Apache License 2.0](LICENSE).
+Intentional contributions use the same license under its contribution terms.
+Submit only work you have authority to license; identify third-party material
+and preserve its notices. No separate CLA or DCO sign-off is currently required.
+Imported user data and private development records are never contributions.
 
-The owner now plans an open-source transition. The release license has not yet
-been selected or adopted, and repository visibility has not changed. Follow the
-current [LICENSE](LICENSE) until the chosen release and contribution terms are
-formally adopted; this direction alone is not a new license grant.
+Keep discussion respectful and constructive. Report harassment privately to the
+maintainer. Follow [SECURITY.md](SECURITY.md) for sensitive reports; never attach
+real exports, credentials, or personal data to public issues or pull requests.
 
 ## Before changing the repository
 
@@ -117,3 +118,13 @@ Do not add dependencies, model calls, analytics, network access, or a new
 integration merely for convenience. Explain the need and record the resulting
 data flow, maintenance burden, and applicable licensing. Public publication and
 changes to repository visibility require authorization for that action.
+
+## Release and administrative controls
+
+The intended required checks are `CI required` and `Security required`. Workflow
+files do not prove that server-side branch protection or native security settings
+are enabled. See the publication runbook for the exact administrative steps.
+A sole-maintainer setup uses pull requests and checks with zero required external
+approvals; require one independent approval when a second maintainer is available.
+Do not represent a maintainer's own merge as independent review. Dependabot version
+updates target `develop`; native security updates may target the default branch.

@@ -6,10 +6,11 @@ contains the deterministic preservation core and the private service reference
 implementation. Source implementation, local validation, remote CI, and a live
 ChatGPT deployment have separate evidence boundaries.
 
-The owner plans an open-source transition. The release license is not yet
-selected or adopted; the current source license and private visibility remain
-in effect. Review the [decision register](governance/decision-register.md) for
-the current direction and unresolved release choices.
+Project-owned source in this revision uses Apache License 2.0. The historical
+development repository stays private; public distribution uses a reviewed source
+snapshot with a fresh root commit. Source licensing, actual public publication,
+and hosted-service qualification are separate decisions and evidence gates.
+The maintained product's free direction does not restrict downstream rights.
 
 Start with the [product brief](product/product-brief.md). For operation, use the
 [private service runbook](operations/private-service-runbook.md); for executed
