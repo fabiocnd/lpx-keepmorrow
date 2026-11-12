@@ -63,9 +63,41 @@ Python 3.11 and 3.14, and one optional MCP/schema job on Ubuntu/Python 3.12.
 The optional job installs the recorded constraints from
 `requirements/chatgpt-dev-py312.constraints.txt`.
 
-Remote results for this version are pending upload and observation. No result
-from the historical 0.1.0 workflow is attributed to this implementation. This
-section will be updated with the inspected commit, run, and individual outcomes.
+[Run 43221178394](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43221178394)
+completed successfully for source commit
+[`c46234c6e20188a662b42c2d59790cb2d0d34207`](https://github.com/fabiocnd/lpx-keepmorrow/commit/c46234c6e20188a662b42c2d59790cb2d0d34207),
+with Git tree `35836aea7267c1c25803e33c34910e787e6daba6`.
+All five job records and their decoded logs were inspected. All four syntax
+checks passed, as did the optional dependency installation.
+
+| Job | Discovered | Passed | Skipped | Failures or errors |
+| --- | ---: | ---: | ---: | ---: |
+| Ubuntu / Python 3.11 | 168 | 153 | 15 | 0 |
+| Ubuntu / Python 3.14 | 168 | 153 | 15 | 0 |
+| Windows / Python 3.11 | 168 | 151 | 17 | 0 |
+| Windows / Python 3.14 | 168 | 151 | 17 | 0 |
+| MCP and collection schema / Python 3.12 | 18 | 18 | 0 | 0 |
+
+Each core job omitted 10 SDK-dependent tests and five schema-dependent tests
+because those optional dependencies were not installed. Windows additionally
+skipped a named-pipe scenario and a case-sensitive filename-collision scenario
+that could not be constructed on the runner. These skips are not counted as
+executed or passed. Both platform-specific scenarios executed on Ubuntu; the
+optional job separately passed all 13 adapter/registry and five schema tests.
+Its installation logs confirm `mcp==1.29.0`, `jsonschema==4.26.0`,
+`starlette==1.6.0`, and `uvicorn==0.52.1`.
+
+The [initial run](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43220767645)
+passed on Ubuntu and in the optional job, but each Windows job failed one
+backslash-path subtest. The Windows ZIP writer had normalized the intended
+invalid name before serialization. The corrected test constructs identical raw
+header names across platforms and checks `orig_filename` before exercising
+refusal. The runtime rejection policy was unchanged. The corrected scenario
+passed on all four platforms, and its focused local ZIP suite passed 23 tests.
+
+These results apply to the exact source revision and hosted environments above.
+Documentation-only commits can advance `main` without expanding the tested
+runtime, platform, or input-format scope.
 
 ## Measured collection workload
 
@@ -123,7 +155,23 @@ generations and full-byte verification before queries remain explicit costs.
 
 ## Source delivery
 
-The intended destination is the existing private repository
-[fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow). Source upload,
-remote tree equality, current visibility, and remote execution will be recorded
-after their results are observed.
+Authenticated repository metadata confirmed that
+[fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow) remained
+private. The complete repository contained 104 tracked UTF-8 files; only
+synthetic inputs were included. The update used the existing branch history and
+an expected-head check, without a force update or visibility change.
+
+| Evidence | Verified value |
+| --- | --- |
+| Repository ID | `1455189876` |
+| Visibility | Private |
+| Tested remote source commit | `c46234c6e20188a662b42c2d59790cb2d0d34207` |
+| Corresponding local source snapshot | `cab8d5489f6714d27c31f4b7a16ed740c40acc1a` |
+| Matching remote and local Git tree | `35836aea7267c1c25803e33c34910e787e6daba6` |
+
+The local snapshot retains `Fabio de Sousa Lopes <fabio@lopixneural.com>` as its
+author. The GitHub connector uses the account's managed commit identity; the
+remote message records the local snapshot and the canonical project identity
+in a co-author trailer. The tree equality, rather than identical commit hashes,
+establishes content equivalence between these two histories. Later evidence
+updates may advance the branch and are identified separately when delivered.
