@@ -10,7 +10,7 @@
 
 **Release:** 0.3.0 reference service
 
-**Status:** Local validation and initial hosted CI; corrected Windows rerun pending
+**Status:** Local and hosted validation; five corrected jobs passed, one awaiting runner steps
 
 This record separates implemented and locally exercised behavior from evidence
 that requires the intended deployment host, identity provider, ChatGPT account,
@@ -82,17 +82,47 @@ unclosed connection as a resource warning.
 The test now explicitly commits and closes its independent fixture connection
 before the existing refusal and byte-preservation assertions. The five access
 persistence tests passed locally after this correction. Production modules and
-the benchmark source remain unchanged. A corrected hosted run is required before
-the Windows matrix can be reported as passing.
+the benchmark source remain unchanged. The corrected Windows results are
+recorded in the next section; this first-run failure remains part of the
+verification history.
 
 All 49 operation and workspace tests passed in each original Windows job. The
 58 skips comprise 55 optional-dependency checks and three platform conditions:
 unavailable named pipes, a case-insensitive filesystem that cannot construct the
 collision fixture, and the POSIX permission/link contract.
 
-The hosted browser result exercises a synthetic host. It does not establish a
-live ChatGPT connection, external identity-provider configuration, or visual
-review of a particular deployment.
+## Corrected hosted CI checkpoint
+
+[Workflow run 43245680709](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43245680709)
+executed commit `9cadba7aa692410e9d99fd7d3483a8a1f350295f`, including the explicit
+fixture-connection close. At **2026-11-12 15:19 UTC**, five jobs had completed
+successfully. The Ubuntu/Python 3.11 job was marked in progress after runner
+assignment but exposed no executed steps. It is not recorded as a passing job
+or a test failure.
+
+| Job | Recorded corrected-run outcome |
+| --- | --- |
+| Ubuntu, Python 3.11 | Awaiting runner steps at this checkpoint; no test result available |
+| Ubuntu, CPython 3.14.10 | 331 discovered; 55 skipped; successful in 4.751 seconds |
+| Windows Server 2025, CPython 3.11.9 | 331 discovered; 58 skipped; successful in 53.181 seconds |
+| Windows Server 2025, CPython 3.14.10 | 331 discovered; 58 skipped; successful in 39.890 seconds |
+| Complete optional service, CPython 3.12.16 | 331 passed; zero skips; 6.477 seconds; policy comparison and wheel build passed |
+| MCP Apps interface, Node 24 | Type checking and bundle comparison passed; 28 interface tests passed with zero skips; eight Playwright synthetic-host tests passed in 21.7 seconds |
+
+Neither corrected Windows log contained the previous unclosed-database warning.
+The Ubuntu/Python 3.11 success in the initial run is evidence for its separately
+identified commit; it does not substitute for the pending job. Any later run
+must be recorded against its own commit and inspected outcomes. A documentation
+commit does not retroactively expand this checkpoint.
+
+## Synthetic browser artifact review
+
+Retained screenshots from the initial hosted browser run were visually reviewed
+at **1280 × 1600** and **320 × 1600** pixels. The interface remained intact in
+both captured views, with no visible horizontal overflow. This review covers
+those synthetic-host states and viewport sizes. The executed browser tests and
+screenshots do not establish a live ChatGPT connection, external identity-provider
+configuration, or the behavior of an unreviewed deployment.
 
 ## Operation and workspace evidence
 
@@ -151,6 +181,14 @@ the generated operator key was private and was not printed.
 This is an installation and packaging check, not a public package release. A
 change to packaged source, policies, notices, or assets requires a new build and
 artifact record.
+
+The source-archive inventory was separately reviewed: **189 files**, excluding
+Git repository metadata/history, removed private development records, and local
+credentials or runtime state. Local file targets in **54 Markdown documents**
+resolved successfully. These are artifact-structure and documentation-link
+checks; they do not constitute a repository-history purge or a new source
+license. Rebuild the source archive after the final documentation commit. Its
+digest must describe those final bytes rather than this intermediate inventory.
 
 ## Local service benchmark
 
@@ -223,7 +261,7 @@ claiming a universal cancellation deadline.
 | Live identity provider | Registered clients, PKCE/browser flow, issuer/audience/JWKS validation, token expiry/rotation, session behavior | Synthetic verifier and protocol tests do not prove a deployed provider configuration |
 | Actual binary transfer | Host-supported upload selection and one authenticated output downloaded and independently verified | Local byte round trips are available; host-specific delivery must be observed |
 | Representative export | Explicit intake/review consent, inventory, actual images/binaries and missing-artifact report, branch/association findings | No user-authorized representative archive was supplied for this validation |
-| Browser visual review | Desktop/mobile screenshots, consent readability, keyboard/focus behavior, host iframe behavior | Eight hosted synthetic browser tests passed; artifact review and actual host behavior remain separate evidence in the UI package's validation record |
+| Browser visual review | Consent readability, keyboard/focus behavior, and actual host iframe behavior | Eight hosted synthetic tests passed; desktop and narrow screenshots were reviewed without visible horizontal overflow; live host behavior remains unverified |
 | Deployment envelope | Measured RSS/storage/I/O, load rejection, dependency failures, retention, restart, backup/rollback on selected host | No production host or load envelope has been qualified |
 | Legal release review | Correct entity/jurisdiction facts, operative privacy/retention disclosures, review of mandatory rights and liability limitations | Draft policy text and enforced acceptance do not establish legal enforceability |
 | Open-source publication | Adopted release and contribution terms, complete third-party attribution, reviewed release contents, and an explicit publication decision | The transition is planned; no replacement source license or public release is established by this validation |

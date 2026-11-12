@@ -145,9 +145,9 @@ local service workflow and does not establish HTTP, IdP, tunnel, or ChatGPT late
 | Legal release | Approved final terms, privacy notices, retention, and support obligations | Owner and qualified counsel review |
 | Open-source release | Exact license, current dependency notices, sanitized source artifact, and reviewed publication history | License adoption and public destination decision |
 
-The current browser environment did not provide a signed-in ChatGPT account.
-Local DOM/protocol tests and synthetic browser CI remain separate from this live
-acceptance gate. No credentials are requested through chat or stored in source.
+The signed-in ChatGPT acceptance flow has not been demonstrated. Local
+DOM/protocol tests and successful synthetic Chromium CI are separate from that
+live gate. No credentials are requested through chat or stored in source.
 
 ## 8. Connectivity and product policy
 

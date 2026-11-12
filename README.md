@@ -148,8 +148,9 @@ and operation status. The original local CLI remains independently usable.
 **Implementation is not deployment evidence.** Synthetic tests exercise two
 identities, the actual HTTP/MCP boundary, operation interruption, and byte-exact
 package recovery. A real ChatGPT account connection, selected live identity
-provider and host, representative real export, and actual browser qualification
-remain open gates. Account-wide discovery, native ChatGPT restoration, model
+provider and host, representative real export, and deployed portal/browser
+qualification remain open gates. The companion has passed synthetic Chromium
+tests and desktop/narrow screenshot review. Account-wide discovery, native ChatGPT restoration, model
 inference, and model training are not implemented.
 
 ## Start here

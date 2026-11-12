@@ -41,7 +41,8 @@ its current evidence and external dependencies.
 - [x] Separate source licensing from processing consent and user-data ownership.
 - [x] Inspect bundled UI license texts and preserve third-party notices.
 - [ ] Adopt the exact release license and update all corresponding package metadata.
-- [ ] Inspect a sanitized source artifact with no private development history.
+- [x] Inspect a sanitized source artifact with no private development history.
+  Rebuild and recheck the exact public artifact after license adoption.
 - [ ] Approve and create the public distribution destination and publication history.
 - [ ] Establish public contribution, issue-reporting, security, and release procedures.
 
