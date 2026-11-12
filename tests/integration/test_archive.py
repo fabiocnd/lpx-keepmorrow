@@ -7,9 +7,11 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from keepmorrow.archive import ArchiveError, Limits, create_archive, restore_archive, verify_archive
+from keepmorrow.archive.filesystem import copy_tree
 from keepmorrow.cli import main
 from keepmorrow.consent import CURRENT_PRIVACY_VERSION, CURRENT_TERMS_VERSION
 
@@ -47,6 +49,51 @@ class ArchiveTests(unittest.TestCase):
         second = self.root / "second"
         create_archive(self.source, second)
         self.assertEqual((self.archive / "manifest.json").read_bytes(), (second / "manifest.json").read_bytes())
+
+    def test_incomplete_directory_entry_metadata_preserves_stable_files(self) -> None:
+        original_scandir = os.scandir
+
+        class PartialIdentityEntry:
+            """Model directory enumeration that omits device and file IDs."""
+
+            def __init__(self, entry: os.DirEntry[str]) -> None:
+                self.entry = entry
+                self.name = entry.name
+                self.path = entry.path
+
+            def stat(self, *, follow_symlinks: bool = True) -> SimpleNamespace:
+                info = self.entry.stat(follow_symlinks=follow_symlinks)
+                return SimpleNamespace(st_dev=0, st_ino=0, st_mode=info.st_mode,
+                                       st_size=info.st_size, st_mtime_ns=info.st_mtime_ns,
+                                       st_ctime_ns=info.st_ctime_ns)
+
+        @contextlib.contextmanager
+        def incomplete_scandir(path: Path):
+            with original_scandir(path) as entries:
+                yield (PartialIdentityEntry(entry) for entry in entries)
+
+        with patch("keepmorrow.archive.filesystem.os.scandir", incomplete_scandir):
+            create_archive(self.source, self.archive)
+            self.assertTrue(verify_archive(self.archive).verified)
+        self.assertEqual((self.archive / "payload/notes/data.bin").read_bytes(), self.data)
+
+    def test_replacement_after_inventory_cancels_publication(self) -> None:
+        def replace_before_copy(source, destination, inventory, limits):
+            target = source / "notes/data.bin"
+            original = target.stat()
+            replacement = self.root / "replacement.bin"
+            replacement.write_bytes(self.data)
+            replacement.chmod(original.st_mode)
+            os.utime(replacement, ns=(original.st_atime_ns, original.st_mtime_ns))
+            replacement.replace(target)
+            return copy_tree(source, destination, inventory, limits)
+
+        with patch("keepmorrow.archive.service.copy_tree", side_effect=replace_before_copy):
+            with self.assertRaisesRegex(ArchiveError, "changed after inventory"):
+                create_archive(self.source, self.archive)
+        self.assertFalse(self.archive.exists())
+        self.assertEqual(list(self.root.glob(".keepmorrow-*")), [])
+        self.assertEqual((self.source / "notes/data.bin").read_bytes(), self.data)
 
     def test_corruption_is_reported_and_recovery_is_canceled(self) -> None:
         create_archive(self.source, self.archive)

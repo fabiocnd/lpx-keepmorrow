@@ -1,7 +1,8 @@
 # Foundation Verification Record
 
 **Date:** 2026-11-12  
-**Status:** Local foundation verified; remote repository publication not yet verified  
+**Status:** Private source upload verified; Windows portability correction awaiting CI verification
+
 **Environment:** Linux x86_64, Python 3.12.14
 
 ## Executed validation
@@ -10,7 +11,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-Result: **38 tests passed**, with no skips or failures in this environment.
+Initial source result: **38 tests passed**, with no skips or failures in this environment.
 
 The executed scenarios cover byte-identical recovery, deterministic manifests,
 empty files and directories, corruption, missing and unexpected inventory,
@@ -28,6 +29,23 @@ in the reviewed document set. A focused pattern check found no exposed private
 keys, known token prefixes, or unrelated personal contact/address details.
 This is a bounded review, not a certification that all possible secrets or
 security defects are absent.
+
+## Windows portability correction
+
+The [initial CI run](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43207182721)
+passed on Ubuntu with Python 3.11 and 3.14, but failed on both Windows jobs.
+Directory-entry metadata on Windows omitted the device and file identifiers
+needed for comparison with an opened file descriptor. Valid source files were
+therefore incorrectly rejected as changed after inventory.
+
+Inventory now obtains complete metadata with `os.stat(..., follow_symlinks=False)`.
+All six source-mutation signature fields remain checked. Two behavioral
+regressions cover incomplete directory-entry metadata and replacement of a source
+file after inventory, including refusal and staging cleanup.
+
+The full local command above passed **40 tests with no failures or skips** after
+this correction. A successful Windows rerun has not yet been established by this
+version of the record.
 
 ## Measured performance
 
@@ -49,7 +67,8 @@ established.
 ## Reviewed limitations
 
 - Windows publication behavior is implemented but has not been executed locally.
-- CI is configured; remote execution is not established by this record.
+- The initial Windows CI failure is corrected locally; remote verification of
+  the correction remains pending.
 - No hostile concurrent ancestor-replacement defense or fsync crash-durability
   guarantee is implemented.
 - Source conversations and native project relationships are not semantically
@@ -63,7 +82,30 @@ established.
 
 ## Remote status
 
-The authenticated GitHub connector identified `fabiocnd`. The repository
-creation operation is not exposed by that connector. Browser authentication
-was started for private repository creation and requires completion before
-remote existence, privacy, source upload, or CI can be reported as verified.
+On 2026-11-12, authenticated GitHub metadata confirmed that the user-created
+[fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow) repository
+was private. The initial upload contained all 64 tracked source files. At
+verification time, `main` pointed to the remote commit recorded below.
+
+| Evidence | Verified value |
+| --- | --- |
+| Repository ID | `1455189876` |
+| Verification date | `2026-11-12` |
+| Visibility | Private |
+| Tracked files uploaded | 64 |
+| Remote source commit | `e01ccf12b849bef742cd53b7d1ea2f23b21a0f28` |
+| Local source snapshot commit | `ab4eb2bd531398edb8f33f225ced5f14e1562293` |
+| Matching remote and local Git tree | `36a2c9dc3b3eb89fcc62a9ce92948a86c3eb74e8` |
+
+The remote Git tree matched the local `git write-tree` result exactly. These
+identifiers record the verified initial source upload; later documentation
+commits may advance `main`. Source delivery does not establish CI execution or
+an implemented remote archive-transfer capability. CI evidence is recorded
+separately above.
+
+The GitHub connector does not expose author or committer fields. Its remote
+commit records Fabio Lopes under a GitHub-managed noreply identity, while a
+commit trailer credits `Fabio de Sousa Lopes <fabio@lopixneural.com>`. That
+trailer does not replace the primary author or committer metadata. The local
+source snapshot and repository-local Git configuration retain the canonical
+project identity, `Fabio de Sousa Lopes <fabio@lopixneural.com>`.

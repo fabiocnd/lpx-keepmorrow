@@ -104,7 +104,10 @@ def scan_tree(root: Path, limits: Limits) -> Inventory:
             for entry in entries:
                 relative = f"{prefix}/{entry.name}" if prefix else entry.name
                 validate_relative_path(relative)
-                info = entry.stat(follow_symlinks=False)
+                # Windows directory-entry metadata omits device and file IDs.
+                # Fetch complete identity before comparing it with descriptor
+                # metadata; otherwise an unchanged file appears to be replaced.
+                info = os.stat(entry.path, follow_symlinks=False)
                 if stat.S_ISDIR(info.st_mode):
                     directories.append(relative)
                     pending.append((Path(entry.path), relative))

@@ -6,8 +6,8 @@
 - [x] Establish canonical names, ownership, contact, and proprietary source policy.
 - [x] Organize documentation and code by responsibility.
 - [x] Define engineering, performance, and AI standards.
-- [ ] Verify private GitHub repository creation and the remote source commit.
-- [x] Complete reference-core and consent-boundary validation (38 local tests passed).
+- [x] Verify private GitHub repository creation and the remote source commit.
+- [x] Complete reference-core and consent-boundary validation (40 local tests passed).
 - [x] Record initial benchmark methodology and measured results.
 - [ ] Obtain qualified legal review before public use of the draft terms.
 

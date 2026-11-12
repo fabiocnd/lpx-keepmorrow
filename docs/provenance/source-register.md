@@ -30,6 +30,7 @@ personal context are not repository artifacts.
 The following current implementation references were reviewed on 2026-11-12:
 
 - [Creating a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository).
+- [Python directory-entry metadata and Windows identity limitations](https://docs.python.org/3.14/library/os.html#os.DirEntry.stat).
 - [actions/checkout v7.0.1 commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1).
 - [actions/setup-python v7.1.0 commit](https://github.com/actions/setup-python/commit/6d4fd22b20465ccc0f7354476588e8df7c9ca0e0).
 

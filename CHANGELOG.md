@@ -15,6 +15,11 @@
 - Explicit local-operation acceptance boundary.
 - Validation workflow configuration with pinned GitHub Actions.
 
+### Fixed
+
+- Obtain complete filesystem identity during Windows inventory before checking
+  opened source files for replacement or mutation.
+
 ### Scope
 
 This is a development foundation, not a public product release. Semantic export
