@@ -33,6 +33,9 @@ work, not a claim that the owner separately approved a permanent stack.
 | D021 | Treat the ChatGPT mapping adapter as experimental until a representative real export is validated | Implementation choice | Synthetic compatibility evidence exists; no real account export has been supplied |
 | D022 | Add a read-only local MCP development adapter with explicit grants | Implementation choice | Supports the intended ChatGPT integration boundary without deployment, unrestricted history access, or premature write tools |
 | D023 | Revise legal drafts to version 2026-11-12-draft.2 for the changed local processing scope | Implementation choice | Catalogs, search results, association decisions, ZIP preservation, selection, and local MCP handling require accurate disclosure and fresh exact acceptance |
+| D024 | Deliver a synthetic account connection, then an authenticated private read-only pilot, before remote writes | Proposal | Owner requested a senior delivery plan on 2026-11-12; the [plan](../architecture/chatgpt-delivery-plan.md) defines evidence gates and provisional effort, not a deployment approval or completed capability |
+| D025 | Require server-recorded human acceptance and per-principal object grants before real connected content | Proposal | Current model-supplied version declarations do not establish human assent or authenticated authorization; the CLI contract remains unchanged |
+| D026 | Review plugin content eligibility before promising full-history ingestion | Proposal | Current platform guidelines restrict certain data categories; retain originals under owner control and evaluate separately reviewed eligible selections without assuming an exemption |
 
 ## Superseded historical items
 

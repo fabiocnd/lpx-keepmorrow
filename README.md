@@ -45,6 +45,7 @@ unimplemented.
 | Import exports, inspect revisions, and recover a selection | [Collection workflow](docs/architecture/collection-workflow.md) |
 | Review supported input shapes and missing-media states | [Import contract](docs/architecture/import-contract.md) |
 | Understand the ChatGPT integration boundary | [ChatGPT development adapter](docs/architecture/chatgpt-integration.md) |
+| Plan the private ChatGPT pilot and later recovery workflow | [ChatGPT delivery plan](docs/architecture/chatgpt-delivery-plan.md) |
 | Compare the product with official export | [Export comparison](docs/product/export-comparison.md) |
 | Review legal terms and acceptance | [Legal drafts](legal/README.md) |
 | Contribute or change code | [Contributing](CONTRIBUTING.md) and [Golden Coding Standard](docs/engineering/golden-coding-standard.md) |

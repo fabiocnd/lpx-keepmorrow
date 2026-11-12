@@ -19,6 +19,7 @@ being reviewed.
 - [Collection workflow](architecture/collection-workflow.md)
 - [Import contract](architecture/import-contract.md)
 - [ChatGPT development adapter](architecture/chatgpt-integration.md)
+- [ChatGPT integration delivery plan](architecture/chatgpt-delivery-plan.md)
 - [Consent boundary](architecture/consent-boundary.md)
 - [ADR 0001: repository layout](architecture/decisions/0001-repository-layout.md)
 - [ADR 0002: immutable collections](architecture/decisions/0002-immutable-collections.md)

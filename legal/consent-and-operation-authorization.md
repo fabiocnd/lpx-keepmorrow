@@ -143,7 +143,7 @@ Company privacy-request route.
 ## 7. Verification Requirements
 
 Tests must show that missing or mismatched acceptance prevents calls to the
-archive service, that all three operations require both accepted versions, and
+archive service, that all supported operations require both accepted versions, and
 that a valid request records the correct operation without implying a broader
 grant. A production assessment must additionally examine document availability,
 understandability, accessible decline controls, scope correction, tamper-resistant

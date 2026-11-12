@@ -5,6 +5,12 @@
 **Owner:** Lopix Neural Inc.
 **Engineering lead:** Fabio de Sousa Lopes
 
+The [ChatGPT delivery plan](chatgpt-delivery-plan.md) defines the proposed phases,
+account and content-eligibility checks, authentication, server-side consent,
+file-transfer experiments, operating limits, and acceptance evidence. This
+document describes the implemented 0.2.0 adapter; the plan does not change its
+current deployment status.
+
 ## Intended user experience
 
 The product is intended to be usable from a ChatGPT conversation. OpenAI's current

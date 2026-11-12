@@ -1,5 +1,17 @@
 # Delivery Roadmap
 
+## Current delivery sequence
+
+The [ChatGPT integration delivery plan](../architecture/chatgpt-delivery-plan.md)
+sets the proposed execution order from the 0.2.0 baseline: an actual synthetic
+connection, local representative-export validation, an authenticated read-only
+pilot, then UI, durable intake/recovery, and operational release evidence.
+
+The milestones below group capabilities; they are not a requirement to complete
+cloud storage or durable write jobs before testing the existing read tools in
+ChatGPT. Content eligibility, human acceptance, and per-object authorization are
+gates before real content is connected. All new plan items remain pending.
+
 ## Foundation — current work
 
 - [x] Consolidate the retrieved Blueprint and owner instructions.
