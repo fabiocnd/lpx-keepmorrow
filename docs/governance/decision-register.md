@@ -1,58 +1,56 @@
-# Decision Register
+# Engineering and Distribution Decisions
 
-**Recorded:** 2026-11-12
-**Owner:** Fabio de Sousa Lopes
-**Publisher:** Lopix Neural Inc.
+**Reviewed:** November 12, 2026
+**Version:** 0.3.0 development candidate
 
-Status values: **owner-confirmed**, **implementation choice**, **proposal**,
-**open**, and **historical**. An implementation choice is reviewable engineering
-work, not a claim that the owner separately approved a permanent stack.
+This register records product and engineering decisions, their consequences, and
+remaining release choices. Private development conversations and personal research
+are outside the distributable documentation. Status is implementation evidence,
+not a substitute for operational or legal acceptance.
 
-| ID | Decision | Status | Basis and consequence |
+| ID | Decision | Status | Rationale and consequence |
 | --- | --- | --- | --- |
-| D001 | Use LPX Keepmorrow and technical slug `lpx-keepmorrow` | Owner-confirmed | Naming adoption in Blueprint v0.2 |
-| D002 | Keep persistent authored project content in US English | Owner-confirmed | Original and current language instructions; preserve imported original bytes in their source language |
-| D003 | Keep the product free and nonmonetized | Owner-confirmed | Earlier product direction remains in force |
-| D004 | Attribute publisher Lopix Neural Inc. and creator Fabio de Sousa Lopes | Owner-confirmed | Explicit ownership and visibility instruction |
-| D005 | Create a private proprietary GitHub repository | Owner-confirmed | Current instruction resolves source availability for this repository |
-| D006 | Use fabio@lopixneural.com for project contact and commit author identity | Owner-confirmed | Current email instruction; no mailbox validation implied |
-| D007 | Apply Golden Coding Standard to documentation, code, comments, algorithms, and AI work | Owner-confirmed | Current quality instruction; project policy, not an external certification |
-| D008 | Reevaluate performance and group folders by responsibility | Owner-confirmed | Current organization instruction |
-| D009 | Require user acceptance before processing | Owner-confirmed | Current legal/consent instruction; scope-specific permissions remain separate |
-| D010 | Draft protections for company and developer within applicable law | Owner-confirmed | Terms cannot waive mandatory obligations or authorize undisclosed retention/destruction |
-| D011 | Use Python 3.11+ standard library for a small local reference core | Implementation choice | Minimizes setup and runtime dependencies; production runtime remains reviewable |
-| D012 | Use a versioned directory snapshot for the first verifiable slice | Implementation choice | Makes byte preservation, manifest inspection, and recovery independently testable |
-| D013 | Keep model assistance outside deterministic preservation | Working baseline | Blueprint architecture and current engineering requirements |
-| D014 | Use `fabiocnd` as the repository owner | Implementation choice | Authenticated account verified; no installed organization was listed |
-| D015 | Leave Google Drive as a storage-adapter candidate | Proposal | No provider integration or permission flow has been approved or implemented |
-| D016 | Publish or distribute the product | Open | Separate owner decision after engineering, privacy, and legal review |
-| D017 | Production hosting, retention, telemetry, and model provider | Open | Must be specified before relevant data processing is enabled |
-| D018 | Treat the retrieved Blueprint as a historical source snapshot | Implementation choice | Preserve its original open decisions while recording superseding instructions here |
-| D019 | Implement the recent preservation and product-differentiation recommendations | Owner-confirmed | Owner requested senior engineering refactoring and implementation after reviewing official export, binary, and image coverage |
-| D020 | Use immutable collection generations over the existing archive contract | Implementation choice | Preserve previous outputs, keep originals distinct from derived catalogs, and expose full-copy costs; see ADR 0002 |
-| D021 | Treat the ChatGPT mapping adapter as experimental until a representative real export is validated | Implementation choice | Synthetic compatibility evidence exists; no real account export has been supplied |
-| D022 | Add a read-only local MCP development adapter with explicit grants | Implementation choice | Supports the intended ChatGPT integration boundary without deployment, unrestricted history access, or premature write tools |
-| D023 | Revise legal drafts to version 2026-11-12-draft.2 for the changed local processing scope | Implementation choice | Catalogs, search results, association decisions, ZIP preservation, selection, and local MCP handling require accurate disclosure and fresh exact acceptance |
-| D024 | Deliver a synthetic account connection, then an authenticated private read-only pilot, before remote writes | Proposal | Owner requested a senior delivery plan on 2026-11-12; the [plan](../architecture/chatgpt-delivery-plan.md) defines evidence gates and provisional effort, not a deployment approval or completed capability |
-| D025 | Require server-recorded human acceptance and per-principal object grants before real connected content | Proposal | Current model-supplied version declarations do not establish human assent or authenticated authorization; the CLI contract remains unchanged |
-| D026 | Review plugin content eligibility before promising full-history ingestion | Proposal | Current platform guidelines restrict certain data categories; retain originals under owner control and evaluate separately reviewed eligible selections without assuming an exemption |
-
-## Superseded historical items
-
-Blueprint v0.2 left source licensing open. D005 now establishes private,
-proprietary source. The free product direction remains unchanged.
-
-The Blueprint left implementation language open. D011 selects only the local
-reference implementation, not a permanent production architecture.
-
-Draft terms are preparatory documents. Their inclusion in a private repository
-does not establish legal approval, public availability, or an effective contract
-with end users.
+| D001 | Use LPX Keepmorrow and `lpx-keepmorrow` | Adopted | Stable product and package identity |
+| D002 | Author code, documentation, comments, and UI in US English | Adopted | One maintained technical vocabulary; original imported bytes retain their language |
+| D003 | Keep the maintained product free and nonmonetized | Product direction | Separate from downstream rights under a future open-source license |
+| D004 | Attribute Lopix Neural Inc. and Fabio de Sousa Lopes | Adopted | Proportionate professional attribution without modifying preserved originals |
+| D005 | Retain the current private proprietary repository during release preparation | Current state | Open-source transition is planned under D035; no public license has yet been adopted |
+| D006 | Use fabio@lopixneural.com as professional contact | Adopted | Consistent package, security, and maintainer contact |
+| D007 | Apply the project Golden Coding Standard | Adopted | Typed boundaries, explicit invariants, meaningful tests, measured claims; no external certification implied |
+| D008 | Group files by responsibility | Implemented | Cohesive domain, integration, documentation, and operational boundaries; ADR 0001 |
+| D009 | Require acceptance before selected-content processing | Implemented | Explicit CLI declarations and authenticated portal decisions serve different trust boundaries |
+| D010 | Keep legal limitations subject to applicable law | Draft policy | No absolute immunity, undisclosed retention authority, or waiver of mandatory rights |
+| D011 | Keep the deterministic core on Python 3.11+ standard library | Implemented | Minimize authoritative runtime dependencies; HTTP/OAuth/MCP remain optional |
+| D012 | Use a versioned directory archive with exact manifests | Implemented | Inspectable byte preservation, separate verification, and ordinary-file recovery |
+| D013 | Keep model assistance outside preservation decisions | Implemented boundary | No model inference, training, authoritative identity, or integrity decisions |
+| D014 | Maintain the existing repository namespace | Current state | Any public destination is selected with the distribution plan |
+| D015 | Treat Google Drive as a possible later storage adapter | Deferred | No provider integration or reused credentials |
+| D016 | Separate source publication from hosted-service launch | Adopted | A source license does not approve hosting, processing purposes, or retention |
+| D017 | Select actual hosting, region, identity provider, and operational policy before live processing | Open | Configuration examples do not establish a live deployment |
+| D018 | Exclude private development records from the distributable source tree | Adopted for release preparation | Preserve reusable product and engineering requirements without conversation snapshots or biographical research |
+| D019 | Implement continuity, evidence, and selected recovery around supplied exports | Implemented | Native export remains the source acquisition mechanism |
+| D020 | Use immutable collection generations | Implemented | Previous outputs remain unchanged; physical copy costs are explicit; ADR 0002 |
+| D021 | Keep parser compatibility experimental | Current limit | Synthetic fixtures do not replace an authorized representative real export |
+| D022 | Retain the legacy loopback read adapter for synthetic development | Implemented | Separate from the authenticated service; no production identity claim |
+| D023 | Describe local collection processing in draft.2 policies | Superseded by D032 | Historical scope was expanded for the private service |
+| D024 | Require actual ChatGPT and real-source acceptance evidence | Open gate | Backend and UI implementation can proceed before those external dependencies, but cannot close them |
+| D025 | Record human acceptance and per-principal exact-generation grants | Implemented | Model arguments cannot manufacture assent; active plans bind exact receipts |
+| D026 | Review content eligibility before connecting real material | Open gate | Neither private installation nor a checkbox establishes platform eligibility |
+| D027 | Implement the private service as one process with one worker | Implemented | Bounded coordination and failure model; ADR 0003 |
+| D028 | Share transactional SQLite state between grants and operations | Implemented | Serialize publication authorization against revocation using the same immediate transaction |
+| D029 | Separate trusted human decisions from model-callable tools | Implemented | Browser sessions, CSRF, exact snapshots, single-use challenges, and independent plan review |
+| D030 | Reconcile process stops and clean only proven owned scratch | Implemented | Exclusive worker epoch, intended output digest, ownership ledger/marker, and refusal of ambiguous cleanup |
+| D031 | Use the portal for private-pilot file transfer | Implemented | Bounded upload and authorized download; native ChatGPT file acquisition remains separate work |
+| D032 | Use policy version 2026-11-12-draft.3 for the current private service | Draft implementation policy | Accurate disclosure of service identity, consent, temporary storage, operations, and unresolved deployment choices |
+| D033 | Keep active-plan fencing strict while allowing explicit completed-ancestor renewal | Implemented | Fresh child permission alone cannot override ancestor withdrawal; historical plans remain immutable |
+| D034 | Validate storage budgets before startup | Implemented | Require the full upload pool plus one 2 GiB operation reservation; admission still checks retained outputs and free space |
+| D035 | Prepare an open-source transition | Planned release | Apache-2.0 is the engineering recommendation; exact adoption and public publication remain pending |
+| D036 | Publish only reviewed source with an appropriate history boundary | Release requirement | Deleting current files does not remove earlier commits, CI logs, or artifacts |
 
 ## Change discipline
 
-Record the decision, date, evidence, status, rationale, and consequence.
-Material architecture choices also receive an
-[architecture decision record](../architecture/decisions/0001-repository-layout.md).
-Do not overwrite historical evidence to make it appear that a proposal was
-always an accepted decision.
+Record substantive architecture changes in a focused ADR. Update implementation
+contracts, tests, operating limits, and user-facing claims together. Historical
+technical measurements retain their original workload and version attribution.
+Do not turn a synthetic test into a live deployment claim or a licensing proposal
+into an effective source grant.

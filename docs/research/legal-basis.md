@@ -1,16 +1,22 @@
 # Legal Basis and Drafting Decisions
 
-**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**  
-**Reviewed:** 2026-11-12  
-**Jurisdictional baseline:** Ontario and applicable federal Canadian law  
-**Related document set:** `2026-11-12-draft.1`
+**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
+**Reviewed:** 2026-11-12
+**Jurisdictional baseline:** Ontario and applicable federal Canadian law
+**Initial drafting context:** `2026-11-12-draft.1`
+**Current implementation alignment:** `2026-11-12-draft.3`, reviewed 2026-11-12
+
+The source register records the bounded legal research performed on the stated
+review date. Later implementation notes below distinguish the original local
+reference from the added private service. They do not represent a new legal
+opinion, additional case-law research, or approval by counsel.
 
 ## Scope and Conclusions
 
-The owner requested professional user terms addressing retention of private
-information and loss or destruction of content and source structures, with
-explicit acceptance before processing. The requested protected parties are
-Lopix Neural Inc. and its developer, Fabio de Sousa Lopes. This research supports
+This research addresses retention of private information, loss or destruction
+of content and source structures, and explicit acceptance before processing.
+The proposed protected parties are Lopix Neural Inc. and its developer,
+Fabio de Sousa Lopes. This research supports
 an internal draft and implementation requirements; it is not a legal opinion or
 an assessment that every proposed clause will be enforceable.
 
@@ -41,26 +47,40 @@ documents, and official docket records supplied the cited passages. This is a
 bounded source review, not comprehensive case-law research or confirmation of
 unpublished changes. No third-party law-firm summary is used as authority here.
 
-## Application to the Reference Product
+## Original Reference and Current Implementation
 
-The inspected reference implementation performs local file operations and has no
-application network client, model service, automatic telemetry, or source-deletion
-operation. It copies supported bytes, records metadata, and verifies a portable
-directory archive. Those implementation facts determine the draft notice. A
-future hosted service must not reuse the local notice without assessing the new
-data flow and responsibilities.
+The implementation inspected for the initial draft performed local file
+operations without an application network client, model service, automatic
+telemetry, or source-deletion operation. It copied supported bytes, recorded
+metadata, and verified a portable directory archive. Those facts describe that
+research baseline; they do not describe every subsequent delivery component.
 
-The current CLI gate requires the exact draft Terms and Privacy Notice versions
+The CLI gate still requires the exact draft Terms and Privacy Notice versions
 before selected-data I/O. Its receipt contains document versions, UTC time, and
 operation. It does not record identity or full selected scope and is not an
-automatic persistent ledger. Production evidence requirements remain a delivery
-decision, with privacy and retention consequences of their own.
+automatic persistent ledger.
 
-The user's concern about private retention is addressed by identifying where
-copies remain and who controls them. The structural-loss concern is addressed by
-an accurate preservation promise, independent backups, separate recovery, and
-explicit limits on native-application reconstruction. Neither concern is resolved
-by inventing an unlimited waiver.
+The private service now implements external-token verification, an authenticated
+browser consent portal, resource-specific grants, independently reviewed
+operations, temporary upload intake, and verified package delivery. Its control
+database retains policy digests, principal digests, scoped human interactions,
+bounded plan parameters, expiry, revocation, and operation history. The current
+Privacy Notice describes these additional flows separately from the local core.
+Network requests are limited to configured authentication endpoints; no model
+inference or source-deletion operation has been added.
+
+Implementation evidence remains synthetic. A real host, provider relationship,
+ChatGPT connection, applicable user jurisdictions, long-term evidence-retention
+schedule, and production legal approval are not established by this repository.
+The technical distinction between immutable active-plan authority and renewed
+permission for completed ancestors is documented in the
+[consent boundary](../architecture/consent-boundary.md); it is not a conclusion
+about the legal sufficiency of a particular consent interaction.
+
+Retention risks are addressed by identifying where copies remain and who
+controls them. Structural-loss risks require an accurate preservation promise,
+independent backups, separate recovery, and explicit limits on native-application
+reconstruction. An unlimited waiver does not establish those controls.
 
 ## Decisions for Owner and Counsel
 
@@ -79,6 +99,10 @@ by inventing an unlimited waiver.
 - Review every future cloud or AI provider, transfer, reuse condition, and
   destructive operation before enabling it. No GDPR or worldwide compliance
   claim is established by this Ontario/Canada baseline.
+- Evaluate the owner's planned open-source transition separately from user-data
+  processing terms. The exact license and publication decision remain pending;
+  neither an intended source release nor a source license establishes privacy
+  compliance or authorization to operate a hosted service.
 
 ## Related Documents
 

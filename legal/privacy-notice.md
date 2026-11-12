@@ -1,12 +1,12 @@
 # LPX Keepmorrow Privacy Notice
 
 **DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
-**Privacy notice version:** `2026-11-12-draft.2`
+**Privacy notice version:** `2026-11-12-draft.3`
 **Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
-This draft describes the local reference application and proposed privacy
-commitments for a reviewed release. It is not an approved production notice or a
+This draft describes the local core, private development service, and proposed
+privacy commitments for a reviewed release. It is not an approved production notice or a
 certification of compliance. Future delivery models must be assessed before
 their processing starts.
 
@@ -40,10 +40,14 @@ integrated version.
 
 The local preservation core has no model inference, outbound application network
 requests, automatic telemetry, account tracking, or automatic upload to the Company.
-The optional MCP development server accepts local loopback connections and returns
-requested results to that client. It does not authenticate users or implement a
-multi-user service. A remote ChatGPT connection, authenticated deployment, and
-provider-specific disclosure require a separate implemented and reviewed boundary.
+The legacy MCP development server accepts loopback connections and returns
+requested results to that client without authenticating an end user. It remains
+a synthetic development surface. The separate private service implements OAuth
+token validation, a browser consent portal, per-resource grants, and reviewed
+operations. It makes network requests only to explicitly configured identity
+provider endpoints for authentication. It never fetches URLs found in an archive.
+A real ChatGPT account connection and hosting-specific disclosures remain
+unverified until completed in the selected environment.
 Reading or copying a file can still cause activity by the operating system,
 security software, backups, or independently configured synchronization tools.
 Choose the execution environment and destination with those settings in mind.
@@ -53,7 +57,31 @@ help detect inconsistency; they do not anonymize the archive or authenticate its
 publisher. Protect archives and manifests according to the sensitivity of their
 contents.
 
-## 3. Purposes and Your Choices
+## 3. Information Handled by the Private Service
+
+The operator chooses the execution host and controls its storage. Local operator
+mode uses a local key and an opaque, short-lived browser session; it does not
+expose MCP. OAuth mode uses the configured issuer and subject to distinguish
+allowlisted users. An email address or source account label is not access proof.
+Before real connected use, the operator must identify the actual host, location,
+privacy contact, and any additional processors in the deployment disclosures.
+
+| Record or transfer | Handling and purpose |
+| --- | --- |
+| Identity and browser access | Token claims are validated for the configured resource. Raw OAuth bearer tokens and authorization codes are not retained in the application database. Browser session digests expire within 15 minutes. |
+| Resource grants and human acceptance | Principal digests, exact policy versions and document digests, resource generations, selected actions, purposes, recipients, acceptance time, expiry, and revocation are stored in the private control database. |
+| Prepared plans and operation history | Opaque input/output identifiers, parameter digests, bounded source labels or association reasons, review records, states, counters, and fixed outcome categories support execution, retries, and incident assessment. Plans contain no conversation bodies or arbitrary source paths. |
+| Selected uploads | The portal transfers only the file explicitly selected after upload authorization. Bytes, size, digest, display name, and expiry are retained in an owner-scoped staging store. Uploading does not automatically import the file. |
+| Content requested through MCP | Accepted collection summaries, excerpts, revision nodes, and verification outcomes are sent to the connected client only for the authorized request. Data already sent becomes subject to that recipient's handling and retention. |
+| Recovery downloads | A separate accepted download scope permits streaming the exact verified package. The service checks authorization again while transmitting. It cannot recall bytes already transmitted. |
+
+No model-callable tool can record policy acceptance, attest content eligibility,
+or approve an operation. Those decisions require the authenticated browser
+session, a fresh challenge, and deliberate controls. A record of the gesture
+proves only the recorded event and scope; it is not evidence that a person read
+every word or had authority over all third-party information.
+
+## 4. Purposes and Your Choices
 
 The core purpose is to perform the specific local preservation, import, catalog,
 search, reading, association, verification, or recovery operation that you request.
@@ -70,7 +98,7 @@ If another person's information is included, consider whether you have authority
 to process it for this purpose. Your acceptance does not override that person's
 rights or applicable confidentiality obligations.
 
-## 4. Retention and Removal
+## 5. Retention and Removal
 
 | Location or record | Current handling and control |
 | --- | --- |
@@ -82,6 +110,22 @@ rights or applicable confidentiality obligations.
 | Independently synchronized, shared, or backed-up copies | Governed by the chosen environment and provider. Removing one copy does not establish that every copy has been removed. |
 | Information separately received by the Company | Must be subject to a documented purpose-based retention schedule, applicable legal retention requirements, and a removal process before production operation. No arbitrary fixed period is promised by this draft. |
 
+
+The private service applies these additional development controls:
+
+| Service category | Development retention and removal |
+| --- | --- |
+| Browser sessions and interaction challenges | Sessions last at most 15 minutes; challenges at most five minutes and are single-use. Expired records are purged during subsequent session/challenge activity. |
+| Temporary uploads | Default maximum lifetime is one hour, shortened when the deployment's configured retention is shorter. Active worker pins delay removal until processing returns. Startup reconciles abandoned intake under exclusive service ownership. |
+| Download packages | Default access lifetime is 24 hours from operation creation, configurable from one minute through seven days. Periodic or startup maintenance removes eligible expired service-owned wrappers after recovery reconciliation. A stopped service or refused cleanup can leave bytes until the operator resolves the condition. |
+| Completed collection generations | Persist until the operator intentionally removes them using controlled storage procedures. No automatic source or collection deletion is provided. Storage admission refuses further work when the configured budget is exhausted. |
+| Consent, grant, plan, and operation records | Remain in the private control database for pilot troubleshooting and proof of scope. No automatic long-term purge is represented as implemented. Before production, the operator must approve a purpose-based retention period, legal-hold process, backup policy, and verified purge procedure. |
+
+Retention controls are not secure erasure. A database journal, filesystem
+snapshot, external backup, or provider-held copy can outlive removal of the
+primary object. The draft does not release the Company or developer from
+applicable retention, security, access, or incident-response obligations.
+
 If the Company receives information for support, it should retain only what is
 needed to handle the request and any applicable legal obligation. A legal hold
 or required incident record may justify retaining a limited record after a
@@ -89,7 +133,7 @@ request is otherwise complete. Production procedures must identify the category,
 purpose, retention trigger, review responsibility, and removal method rather than
 using an indefinite general retention statement.
 
-## 5. Access, Withdrawal, and Privacy Requests
+## 6. Access, Withdrawal, and Privacy Requests
 
 You control whether to initiate another local operation. Declining a later
 invocation prevents that invocation; it does not reverse a completed copy.
@@ -107,7 +151,7 @@ Where another provider controls a copy, its own request process may be relevant.
 You retain the right to contact a competent privacy regulator; a Company support
 exchange is not a waiver of that right.
 
-## 6. Security and Residual Risks
+## 7. Security and Residual Risks
 
 Access controls, encrypted storage where appropriate, device maintenance, and
 independent backups remain relevant to local archives. Application integrity
@@ -127,10 +171,11 @@ Company must investigate and meet applicable assessment, recordkeeping, reportin
 and notification obligations. Acceptance of this notice does not release the
 Company or Fabio de Sousa Lopes from legal duties that apply to them.
 
-## 7. Future Cloud, AI, and Other Recipients
+## 8. Connected Processing and Other Recipients
 
-This draft does not authorize a future cloud or AI integration. Before enabling
-one, the Company must identify the selected information, actual recipient,
+This draft does not itself authorize a deployment, additional recipient, or AI
+use. Before enabling the configured integration with real content, the operator
+must identify the selected information, actual recipient,
 purpose, relevant processing location, provider retention and reuse terms,
 deletion limits, and material consequences. Optional uses require a separate,
 unselected-by-default choice; a refusal must preserve access to the independent
@@ -141,7 +186,7 @@ is made. An operator's selection of a synchronized folder does not establish tha
 storage remains in Canada. New recipients or materially changed purposes require
 review and the appropriate new consent before disclosure.
 
-## 8. Changes
+## 9. Changes
 
 The application must make the applicable notice available when requesting
 acceptance and preserve its version. Material privacy changes must be explained

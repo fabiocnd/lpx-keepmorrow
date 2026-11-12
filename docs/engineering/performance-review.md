@@ -4,6 +4,11 @@ This foundation review records the 0.1.0 design. The 0.2.0 collection workflow,
 its immutable-generation costs, and its measured workload are documented in
 [ADR 0002](../architecture/decisions/0002-immutable-collections.md) and the
 [collection benchmark](../../benchmarks/COLLECTION_BENCHMARK.md).
+The 0.3.0 service, journal, and workload are covered by the
+[operation journal](../architecture/operation-journal.md),
+[private pilot validation](private-pilot-validation.md), and
+[private-service benchmark](../../benchmarks/PRIVATE_SERVICE_BENCHMARK.md).
+The foundation decisions and limits below remain historical observations.
 
 **Review date:** 2026-11-12
 **Scope:** Foundation design and local reference implementation.

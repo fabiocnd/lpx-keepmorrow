@@ -3,6 +3,9 @@
 This is the historical 0.1.0 record. Its counts, capability limits, commits, and
 measurements apply to that version. See the
 [collection verification record](collection-verification.md) for 0.2.0.
+Current 0.3.0 checks and open release gates are recorded in
+[Private Pilot Validation](private-pilot-validation.md); they do not alter the
+historical counts or remote commits below.
 
 **Date:** 2026-11-12
 **Status:** Private source upload, local validation, and configured CI matrix verified
@@ -120,33 +123,3 @@ established.
   evidence or a persistent consent ledger.
 - The legal documents remain drafts for owner and qualified Ontario counsel
   review. Tests do not establish enforceability.
-
-## Remote status
-
-On 2026-11-12, authenticated GitHub metadata confirmed that the user-created
-[fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow) repository
-was private. The initial upload contained all 64 tracked source files. At
-verification time, `main` pointed to the remote commit recorded below.
-
-| Evidence | Verified value |
-| --- | --- |
-| Repository ID | `1455189876` |
-| Verification date | `2026-11-12` |
-| Visibility | Private |
-| Tracked files uploaded | 64 |
-| Remote source commit | `e01ccf12b849bef742cd53b7d1ea2f23b21a0f28` |
-| Local source snapshot commit | `ab4eb2bd531398edb8f33f225ced5f14e1562293` |
-| Matching remote and local Git tree | `36a2c9dc3b3eb89fcc62a9ce92948a86c3eb74e8` |
-
-The remote Git tree matched the local `git write-tree` result exactly. These
-identifiers record the verified initial source upload; later documentation
-commits may advance `main`. Source delivery does not establish CI execution or
-an implemented remote archive-transfer capability. CI evidence is recorded
-separately above.
-
-The GitHub connector does not expose author or committer fields. Its remote
-commit records Fabio Lopes under a GitHub-managed noreply identity, while a
-commit trailer credits `Fabio de Sousa Lopes <fabio@lopixneural.com>`. That
-trailer does not replace the primary author or committer metadata. The local
-source snapshot and repository-local Git configuration retain the canonical
-project identity, `Fabio de Sousa Lopes <fabio@lopixneural.com>`.

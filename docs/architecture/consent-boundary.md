@@ -1,97 +1,168 @@
 # Consent and Operation Boundary
 
-**Status:** Local reference implementation; internal legal drafts
-**Terms version:** `2026-11-12-draft.2`
-**Privacy version:** `2026-11-12-draft.2`
 **Owner:** Lopix Neural Inc.
 **Contact:** fabio@lopixneural.com
+**Status:** Implemented local and private-service boundaries; synthetic validation only
+**Terms version:** `2026-11-12-draft.3`
+**Privacy version:** `2026-11-12-draft.3`
+**Review date:** 2026-11-12
 
-The ordinary CLI and optional MCP adapter must obtain explicit acceptance of
-both current policy versions before reading selected source or collection
-content. Missing, stale,
-malformed, or unsupported declarations fail closed. Argument parsing and loading
-the application itself do not inspect selected user content.
+LPX Keepmorrow separates agreement to the current documents, permission for a
+specific resource and action, and approval of a prepared operation. A valid
+credential or a model-supplied argument does not establish all three decisions.
+The applicable boundary must authorize an operation before it inspects selected
+content. Configuration loading and policy presentation do not inspect that
+content.
 
-Review [Terms of Use](../../legal/terms-of-use.md),
+The [Terms of Use](../../legal/terms-of-use.md),
 [Privacy Notice](../../legal/privacy-notice.md), and
 [Consent and Operation Authorization](../../legal/consent-and-operation-authorization.md)
-before declaring acceptance. These drafts apply to internal evaluation; accepting
-them does not authorize public release.
+remain internal drafts. Technical acceptance does not establish counsel approval,
+legal enforceability, a live account connection, or permission to launch a public
+service.
 
-## Boundary contract
+## Supported boundaries
+
+| Boundary | Identity and acceptance contract | Supported use |
+| --- | --- | --- |
+| Ordinary CLI | Exact terms and privacy version flags for each content-processing invocation; no authenticated identity | Explicit local operations |
+| Legacy MCP development adapter | Exact version arguments before resolving a configured opaque collection ID; no authenticated human acceptance | Synthetic loopback development only |
+| Private browser portal | Authenticated session, exact Origin, CSRF validation, displayed scope, and single-use interaction challenge | Human consent, operation review, and controlled local or configured OAuth service use |
+| Private MCP endpoint | Verified external access token, allowlisted issuer/subject identity, and existing current human-accepted grants | Requests within already accepted scopes; no acceptance or review tool |
+| Internal Python APIs | Caller-owned trust boundary; constructing domain objects proves no identity or assent | Application implementation and isolated tests |
+
+Local operator mode exposes the portal on loopback and has no MCP endpoint.
+OAuth mode requires explicit provider and browser-client configuration. Its MCP
+transport retains the SDK's complete authentication middleware. A browser cookie
+does not authenticate MCP, and a bearer token alone does not authorize a human
+consent submission. See [external authentication](external-authentication.md)
+and the [trusted portal](trusted-portal.md).
+
+## Local invocation contract
 
 `keepmorrow.consent.require_acceptance(terms_version, privacy_version, operation)`
 accepts exact current version strings and one of `create`, `verify`, `restore`,
-`import`, `catalog`, `search`, `read`, `associate`, or `recover`.
-It performs no file or network access. Any other value raises `ConsentError`.
+`import`, `catalog`, `search`, `read`, `associate`, or `recover`. It performs no
+file or network access. Missing, stale, malformed, or unsupported declarations
+raise `ConsentError` before selected content is accessed.
 
-Acceptance is limited to the selected local operation and its explicit paths.
-It does not authorize deletion, cloud transfer, AI processing, training, account
-enumeration, source redistribution, or public publication. Selecting an
-operation does not override filesystem validation, archive-integrity checks, or
-the prohibition on overwriting an existing destination.
-
-The CLI requires both `--accept-terms VERSION` and `--accept-privacy VERSION` for
-each invocation of a processing command. Use the flags after the operation name.
-There is no remembered acceptance and no implicit `latest` version. A changed
-policy version therefore requires a new exact declaration.
+The CLI requires both options after the operation name. It has no remembered
+acceptance or implicit `latest` value:
 
 ```bash
 PYTHONPATH=src python -m keepmorrow create examples/synthetic-input /tmp/keepmorrow-example \
-  --accept-terms 2026-11-12-draft.2 \
-  --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 \
+  --accept-privacy 2026-11-12-draft.3
 ```
 
-The internal archive, importer, and catalog functions remain implementation primitives.
-Direct Python calls are not an authenticated user-facing API and do not enforce
-acceptance themselves. Embedding applications must put an equivalent boundary
-before every user-content operation and must not expose these primitives as an
-ungated service.
+The operation and explicit paths define that invocation's scope. Its immutable
+receipt contains the accepted document versions, UTC timestamp, and operation
+name. The CLI returns it as `acceptance` in JSON output: stdout for ordinary
+results, or stderr when an accepted operation fails. It contains no identity
+proof, credentials, selected paths, or content. The application does not persist
+this local receipt in a consent database; the caller controls any output capture.
+Refused acceptance creates no receipt. A receipt is not evidence of successful
+execution or verified recovery.
 
-## MCP development boundary
+The legacy MCP adapter's version arguments establish only a client declaration.
+They must never be promoted to authenticated consent in the private service or
+used to expose the development adapter remotely.
 
-Every MCP tool requires `terms_version` and `privacy_version`.
-The server checks them before resolving the selected
-collection grant or inspecting registered content. Its registry uses explicit
-opaque IDs; request arguments cannot select arbitrary filesystem paths. Registry
-configuration loading does not inspect the contents of its registered paths.
+## Private-service consent and review
 
-The adapter exposes only collection listing, browsing, search, revision reading,
-and verification. Results are returned to the calling client. Loopback transport
-is a development restriction, not remote authentication or authenticated proof
-of the user's agreement. The adapter does not implement a consent presentation
-UI or a durable acceptance ledger. A deployed ChatGPT interface must present the
-policies, record a deliberate user decision, enforce collection authorization,
-and describe that client's data handling before content access. See
-[ChatGPT integration](chatgpt-integration.md).
+The service derives a principal from verified identity or the explicitly
+configured local operator. Email addresses, source account labels, and tool
+arguments cannot select another principal. The access store records two distinct
+objects: an administrative grant and a human acceptance of its selected action
+subset. Creating a grant alone does not authorize content access.
 
-## Receipt and persistence
+Consent preparation presents the exact resource, immutable generation, actions,
+purpose, recipient, policy versions and byte digests, and versioned content
+eligibility declaration. Submission requires four deliberate choices: terms
+agreement, privacy acknowledgment, scope authorization, and content eligibility.
+The server checks the displayed snapshot and atomically consumes its challenge,
+records acceptance, and retains the scope-digest and eligibility context. Replay,
+changed policies, changed scope, and nonliteral Boolean declarations fail closed.
+No model-callable tool can perform this interaction.
 
-After validation, the boundary returns an immutable receipt containing the
-accepted terms version, privacy version, UTC timestamp, and operation name. It
-contains no user identity, credential, source path, conversation text, or file
-content. The receipt records a local declaration; it does not prove who made
-that declaration or establish cryptographically verifiable assent.
+Import, association, recovery, package creation, and unpacking also require an
+immutable prepared plan and a separate human review of its canonical parameter
+digest. Starting consumes that review. Repeating the same principal-scoped
+idempotency key identifies the same operation; it does not create another
+capture. Upload permission is checked before intake and does not imply import
+permission. A newly created collection or package needs its own accepted scope
+before content delivery.
 
-CLI JSON status includes the receipt as `acceptance`: on stdout for normal
-results, or stderr when an accepted operation fails. The caller controls any
-explicit capture of that output. The application does not send the receipt to a
-service or persist it in a consent database. Refused operations produce no
-receipt. An accepted operation can still fail validation or execution; its
-receipt must not be interpreted as a completion or integrity result.
+The service persists principal digests, exact scope and policy evidence, bounded
+plan parameters, expiry, revocation, and operation state. It does not persist raw
+OAuth tokens, browser cookies, or conversation bodies in the consent ledger.
+These records provide technical evidence of the recorded interaction; they do
+not prove that a person understood every provision or had authority over all
+third-party information. The [access contract](access-control.md) defines the
+internal APIs and transaction requirements.
 
-This persistence limit is deliberate for the current local reference. A future
-authenticated product needs a separately designed record of the document
-versions presented, the authenticated actor or other permitted attribution,
-acceptance event, operation scope, retention, revocation behavior, and integrity
-of the record. Implementing that system requires an explicit data-handling
-design and appropriate legal review; the CLI receipt is not its substitute.
+## Current authority, renewal, and withdrawal
+
+Every authorization checks current policy versions and exact document digests.
+An old receipt cannot authorize changed policies. Action names are independent:
+`read` does not imply `recover`, `package`, or `download`.
+
+| Requested behavior | Required current authority |
+| --- | --- |
+| Admit, continue, or authorize publication of active work | The reviewed primary grant ID, version, and acceptance receipt for the exact resource, generation, and action, plus required ancestry and intake scopes |
+| Disclose a completed or partially completed result | Current explicitly accepted permission for each completed ancestor's exact resource, generation, and action, plus the requested result's own access scope |
+| Return completed-operation result metadata | Current authority for the creating plan's exact scope and its ancestry; otherwise output identifiers and results are withheld |
+| Stream a package | The exact selected download grant, live browser session, available unexpired package, and authorized ancestry, rechecked before and after each frame read |
+
+Fresh consent cannot replace an active plan's immutable primary grant or receipt.
+If that authority ends, the owner must prepare and review new work. Completed
+history is different: the owner may explicitly renew an ancestor through a new
+grant and acceptance for its exact scope. That renewal restores eligible future
+disclosure without rewriting historical plans, receipts, or preserved bytes.
+A grant on a child collection alone cannot override an unauthorized ancestor.
+Renewing permission also does not extend a package's separate access lifetime or
+recreate bytes already removed by retention maintenance.
+
+Publication authorization and revocation share one immediate SQLite transaction
+boundary. Revocation committed first prevents authorization under that grant. If
+the publication decision commits first, the verified private publication may
+finish; subsequent delivery is independently authorized. Download checks stop
+future frames after authorization loss or package expiry. Already transmitted
+bytes cannot be recalled, and withdrawal does not silently delete completed
+collections or change original source material.
+
+## Scope and retained evidence
+
+No current acceptance authorizes source deletion, overwrite, account enumeration,
+model inference, training, advertising, or public redistribution. Original files
+and previous immutable generations remain distinguishable from derived outputs.
+Filesystem validation, integrity checks, storage admission, and no-overwrite
+rules remain mandatory after acceptance.
+
+Temporary uploads and download packages have separate bounded access and cleanup
+rules. Completed collections and historical control records remain subject to
+incident and retention procedures approved for the actual deployment. The
+implementation does not provide automatic long-term consent-ledger purge or
+secure erasure, and it cannot delete copies held by another recipient. Production
+requires a documented retention schedule, actual operator and recipient
+disclosures, and qualified legal review. See the
+[Privacy Notice](../../legal/privacy-notice.md) for the current categories.
 
 ## Verification scope
 
-Tests establish refusal for missing or stale acceptance and unknown operations,
-exact version matching, receipt scope, and CLI and MCP rejection before services
-or selected content are inspected. They also show that
-explicit current acceptance allows the ordinary archive validation path to run.
-These tests establish the application boundary described here, not the legal
-enforceability of the draft terms.
+Synthetic CLI tests establish version refusal before selected-data processing.
+Access tests cover identity separation, current policy digests, replay, expiry,
+revocation, and both transaction orderings against publication. Application
+tests demonstrate that a child grant cannot bypass an expired ancestor, explicit
+parent renewal restores completed-result access without changing history, and
+fresh consent cannot rebind an uncompleted plan.
+
+Portal tests cover authenticated cookies, Origin and CSRF checks, deliberate
+choices, review separation, scoped uploads, and bounded verified downloads.
+Streaming tests stop transmission after grant withdrawal or package expiry and
+close resources on disconnect. Lifecycle tests refuse failed startup, suppress
+private error details, and release worker ownership.
+
+These are implementation checks with synthetic fixtures. They do not establish
+a real identity-provider connection, ChatGPT account availability, production
+capacity, legal approval, or enforceability of the draft agreement.

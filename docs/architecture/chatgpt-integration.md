@@ -1,15 +1,21 @@
-# ChatGPT Development Adapter
+# Legacy ChatGPT Development Adapter
+
+> This document describes the retained synthetic loopback adapter. Version 0.3.0
+> adds a separate authenticated private service: see the
+> [trusted portal](trusted-portal.md), [authentication contract](external-authentication.md),
+> and [operating runbook](../operations/private-service-runbook.md).
+
 
 **Status:** Implemented local MCP protocol adapter; no deployed or installed ChatGPT connection
 **Review date:** 2026-11-12
 **Owner:** Lopix Neural Inc.
 **Engineering lead:** Fabio de Sousa Lopes
 
-The [ChatGPT delivery plan](chatgpt-delivery-plan.md) defines the proposed phases,
-account and content-eligibility checks, authentication, server-side consent,
-file-transfer experiments, operating limits, and acceptance evidence. This
-document describes the implemented 0.2.0 adapter; the plan does not change its
-current deployment status.
+The [ChatGPT delivery record](chatgpt-delivery-plan.md) identifies implemented
+service components and remaining account, content, hosting, and release gates.
+This document describes the retained 0.2.0 adapter. Its synthetic-only transport
+and declaration-based acceptance do not acquire the separate service's identity
+or human-consent properties.
 
 ## Intended user experience
 

@@ -18,6 +18,8 @@ from pathlib import Path, PurePosixPath
 import re
 from typing import Any
 
+from keepmorrow.control import checkpoint
+
 from keepmorrow.archive.filesystem import open_regular, safe_directory
 from keepmorrow.archive.model import ArchiveError, FileRecord, validate_relative_path
 from keepmorrow.formats import check_json_budget
@@ -124,6 +126,7 @@ def _decode_json(data: bytes, limits: ImportLimits) -> Any:
         # Reject both before they reach hashes, output JSON, or rendered views.
         pending = [document]
         while pending:
+            checkpoint()
             value = pending.pop()
             if isinstance(value, dict):
                 for key, item in value.items():
@@ -287,6 +290,7 @@ def _nodes(mapping: object, context: _Context) -> tuple[MessageNode, ...]:
     context.budget.charge("nodes", len(mapping))
     graph: dict[str, tuple[str | None, tuple[str, ...]]] = {}
     for node_id in sorted(mapping):
+        checkpoint()
         value = mapping[node_id]
         _identifier(node_id, context.budget.limits)
         if not isinstance(value, dict) or "parent" not in value or "children" not in value or "message" not in value:
@@ -326,6 +330,7 @@ def _nodes(mapping: object, context: _Context) -> tuple[MessageNode, ...]:
     pending = [node_id for node_id, count in incoming.items() if count == 0]
     visited = 0
     while pending:
+        checkpoint()
         node_id = pending.pop()
         visited += 1
         for child in graph[node_id][1]:
@@ -466,6 +471,7 @@ def parse_chatgpt_export(
         raise ImportFailure("The preserved source root is not a supported ordinary directory.") from error
     seen_revisions: dict[str, set[str]] = {}
     for candidate in candidates:
+        checkpoint()
         try:
             document = _decode_json(_read_document(preserved_root, candidate, active), active)
         except _MalformedDocument:
@@ -485,6 +491,7 @@ def parse_chatgpt_export(
         budget.charge("conversations", len(document))
         accepted = rejected = 0
         for index, record in enumerate(document):
+            checkpoint()
             try:
                 parsed = _conversation(record, candidate.path, index, account_namespace,
                                        export_prefix, inventory, budget, issues)

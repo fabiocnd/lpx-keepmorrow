@@ -25,3 +25,15 @@ Thumbs.db
 /local-consent/
 /benchmark-results/
 /reports/
+node_modules/
+/local-service/
+playwright-report/
+test-results/
+*.env
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+/service-state/

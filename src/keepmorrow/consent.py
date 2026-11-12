@@ -9,8 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-CURRENT_TERMS_VERSION = "2026-11-12-draft.2"
-CURRENT_PRIVACY_VERSION = "2026-11-12-draft.2"
+CURRENT_TERMS_VERSION = "2026-11-12-draft.3"
+CURRENT_PRIVACY_VERSION = "2026-11-12-draft.3"
 _SUPPORTED_OPERATIONS = frozenset({"create", "verify", "restore", "import", "catalog", "search", "read", "associate", "recover"})
 
 

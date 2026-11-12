@@ -1,9 +1,13 @@
 # Golden Coding Standard
 
-**Owner:** Lopix Neural Inc.  
-**Engineering lead:** Fabio de Sousa Lopes  
-**Contact:** fabio@lopixneural.com  
-**Effective date:** 2026-11-12  
+**Owner:** Lopix Neural Inc.
+
+**Engineering lead:** Fabio de Sousa Lopes
+
+**Contact:** fabio@lopixneural.com
+
+**Effective date:** 2026-11-12
+
 **Status:** Mandatory project engineering policy
 
 The Golden Coding Standard is LPX Keepmorrow's own definition of acceptable
@@ -66,8 +70,8 @@ and `retry_count` are clearer than ambiguous quantities. Use US English in all
 authored project content. Preserve source-defined keys when compatibility
 requires exact spelling.
 
-Organize paths by responsibility. Use product, architecture, engineering, AI,
-governance, provenance, and research documentation areas with a concise README
+Organize paths by responsibility. Use product, architecture, engineering,
+operations, AI, governance, and research documentation areas with a concise README
 map. Use lowercase kebab-case for documentation paths and snake_case for Python
 modules and identifiers. Conventional files such as `README.md` keep their
 established names.
@@ -76,7 +80,7 @@ Archive modules belong together under `src/keepmorrow/archive/`. Keep the CLI
 thin: argument parsing, application invocation, and result formatting. Core
 rules must remain usable without the CLI. Place behavioral tests near their
 subject in the test hierarchy, and reproducible performance workloads under
-`benchmarks/` when they exist. Do not create empty future services or broad
+`benchmarks/`. Do not create empty future services or broad
 `utils` and `common` containers that hide ownership. A new module must create a
 useful responsibility boundary rather than satisfy an arbitrary line count.
 
@@ -97,6 +101,11 @@ destination, and outcome of a repeated or conflicting request.
 Retries require a bounded count or time budget and a classification of retryable
 failures. Cancellation and partial completion MUST remain distinct from success.
 Do not invent resumability where the current implementation safely restarts.
+
+When publication depends on revocable authorization, define the serialized
+decision boundary and retain attempt ownership through publication and cleanup.
+Human acceptance and plan-review records MUST originate in the documented
+trusted interaction boundary. A model-supplied assertion is not that record.
 
 ## 5. Performance is an engineering result
 
@@ -187,8 +196,9 @@ determine operational permissions.
 Operational telemetry SHOULD contain identifiers, counts, timings, and error
 categories, with the minimum data needed for diagnosis. Conversation bodies,
 credentials, and unnecessary personal data MUST stay out of logs and fixtures.
-Document the processing and retention of any future external integration before
-enabling it. Follow [SECURITY.md](../../SECURITY.md).
+Document the processing and retention of each external integration before
+enabling it, including the deployed behavior of an existing reference adapter.
+Follow [SECURITY.md](../../SECURITY.md).
 
 ## 10. Review and completion
 
@@ -201,7 +211,7 @@ The repository may enforce some checks through automation. Contributors MUST
 distinguish installed checks, manually reviewed requirements, and future gates.
 A successful CI run establishes only what that workflow actually executed.
 
-Do not add a blanket confirmation step to already authorized work. Continue
-within the task's authority and scope. Public publication, source redistribution,
-visibility changes, and new uses of private data remain separate actions unless
-the user has already authorized them.
+External side effects MUST remain within the approved scope. Public publication,
+source redistribution, repository visibility changes, and new uses of private
+data require the applicable owner decision and license or data authorization.
+An engineering test result does not provide that authority.

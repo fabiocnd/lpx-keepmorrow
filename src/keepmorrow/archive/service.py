@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
+from ..control import temporary_parent
 from .filesystem import copy_tree, destination_path, open_regular, publish_directory, safe_directory, scan_tree, stream_file
 from .model import (
     MANIFEST_NAME,
@@ -27,7 +28,7 @@ from .model import (
 
 @contextmanager
 def _staging(destination: Path) -> Iterator[Path]:
-    stage = Path(tempfile.mkdtemp(prefix=".keepmorrow-", dir=destination.parent))
+    stage = Path(tempfile.mkdtemp(prefix=".keepmorrow-", dir=temporary_parent(destination.parent)))
     try:
         yield stage
         if os.path.lexists(destination):

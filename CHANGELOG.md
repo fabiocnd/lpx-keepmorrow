@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.3.0 — Authenticated Preservation Service — 2026-11-12
+
+### Added
+
+- Configured external OAuth resource-token verification, exact principal identity,
+  per-generation grants, current policy digests, explicit human acceptance,
+  withdrawal, and separate exact-plan review through a trusted portal.
+- Durable typed plans and operations with idempotent admission, bounded resource
+  reservations, exclusive worker ownership, cooperative cancellation, transactional
+  publication fencing, process-restart reconciliation, and owned scratch cleanup.
+- Authorized upload staging and portable collection ZIPs with independent encoded
+  and expanded limits, verified unpacking, and bounded authenticated downloads.
+- A private MCP service with sixteen tools and a TypeScript MCP Apps companion
+  using the official SDK, together with an independently usable operator portal.
+- Installed service initialization/check/serve commands, policy and UI assets,
+  pinned optional dependencies, deployment examples, and operational runbooks.
+- Adversarial service, identity, consent, transfer, interruption, and UI tests;
+  isolated wheel validation; an expanded CI workflow; and a reproducible synthetic
+  service benchmark with source/policy hashes and explicit measurement limits.
+
+### Changed
+
+- Added cohesive access, persistence, operations, transfers, application, and UI
+  boundaries while retaining the standard-library preservation core.
+- Advanced current processing notices to `2026-11-12-draft.3` for accurate service,
+  temporary retention, identity, operation, and delivery disclosure.
+- Required current scopes across completed-generation ancestry while allowing
+  explicit human renewal; kept active operations fenced to their reviewed grant.
+- Revalidated package expiry during streaming and rejected storage configurations
+  that cannot reserve their upload pool plus one operation.
+- Updated current product, architecture, legal, engineering, performance, and
+  operational documentation; labeled historical measurements by their scope.
+- Clarified native export comparison and added transparent, scenario-dependent
+  workflow scores, separate from measured performance or release qualification.
+
+### Distribution preparation
+
+- Recorded the planned open-source transition with Apache-2.0 as an unadopted
+  engineering recommendation. Existing license and private visibility remain.
+- Removed private conversation snapshots and personal research from the current
+  source tree; retained public professional attribution and technical evidence.
+- Defined a source-snapshot publication path that excludes private Git history
+  and operational state. Earlier commits are not represented as purged.
+
+### Scope
+
+This is a development candidate validated with synthetic data. Actual ChatGPT
+installation, live identity-provider registration, a selected reachable host,
+representative real-export compatibility, production legal/retention approval,
+and public source release remain separate gates. Native provider restoration,
+account enumeration, model inference, physical deduplication, per-file resume,
+and payload power-loss durability are not implemented.
+
 ## 0.2.0 — Collections and ChatGPT Development Adapter — 2026-11-12
 
 ### Added
@@ -49,7 +102,7 @@ are not implemented. Legal documents remain drafts.
 
 ### Added
 
-- Preserved Blueprint v0.2 and project-source coverage record.
+- Established the initial product requirements and technical scope.
 - Product brief, requirements, roadmap, naming conventions, and decision register.
 - Private proprietary ownership and canonical contact fabio@lopixneural.com.
 - Responsibility-based repository layout and performance review.

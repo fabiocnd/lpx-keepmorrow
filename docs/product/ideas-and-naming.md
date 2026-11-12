@@ -5,19 +5,13 @@
 | Use | Name |
 | --- | --- |
 | Product | LPX Keepmorrow |
-| Native ChatGPT Project | `___LPX Keepmorrow___` |
 | Compact brand | LpxKeepmorrow |
 | Repository and technical slug | `lpx-keepmorrow` |
 | Python package | `keepmorrow` |
 
 Keepmorrow combines “keep” and “morrow” to express preserving present work for
-future use. LPX is the short project signature for Lopix Neural Inc. The
-underscores belong to the native ChatGPT Project display name only.
-
-The owner adopted this name on 2026-11-12. No trademark registration, name
-clearance, or domain availability is asserted. Earlier naming research was
-referenced in conversation, but its complete list and research materials were
-not available for this repository snapshot; they have not been reconstructed.
+future use. LPX is the short project signature for Lopix Neural Inc. No trademark
+registration, name clearance, or domain availability is asserted.
 
 ## Product ideas retained from the project direction
 
@@ -26,9 +20,9 @@ not available for this repository snapshot; they have not been reconstructed.
 | Project and standalone-conversation organization | Core requirement | Make related work discoverable |
 | Unknown-association review queue | Core requirement | Avoid silently misclassifying missing metadata |
 | Original-file recovery | Core requirement | Recover useful work independently of the platform |
-| Repeated-capture consolidation | Planned | Preserve revisions without unexplained duplicates |
-| Google Drive adapter | Candidate | Match the workflow that motivated the project |
-| ChatGPT-facing experience | Planned | Make supported operations accessible in conversation |
+| Repeated-capture consolidation | Implemented for the experimental profile | Preserve revisions without unexplained duplicates |
+| Google Drive adapter | Candidate | Provide an explicitly authorized remote destination |
+| ChatGPT-facing experience | Service/UI implemented; actual connection pending | Make supported operations accessible in conversation |
 | Optional model-assisted descriptions | Proposal | Improve navigation while preserving evidence boundaries |
 | Archive splitting for provider limits | Optional future transport feature | Fit a verified destination limit |
 | About-screen and release-note attribution | Accepted direction | Give proportionate creator and company visibility |
@@ -45,7 +39,7 @@ Documentation paths use lowercase kebab-case. Python modules use snake_case.
 Conventional repository filenames retain their established form:
 `README.md`, `AGENTS.md`, `LICENSE`, and `SECURITY.md`.
 
-## Future organization inside an archive
+## Organization inside an archive
 
 Group conversation views by confirmed associations without moving or modifying
 the original provider data. Use stable identifiers behind user-facing names.

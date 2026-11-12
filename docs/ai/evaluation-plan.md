@@ -1,13 +1,18 @@
 # AI Evaluation Plan
 
-**Status:** Planned validation contract for optional AI features  
-**Owner:** Lopix Neural Inc.  
-**Engineering lead:** Fabio de Sousa Lopes  
+**Status:** Planned validation contract for optional AI features
+
+**Owner:** Lopix Neural Inc.
+
+**Engineering lead:** Fabio de Sousa Lopes
+
 **Date:** 2026-11-12
 
 No model-assisted feature, provider, benchmark result, or production quality
-threshold is established by this document. The initial preservation foundation
-must remain independently usable without AI.
+threshold is established by this document. Version 0.3.0's preservation core and
+private operator service remain usable without a Keepmorrow model-inference
+pipeline. The existing MCP interface supplies deterministic tools to a host;
+its protocol and authorization tests are not an AI-quality evaluation.
 
 ## Evaluation unit
 
@@ -37,6 +42,9 @@ retention, access, and deletion separately.
 | Long or truncated input | The result labels the processed scope and any omitted material. |
 | Empty, malformed, or unsupported response | Deterministic validation rejects it or returns the specified error. |
 | Provider timeout or budget limit | The optional feature fails explicitly while preservation remains usable. |
+| Model assertion that a user already agreed | No human acceptance or review record is created from that assertion. |
+| Changed input handle, digest, generation, or selection | The reviewed-plan binding is enforced; a model cannot silently reuse approval for different work. |
+| Revoked ancestor with an active child grant | Generated calls cannot bypass the required exact ancestor scope. |
 
 Authored fixtures and test descriptions use US English. Additional source-language
 cases may be introduced as separately identified imported-source test data when

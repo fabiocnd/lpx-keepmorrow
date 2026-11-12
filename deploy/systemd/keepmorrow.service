@@ -1,0 +1,28 @@
+# Reviewed deployment candidate; install paths and identity are operator-owned.
+[Unit]
+Description=LPX Keepmorrow private preservation service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=keepmorrow
+Group=keepmorrow
+UMask=0077
+WorkingDirectory=/var/lib/keepmorrow
+ExecStart=/opt/keepmorrow/venv/bin/keepmorrow-service serve --configuration /etc/keepmorrow/service.json
+EnvironmentFile=/etc/keepmorrow/credentials.env
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/keepmorrow
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

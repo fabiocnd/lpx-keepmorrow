@@ -1,5 +1,11 @@
 # Collection Verification Record
 
+This is the historical 0.2.0 verification record. Its policy versions, capability
+limits, counts, measurements, and remote commits apply to that revision. The
+[private pilot record](private-pilot-validation.md) documents the current 0.3.0
+service and remaining live release gates. Later implementation does not rewrite
+the evidence below.
+
 **Date:** 2026-11-12
 **Version:** 0.2.0, private development
 **Local environment:** Linux x86-64, CPython 3.12.14
@@ -134,8 +140,8 @@ generations and full-byte verification before queries remain explicit costs.
 
 - The source interpreter is experimental until representative real exports are
   authorized and checked against independent expectations.
-- HTML structural and security tests passed. A browser-rendering attempt was
-  blocked by the available browser sandbox; no visual browser QA is claimed.
+- HTML structural and security tests passed. Browser visual QA was not completed
+  for this revision; structural checks do not establish rendering quality.
 - The optional MCP adapter is loopback-only and was tested with local SDK
   clients. It is not remotely authenticated, deployed, installed, or tested in
   an actual ChatGPT account. No embedded ChatGPT component is implemented.
@@ -152,26 +158,3 @@ generations and full-byte verification before queries remain explicit costs.
   authenticated legal assent. The legal documents remain drafts.
 - No model inference, cloud archive storage, automatic account enumeration,
   native ChatGPT restoration, source deletion, or public release was performed.
-
-## Source delivery
-
-Authenticated repository metadata confirmed that
-[fabiocnd/lpx-keepmorrow](https://github.com/fabiocnd/lpx-keepmorrow) remained
-private. The complete repository contained 104 tracked UTF-8 files; only
-synthetic inputs were included. The update used the existing branch history and
-an expected-head check, without a force update or visibility change.
-
-| Evidence | Verified value |
-| --- | --- |
-| Repository ID | `1455189876` |
-| Visibility | Private |
-| Tested remote source commit | `c46234c6e20188a662b42c2d59790cb2d0d34207` |
-| Corresponding local source snapshot | `cab8d5489f6714d27c31f4b7a16ed740c40acc1a` |
-| Matching remote and local Git tree | `35836aea7267c1c25803e33c34910e787e6daba6` |
-
-The local snapshot retains `Fabio de Sousa Lopes <fabio@lopixneural.com>` as its
-author. The GitHub connector uses the account's managed commit identity; the
-remote message records the local snapshot and the canonical project identity
-in a co-author trailer. The tree equality, rather than identical commit hashes,
-establishes content equivalence between these two histories. Later evidence
-updates may advance the branch and are identified separately when delivered.

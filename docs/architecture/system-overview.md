@@ -1,152 +1,139 @@
 # System Overview
 
-## Current implementation: 0.2.0
+**Implemented version:** 0.3.0 development candidate
+**Reviewed:** November 12, 2026
 
-LPX Keepmorrow preserves explicitly selected local directories or supported ZIPs
-and builds a derived conversation collection over those originals. The local
-workflow includes repeated captures, namespaced identities, revision history,
-message graphs, association decisions, literal search, standalone HTML, and
-selected recovery. The generic directory archive commands remain available.
-
-The ChatGPT mapping adapter is experimental. Its supported JSON shapes are
-documented and exercised with synthetic fixtures; no representative real account
-export has been validated. Successful preservation of supplied bytes and
-successful interpretation of the declared profile are separate outcomes. Neither
-establishes completeness of a ChatGPT account. See the
-[import contract](import-contract.md) for the exact compatibility boundary.
+LPX Keepmorrow preserves selected directories or compatible export ZIPs and builds
+an immutable conversation collection over the supplied originals. The private
+service coordinates authenticated access, trusted human decisions, recoverable
+operations, and bounded transfers around that deterministic core.
 
 ## Responsibility boundaries
 
-| Boundary | Implemented responsibility | Limit |
+| Package or surface | Responsibility | Boundary |
 | --- | --- | --- |
-| CLI and consent | Require current terms/privacy declarations before inspecting selected content; format operation results | Local declarations do not authenticate a person or establish legal approval |
-| `archive` | Inventory, copy, hash, assemble, verify, and recover exact supplied bytes | Local filesystem destinations; no remote storage adapter |
-| `formats` | Bound JSON bytes, nesting, and lexical tokens before object construction | Structural preflight supplements strict decoding and domain validation |
-| `importers` | Validate directory/ZIP intake and interpret the experimental ChatGPT mapping profile | Unsupported material remains preserved and explicitly reported |
-| `catalog` | Reconcile identities and revisions; validate graphs; record associations; query, render, and recover selections | Bounded in-memory metadata and literal scans; no persistent search database |
-| `integrations/chatgpt` | Optional read-only MCP tools over explicitly registered local collections | SDK-tested loopback adapter; no authenticated, deployed, or installed ChatGPT connection |
-| Optional AI assistance | No model feature is implemented in the preservation path | Suggestions remain a future, separately governed capability |
+| CLI and `consent` | Validate explicit current policy declarations before selected-content I/O | Local declarations do not authenticate a person |
+| `archive` | Inventory, copy, hash, assemble, verify, and recover bytes | Separate new destinations; no remote provider writes |
+| `formats` | Bound JSON bytes, depth, and lexical tokens before decoding | Domain validation still follows structural preflight |
+| `importers` | Validate ZIP intake and parse the experimental mapping profile | Preserve unsupported material and report gaps |
+| `catalog` | Identity, revision/occurrence reconciliation, graphs, associations, queries, views, and selection | Bounded in-memory metadata and literal scans |
+| `access` | Principals, current policy acceptance, exact grants, expiry, and withdrawal | No model-callable acceptance writer |
+| `persistence` | Private SQLite connections, explicit transactions, and schema versions | One operator-controlled local database; no distributed replicas |
+| `operations` | Immutable plans, human reviews, idempotency, admission, fencing, and restart reconciliation | No per-file resume or automatic unbounded retry |
+| `transfers` | Owned upload handles and portable package construction/unpacking | Independent encoded and expanded limits; no arbitrary URL fetch |
+| `application` | Resource generations, authorization lineage, execution, budgets, owned scratch, and setup | One process, one worker, one content-I/O slot |
+| `integrations/chatgpt` | OAuth verification, MCP tools, trusted portal, and streaming delivery | Live identity provider and ChatGPT installation remain unverified |
+| `ui/chatgpt` | Typed MCP Apps companion and official SDK bridge | Human acceptance and operation review occur in the trusted portal |
 
-The core uses the Python standard library. The MCP adapter adds an optional SDK
-dependency; it does not become part of authoritative hashing or identity logic.
-Internal library functions are domain primitives. Any new user-facing boundary
-must enforce its own authorization and acceptance contract.
+The deterministic core and persistence components use the Python standard
+library. Optional HTTP, OAuth, and MCP dependencies belong to the integration
+boundary. The legacy five-tool loopback adapter remains a synthetic development
+surface; local operator service mode exposes the portal without MCP.
 
-## Collection construction
+```mermaid
+flowchart TD
+    C["ChatGPT tools and companion"] --> M["OAuth MCP boundary"]
+    H["Human portal"] --> A["Identity, consent, and grants"]
+    M --> A
+    A --> Q["Verified queries"]
+    A --> J["Reviewed operation journal"]
+    J --> W["Exclusive worker"]
+    Q --> S["Immutable collections"]
+    W --> S
+    W --> T["Bounded transfers"]
+    J --> D["Shared SQLite transactions"]
+    A --> D
+```
 
-1. Validate acceptance, arguments, resource limits, and destination separation.
-2. Validate the selected directory or extract a supported ZIP into an isolated
-   temporary tree. ZIP metadata and actual decompressed bytes have separate bounds.
-3. Copy and hash originals into private archive staging. ZIP inputs retain both
-   the complete original container and its extracted files.
-4. Parse preserved JSON, reconcile supported records, and retain source provenance
-   and explicit coverage outcomes. The source is never rewritten.
-5. Write the derived catalog, coverage report, and escaped standalone HTML view.
-6. Validate the manifest and collection contract, independently verify payload
-   bytes, and publish to a new destination without replacing existing data.
+## Collection and publication path
 
-The package layout and commands are documented in the
-[local collection workflow](collection-workflow.md). A partial or unsupported
-semantic result can still produce a verified archive; the CLI reports that
-distinction with exit status `3`. Successful selected recovery also returns `3`
-because its capture coverage is intentionally partial.
+1. Validate identity, exact processing scope, current policy acceptance, and limits.
+2. For service writes, persist a typed plan and obtain a separate human review.
+3. Reserve resources and claim a fenced worker attempt. Receive input only through
+   a previously authorized upload or explicitly selected CLI path.
+4. Preserve originals, parse supported records, and write derived metadata in a
+   proven operation-owned workspace. Never execute source content.
+5. Independently validate staged bytes, catalog relationships, and expected output.
+6. Serialize publication authorization against revocation in the shared immediate
+   SQLite transaction, then atomically publish without replacing an existing path.
+7. Verify and register the published generation; record complete or partial
+   semantic coverage. Release the reservation only after executor cleanup.
 
-## Originals, identity, and evidence
+A publication decision committed before revocation may finish privately. Every
+later disclosure still checks current access. Publication is atomic visibility;
+SQLite durability does not establish power-loss durability for payload files.
 
-Logical conversation identity includes the provider, the operator's account
-namespace, and the source conversation identifier. Revisions hash the complete
-decoded source record, including unknown fields. Canonical record hashing and
-exact original-file hashing serve different purposes: formatting changes alone
-do not create a new canonical revision, while the original bytes remain distinct
-capture evidence.
+## Identity, consent, and lineage
 
-The catalog preserves graph parents, children, branches, and null-message
-structural nodes within the supported profile. Unknown source fields remain in
-the originals. A missing project field produces `association_unknown`, not
-`standalone_confirmed`. Explicit operator decisions have their own history and
-do not alter source evidence. Their hash chain establishes internal consistency,
-not authenticated authorship.
+An authenticated principal is the exact configured issuer/subject pair. A source
+account namespace is provenance and never selects the authenticated owner.
+Opaque identifiers require authorization; guessing difficulty is not a policy.
 
-All supplied regular files are preserved regardless of extension. Semantic
-artifact binding currently requires an explicit supported `relative_path` that
-matches the capture inventory. Missing files, unresolved references, external
-URLs, and unsupported references remain visible. Imported URLs are not fetched,
-and binary contents are not decoded or executed by the preservation core.
+The portal records document versions and digests, resource, generation, purpose,
+recipient, permitted actions, deliberate acceptance, expiry, and withdrawal.
+Single-use challenges and CSRF checks protect human decisions. No MCP tool can
+create acceptance or review a plan by supplying a boolean.
 
-## Generations and recovery
+Queued and running operations remain bound to the exact reviewed grant, version,
+and acceptance receipt. Completed descendants require their own current scope
+and every required completed ancestor scope. A fresh human acceptance can renew
+an ancestor's exact resource/generation/action; a child grant alone cannot restore
+that ancestor. Historical plans and published bytes remain unchanged.
 
-Importing additional captures or recording an association creates a new immutable
-generation. The previous generation remains unchanged. Identical source records
-reuse a normalized revision, but each capture occurrence and its original files
-remain represented. Previous payload files are physically copied into the new
-generation; cross-capture and cross-generation blob deduplication is not implemented.
+## Files, derivatives, and delivery
 
-Complete restore recovers every payload file into a new directory. Selected
-recovery creates a derivative package containing chosen conversation records and
-available bound artifacts. It omits raw source ZIPs, unrelated files, and recognized
-whole conversation JSON documents. References to those excluded documents receive
-`excluded_by_selection`. Arbitrary selected attachments are not internally
-redacted and may themselves contain additional information. Full originals remain
-available in the parent collection. Neither recovery operation recreates native
-ChatGPT chats or projects.
+Original ZIPs and supplied regular files are preserved byte-for-byte. Supported
+relative-path evidence binds available artifacts to conversations. Missing,
+unresolved, unsupported, and external references remain distinct; URLs are not
+followed. The parser's compatibility remains experimental until a representative
+authorized real export is validated.
 
-## Read interfaces
+Selected recovery produces normalized selected records with exact bound artifacts.
+It omits recognized whole conversation exports and original ZIPs that can contain
+unrelated material. Intact arbitrary attachments may still contain other data;
+selection does not redact their internals. Full originals stay in the parent.
 
-The CLI provides paginated browsing and reading plus literal, Unicode
-case-insensitive search across retained revisions. It verifies the complete
-archive before querying its catalog. The standalone HTML view contains escaped
-text and local artifact links, with no scripts or network requests. Opening that
-view directly does not perform integrity verification.
+The portable ZIP retains the collection manifest and payload. Its service delivery
+receipt has a separate generation and binds the ZIP digest. Download requires the
+package's exact scope and current lineage. HTTP delivery checks session, grants,
+resource availability, and expiry before and after each 64 KiB read. Already
+transmitted bytes cannot be recalled.
 
-The optional MCP server binds to `127.0.0.1` and exposes bounded read operations
-over configured opaque collection IDs. Protocol tests exercise the official SDK;
-they do not establish installation or connectivity in a real ChatGPT account.
-Authentication, per-user grants, a reachable deployment, and actual account
-acceptance testing remain open. See the
-[ChatGPT integration contract](chatgpt-integration.md).
+## Failure and resource model
 
-## Performance and failure model
+The worker holds an OS lock for its entire lifetime. Persisted epochs and attempt
+tokens reject obsolete owners. Startup first recovers proven workspaces and upload
+pins, then reconciles publication, then runs retention cleanup. Unknown or ambiguous
+directories are preserved for operator review. A timed-out shutdown retains worker
+ownership while its executor remains active.
 
-Let B be payload bytes, N inventory entries, V graph nodes, E graph edges, and T
-indexed text length. Copying and hashing require O(B) byte processing; canonical
-inventory sorting requires O(N log N) comparisons. Graph validation uses O(V + E)
-work. Literal search scans retained text and incurs full archive verification
-before that scan.
+Status, listing, and cancellation use bounded metadata paths outside the content
+slot. Content reads and writes share that slot; database work and uninterruptible
+system calls can still affect latency. Fixed error categories avoid returning
+source text, credentials, or private paths.
 
-Assembly copies and hashes a supplied file in one pass and avoids another payload
-copy merely to package derived metadata. Final verification still rereads all
-payload bytes. ZIP extraction adds decompression and temporary storage. Extending
-a generation copies previous and new content, so its cost is not proportional
-only to newly supplied bytes.
+Default service limits are lower than reusable core limits: 128 MiB per upload,
+512 MiB collection payload, 1 GiB encoded/expanded package ceilings, a 2 GiB
+operation reservation, and a 4 GiB managed logical budget. The full upload pool
+is accounted separately. These bounds are admission rules, not throughput or
+filesystem quota guarantees.
 
-File streaming uses bounded chunks. JSON documents and catalog metadata are
-materialized under byte, depth, token, record, graph, and aggregate metadata
-ceilings; total memory is not constant. Exact limits appear in the
-[import contract](import-contract.md) and [archive reference](reference-core.md).
-Benchmark results apply to their recorded workloads and environments.
+Copying and full verification process O(B) payload bytes. Inventory ordering uses
+O(F log F) comparisons; graph checks use O(V + E). Literal search scans retained
+text after full archive verification. Extending a generation copies previous
+payloads. JSON and catalog metadata are bounded but materialized; total memory
+is not constant. The [service benchmark](../../benchmarks/PRIVATE_SERVICE_BENCHMARK.md)
+records the measured synthetic workload and its limits.
 
-Handled failures and cancellation clean up staging. Atomic publication provides
-a visibility boundary, not `fsync` crash durability. Abrupt process or system
-failure may leave temporary remnants. Durable checkpoints, restart, and resume
-are not implemented. The filesystem contract assumes a stable user-controlled
-tree, rather than hostile concurrent replacement of directory ancestors.
+## Deployment and distribution status
 
-## Preservation and execution boundary
+The local service and integration contracts are implemented and synthetically
+tested. Actual ChatGPT interaction, a live identity-provider registration,
+a selected host/tunnel, real-export compatibility, and approved operational/legal
+policies remain external gates. The source is being prepared for an open-source
+transition; no public license or deployment is implied by these components.
 
-No model decides authoritative identity, integrity, packaging, or recovery.
-Imported instructions, filenames, documents, and links are untrusted data and
-cannot authorize execution or network access. Sources remain unchanged; every
-write operation uses a separate new destination.
-
-Provider-side overwrite, reclassification, or deletion would require a separate
-implemented capability, impact preview, and explicit operation authorization.
-General acceptance does not authorize those actions. Cloud transfer, authenticated
-hosting, retention policy, and public distribution remain separate work.
-
-## Related documents
-
-- [Immutable collection decision](decisions/0002-immutable-collections.md)
-- [Collection verification](../engineering/collection-verification.md)
-- [Performance policy](../engineering/performance-policy.md)
-- [AI engineering standard](../ai/ai-engineering-standard.md)
-- [Consent and operation authorization](../../legal/consent-and-operation-authorization.md)
+See [access control](access-control.md), [operation journal](operation-journal.md),
+[transfer contract](transfer-contract.md), [trusted portal](trusted-portal.md),
+[runbook](../operations/private-service-runbook.md), and
+[private pilot validation](../engineering/private-pilot-validation.md).

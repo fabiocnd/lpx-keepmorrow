@@ -1,6 +1,6 @@
 # Local Collection Workflow
 
-**Release:** 0.2.0 internal development
+**Release:** 0.3.0 development candidate; collection format v1 unchanged
 **Publisher:** Lopix Neural Inc.
 **Engineering lead:** Fabio de Sousa Lopes
 **Contact:** fabio@lopixneural.com
@@ -14,7 +14,7 @@ on the experimental mapping profile.
 
 Read [Terms of Use](../../legal/terms-of-use.md) and
 [Privacy Notice](../../legal/privacy-notice.md), both draft version
-`2026-11-12-draft.2`. The CLI requires both exact declarations for every operation
+`2026-11-12-draft.3`. The CLI requires both exact declarations for every operation
 that inspects selected material. Missing or old versions fail before source
 inspection. These development declarations do not authenticate an end user or
 establish legal approval of the drafts.
@@ -29,7 +29,7 @@ one line in PowerShell. Destinations must be new and outside selected source tre
 ```bash
 python -m keepmorrow import ./export-first.zip ./export-second \
   --destination ../collection-001 --account-namespace my-local-account \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 ```
 
 The account namespace is a stable local label, not a credential. Use the same
@@ -75,7 +75,7 @@ complete parser result says nothing about unsupplied account data.
 python -m keepmorrow import ./export-third.zip \
   --previous ../collection-001 --destination ../collection-002 \
   --account-namespace my-local-account \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 ```
 
 This verifies the prior collection, copies its preserved captures into a new
@@ -94,13 +94,13 @@ the new complete output and temporarily for any ZIP extraction.
 
 ```bash
 python -m keepmorrow catalog ../collection-002 --limit 20 \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow search ../collection-002 "preservation" --limit 20 \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow read ../collection-002 CONVERSATION_KEY --offset 0 --limit 50 \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 ```
 
 Replace `CONVERSATION_KEY` with an exact key returned by the catalog. Search is
@@ -119,7 +119,7 @@ supplied occurrence, which may differ from the platform's edit chronology.
 python -m keepmorrow associate ../collection-002 ../collection-003 \
   --conversation-key CONVERSATION_KEY --state standalone_confirmed \
   --reason "I confirm this conversation belongs outside a project." \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 ```
 
 Use `project_confirmed` with `--project-id PROJECT_ID` to assign a project, or
@@ -132,10 +132,10 @@ identity or authority of the person entering the decision.
 ```bash
 python -m keepmorrow recover ../collection-003 ../selected-package \
   --conversation-key CONVERSATION_KEY \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 
 python -m keepmorrow restore ../collection-003 ../complete-recovery \
-  --accept-terms 2026-11-12-draft.2 --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 --accept-privacy 2026-11-12-draft.3
 ```
 
 Selected recovery can use repeated conversation keys or one confirmed
@@ -154,8 +154,10 @@ separate directory. Neither operation recreates native ChatGPT chats or projects
 
 ## Validation and remaining work
 
-See [collection verification](../engineering/collection-verification.md) for
-observed tests and CI. Real export validation, broader attachment binding,
-durable job resume, authenticated ChatGPT connection, hosted retention rules,
-and legal approval remain explicit work. No source deletion or public release
-is enabled by this workflow.
+See [collection verification](../engineering/collection-verification.md) for the
+0.2.0 technical baseline and [private pilot validation](../engineering/private-pilot-validation.md)
+for current service evidence. The service adds authenticated scopes, reviewed
+operations, restart reconciliation, and bounded transfers around this CLI/core
+workflow. Real-export validation, broader artifact binding, per-file resume, an
+actual ChatGPT connection, host qualification, and legal approval remain open.
+Source deletion and native ChatGPT restoration are outside the implemented scope.

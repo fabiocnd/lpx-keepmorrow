@@ -2,14 +2,14 @@
 
 ## Identity and authority
 
-This repository belongs to the LPX Keepmorrow project (`___LPX Keepmorrow___` in
-ChatGPT). Lopix Neural Inc. is the publisher and maintainer. Fabio de Sousa Lopes
+This repository contains LPX Keepmorrow. Lopix Neural Inc. is the publisher and maintainer. Fabio de Sousa Lopes
 is the creator and lead developer. Use `fabio@lopixneural.com` as the project
 contact and the author email when creating commits on Fabio's behalf.
 
-The repository is private and proprietary. The intended product is free and
-nonmonetized. Free product access does not authorize source redistribution or
-public publication. Apply the user's current, explicit authorization; do not
+The current repository is private under its existing proprietary license. An
+open-source transition is planned; the exact license and public destination must
+be adopted before publication. The maintained product is intended to remain free
+and nonmonetized. That choice is separate from downstream open-source rights. Apply the user's current, explicit authorization; do not
 request the same permission again for work already authorized.
 
 ## Language and source fidelity
@@ -44,7 +44,7 @@ tests.
 ## Repository organization
 
 Group files by responsibility. Keep product requirements, architecture,
-engineering policy, AI policy, governance, provenance, research, source code,
+engineering policy, AI policy, governance, legal research, source code,
 tests, and benchmarks in clearly named areas. Use lowercase kebab-case for new
 documentation paths and Python snake_case for modules and identifiers; preserve
 conventional repository filenames such as `README.md` and `AGENTS.md`.
@@ -74,10 +74,10 @@ not merely to reduce a file's line count. Keep historical source material under
 
 ## Scope and evidence
 
-The initial Python standard-library implementation is a reference foundation.
-Its presence does not select the production stack or complete the MVP. Treat
-storage adapters, native ChatGPT integration, model providers, public release,
-and the rest of the roadmap according to their recorded implementation status.
+Version 0.3.0 includes the deterministic core, private service, trusted portal,
+durable operations, transfers, and MCP Apps companion. Treat actual ChatGPT
+installation, real-export compatibility, live hosting, model features, source
+licensing, and public release according to their recorded acceptance status.
 
 Use synthetic fixtures. Do not commit credentials, private customer archives,
 unrelated personal records, or generated secrets. Keep operational logs free of

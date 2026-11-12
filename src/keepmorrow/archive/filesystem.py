@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO
 
+from ..control import before_publication, checkpoint
+
 from .model import ArchiveError, FileRecord, Limits, validate_inventory, validate_relative_path
 
 _AT_FDCWD = -100
@@ -65,6 +67,7 @@ def publish_directory(stage: Path, destination: Path) -> None:
     RENAME_NOREPLACE; Windows already rejects an existing destination. Other
     platforms fail explicitly until an equivalent primitive has been verified.
     """
+    before_publication(stage, destination)
     if os.name == "nt":
         stage.rename(destination)
         return
@@ -97,11 +100,13 @@ def scan_tree(root: Path, limits: Limits) -> Inventory:
     files: list[FileState] = []
     total_bytes = 0
     while pending:
+        checkpoint()
         current, prefix = pending.pop()
         if not stat.S_ISDIR(current.lstat().st_mode):
             raise ArchiveError("A directory changed type during inventory.")
         with os.scandir(current) as entries:
             for entry in entries:
+                checkpoint()
                 relative = f"{prefix}/{entry.name}" if prefix else entry.name
                 validate_relative_path(relative)
                 # Windows directory-entry metadata omits device and file IDs.
@@ -167,6 +172,7 @@ def stream_file(root: Path, state: FileState, limits: Limits, output: BinaryIO |
         if _signature(os.fstat(source.fileno())) != state.signature:
             raise ArchiveError("A source file changed after inventory.")
         while block := source.read(limits.chunk_bytes):
+            checkpoint()
             count += len(block)
             if count > limits.max_file_bytes or count > state.size_bytes:
                 raise ArchiveError("A source file grew during processing.")
@@ -180,9 +186,11 @@ def stream_file(root: Path, state: FileState, limits: Limits, output: BinaryIO |
 
 def copy_tree(source: Path, destination: Path, inventory: Inventory, limits: Limits) -> tuple[FileRecord, ...]:
     for relative in inventory.directories:
+        checkpoint()
         (destination / relative).mkdir()
     records: list[FileRecord] = []
     for state in inventory.files:
+        checkpoint()
         with (destination / state.path).open("xb") as output:
             records.append(stream_file(source, state, limits, output))
     if scan_tree(source, limits) != inventory:

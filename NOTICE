@@ -8,7 +8,15 @@ Project contact: fabio@lopixneural.com
 
 Project language: US English
 Source availability: Private and proprietary
+Planned direction: Open-source transition; release license not yet selected or adopted
 Product direction: Free to use; no monetization, paid tiers, or advertising
+
+The proprietary notice applies to project-owned source and documentation.
+Third-party components retain their respective copyrights and licenses.
+The bundled interface notices are recorded in
+ui/chatgpt/THIRD-PARTY-NOTICES.txt; dependency versions are recorded in the
+project manifests, constraints, and lockfiles. This notice does not replace
+or restrict rights granted by an applicable third-party license.
 
 The project is independent. References to ChatGPT, OpenAI, GitHub, or storage
 providers identify integration targets and sources; they do not imply

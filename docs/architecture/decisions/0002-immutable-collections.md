@@ -11,10 +11,9 @@ conversations, revisions, branches, project evidence, or attachment references.
 The product needs a useful workflow across repeated exports while retaining an
 independently inspectable original and explicit coverage limitations.
 
-The owner requested implementation and refactoring of the recent preservation,
-binary/image, product-differentiation, and performance recommendations. No real
-account export has been supplied as a compatibility sample. The plugin is intended
-for ChatGPT, but a host connection must expose verified capabilities without
+The collection needs byte-exact binary handling, useful repeated-capture behavior,
+and explicit interpretation evidence. No representative real account export has
+been validated. A ChatGPT interface must expose verified capabilities without
 claiming access to unavailable platform data.
 
 ## Decision
@@ -86,3 +85,12 @@ path attacks, corruption, selective-disclosure boundaries, and protocol acceptan
 The [verification record](../../engineering/collection-verification.md) records
 observed results. Synthetic coverage does not establish compatibility with every
 real ChatGPT export or legal readiness for public distribution.
+
+## Version 0.3.0 integration
+
+This decision retains the collection format and fidelity contract. The later
+[service decision](0003-private-preservation-service.md) adds scoped execution
+checkpoints, trusted human decisions, durable operation records, and restart
+reconciliation around it. The 0.2.0 limitations above describe that baseline;
+the current [system overview](../system-overview.md) records implemented service
+behavior and the remaining power-loss/per-file-resume limits.

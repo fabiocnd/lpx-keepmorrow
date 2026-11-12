@@ -1,9 +1,22 @@
-# Reference Archive Benchmark
+# Reproducible Performance Experiments
 
-For the version 0.2.0 import, history, query, and selective recovery workload,
-see the [Collection Reference Benchmark](COLLECTION_BENCHMARK.md). The archive
-benchmark below isolates the original byte-preservation component; the two
-workloads are not directly comparable performance baselines.
+Each report identifies its measured workload and source. These experiments serve
+different purposes and are not interchangeable performance baselines.
+
+| Experiment | Measurement boundary | Memory evidence |
+| --- | --- | --- |
+| [Private service](PRIVATE_SERVICE_BENCHMARK.md) | One worker, authorization and operation stores, upload/import/query/recovery/package/download/unpack, and control metadata during active work | Actual child-process peak RSS; sampled logical and allocated disk bytes |
+| [Collection reference](COLLECTION_BENCHMARK.md) | Historical 0.2.0-era immutable import, extension, verified query, selective recovery, and wide-branch validation | Python-traced allocation peaks |
+| Archive primitives below | Original create, verify, and restore component | Python-traced allocation peaks |
+
+The collection and archive reference files retain their original observations.
+Their recorded source hashes or component version, rather than the current
+worktree, define their attribution. Changes to the application service do not
+retroactively update those measurements. The private-service report includes
+synthetic consent and review records; it does not establish human acceptance,
+hosted authentication, browser or ChatGPT compatibility, or deployment capacity.
+
+## Archive component experiment
 
 Run from the repository root:
 

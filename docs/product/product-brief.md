@@ -2,119 +2,97 @@
 
 **Product:** LPX Keepmorrow
 **Publisher:** Lopix Neural Inc.
-**Creator and lead developer:** Fabio de Sousa Lopes
+**Engineering lead:** Fabio de Sousa Lopes
 **Contact:** fabio@lopixneural.com
-**Baseline date:** 2026-11-12
-
-**Implementation:** 0.2.0 internal development
+**Version:** 0.3.0 development candidate
+**Reviewed:** November 12, 2026
 
 ## Purpose
 
-Preserve the AI work a user explicitly chooses to archive, keep its available
-artifacts connected to their sources, and make recovery verifiable. The product
-addresses work fragmented across projects, standalone conversations, branches,
-revisions, documents, images, and code.
+Turn explicitly supplied conversation exports into a verifiable collection that
+remains useful across repeated captures. Preserve the original files, interpret
+supported conversation structures, expose missing evidence, and recover the
+complete payload or a selected subset into ordinary files.
 
-The initial audience is independent professionals, researchers, creators,
-developers, and small teams. This audience is a product hypothesis, not a
-validated market-size or adoption claim.
+ChatGPT's native export supplies eligible account data. Keepmorrow uses selected
+exports as inputs and adds revision continuity, explicit association decisions,
+integrity checks, and selective recovery. An occasional downloaded copy may
+already satisfy a user's needs. The [export comparison](export-comparison.md)
+distinguishes documented capabilities from engineering judgments about usefulness.
 
-## Product commitments
+## Intended workflow
 
-- Free use, with no monetization, paid tiers, upsells, or advertising.
-- Clear credit to Lopix Neural Inc. and Fabio de Sousa Lopes.
-- Private, proprietary development source under the owner's current direction.
-- Explicitly selected inputs and clear preservation scope.
-- Original bytes retained before any derived interpretation.
-- Portable recovery, with documented checks and visible omissions.
-- Explicit user acceptance and operation authorization before processing.
-- No promotional changes to preserved conversations or original files.
+1. Obtain an export through the source platform's supported process.
+2. Accept the applicable processing scope and explicitly choose the input.
+3. Preserve the supplied bytes and build the supported derived catalog.
+4. Inspect conversations, revisions, branches, coverage gaps, and available files.
+5. Review a separate plan before creating a new generation or portable package.
+6. Authorize access to the resulting exact generation and verify recovered bytes.
 
-## Organization model
+The local CLI supports directories and compatible ZIPs. The private service adds
+a trusted browser portal for file transfer and human decisions, together with
+MCP tools and a compact MCP Apps interface. Native ChatGPT file-picker acquisition
+and a live ChatGPT connection have not been demonstrated.
 
-A conversation can be linked to a confirmed project, confirmed as standalone,
-or left with an unknown association. Missing project metadata does not establish
-standalone status. Each classification needs recorded evidence. AI suggestions
-remain suggestions until an authorized decision establishes a classification.
+## Implemented capabilities
 
-Projects, conversations, captures, revisions, messages, and artifacts are
-different entities. A folder name is a presentation label, not a durable identity.
-A content hash identifies bytes, not a person or a logical conversation.
+| Area | Version 0.3.0 behavior |
+| --- | --- |
+| Originals | Preserve supplied regular files, empty directories, and complete original ZIP containers with exact byte inventories |
+| Conversations | Interpret the documented experimental mapping profile, source IDs, revisions, branches, and occurrence provenance |
+| Associations | Distinguish confirmed projects, confirmed standalone conversations, and unknown associations; keep corrections separate from source evidence |
+| Inspection | Browse, search literally, read revisions, verify integrity, and open an escaped standalone HTML view |
+| Recovery | Recover complete payloads or selected derived records with exact bound artifacts into new destinations |
+| Identity and consent | Validate configured OAuth resource tokens; record human acceptance, current policy digests, exact generations, actions, expiry, and revocation |
+| Operations | Persist immutable plans, deliberate reviews, idempotent starts, cancellation, publication decisions, and process-restart reconciliation |
+| Transfers | Receive bounded authorized uploads and deliver verified portable packages with current access and expiry checks |
+| Interface | Provide a local operator portal and an OAuth-mode MCP Apps companion with independent human consent and operation review |
 
-## Current delivery
+No source file or previous collection generation is overwritten or deleted.
+A completed derivative requires its own access scope. Completed ancestor scopes
+can be renewed through explicit human acceptance; accepting only a child cannot
+override an expired or withdrawn ancestor. Active operations remain bound to
+their exact reviewed grant and acceptance receipt.
 
-Version 0.2.0 builds a local conversation collection from explicitly selected
-directories or supported ZIP exports. It retains original files and raw ZIP
-containers, then derives a catalog, coverage report, and standalone HTML view.
-The experimental ChatGPT mapping profile supports message graphs, branches,
-structural roots, namespaced conversation identities, and complete-record revision
-history across repeated captures.
+## Compatibility and evidence
 
-Users can browse, search, and read retained revisions; record an explicit project,
-standalone, or unknown association; and recover either the complete payload or a
-selected conversation/project package. Available images and other supplied binary
-files remain byte-for-byte copies. Semantic artifact links require explicit
-supported path evidence; missing or unresolved media remains visible. No remote
-artifact is fetched merely because an export contains its URL.
+The semantic adapter is experimental. Synthetic exports exercise its documented
+profile, but no representative real account export has been validated. Successful
+byte preservation does not establish complete interpretation or account coverage.
+A filename, URI, thumbnail, or unavailable download link does not establish that
+an original image or binary was supplied.
 
-Each update creates a new generation and leaves previous generations unchanged.
-Existing capture files are physically copied into the new generation. Revision
-reuse reduces duplicate normalized records; physical blob deduplication and
-resumable jobs are not implemented. The
-[local collection workflow](../architecture/collection-workflow.md) explains the
-available commands and outputs.
+All supplied regular files are retained independently of extension. Selective
+recovery includes an artifact only when supported metadata binds it to preserved
+bytes. Arbitrary selected attachments remain intact and are not internally
+redacted. Recognized whole conversation documents and original ZIP containers
+are excluded from a selected derivative because they can contain unrelated data.
 
-The optional read-only MCP adapter provides collection browsing, search, reading,
-and verification through the official SDK. Its loopback implementation has SDK
-protocol tests. It is not yet connected to a real ChatGPT account, deployed, or
-authenticated. The intended ChatGPT experience still requires a deployment,
-identity and access design, installation, and account-level acceptance testing.
-See the [ChatGPT integration contract](../architecture/chatgpt-integration.md).
+The [private pilot validation record](../engineering/private-pilot-validation.md)
+separates local tests, synthetic browser/protocol evidence, CI, measured workloads,
+and unfulfilled live-account or deployment gates. Performance observations apply
+to their recorded workload and environment; they are not capacity guarantees.
 
-## Compatibility evidence
+## Product and licensing direction
 
-The semantic parser is explicitly experimental. Paired synthetic mapping exports
-exercise collection behavior, but no representative real account export has been
-validated. The earlier `examples/synthetic-input/catalog.json` remains an opaque
-generic-archive demonstration. These fixtures establish different engineering
-contracts; neither proves universal compatibility with ChatGPT exports.
+The maintained product is intended to remain free and nonmonetized. An open-source
+transition is planned. The current repository remains private under its existing
+proprietary license until the release license and publication scope are adopted.
+See [open-source transition](../governance/open-source-transition.md).
 
-The [import contract](../architecture/import-contract.md) defines supported shapes,
-artifact binding, limits, and partial outcomes. The
-[collection verification record](../engineering/collection-verification.md)
-records observed test evidence. Broader artifact mapping and authentic-source
-validation remain required work.
+Professional attribution belongs in product information and documentation, never
+inside preserved source records. Source licensing does not transfer ownership of
+user archives or replace processing consent, privacy obligations, or service terms.
 
-## Boundaries
+## Limits and remaining gates
 
-The product's scope is the material a user supplies. It does not promise
-unrestricted account discovery, complete capture of every asset, restoration of
-never-supplied deleted material, continuous synchronization from occasional
-exports, or recreation of native ChatGPT chats and Projects. A portable restore
-is a separate collection of ordinary files.
+Keepmorrow does not enumerate a ChatGPT account, reconstruct missing originals,
+restore native chats or Projects, modify provider data, or run model inference.
+New generations copy previous payloads; physical deduplication and per-file resume
+are not implemented. Queries verify the complete archive before scanning bounded
+catalog metadata.
 
-Selected recovery contains derived conversation records and available bound
-artifacts. It omits whole source ZIPs and recognized whole conversation export
-documents, which can contain unselected conversations. Arbitrary chosen binary
-attachments are not internally redacted. Full originals remain available in the
-parent collection.
-
-The official export may already satisfy a user's preservation needs. Keepmorrow
-adds a local workflow for repeated captures, explicit associations, revision
-browsing, verification, and selection. It cannot recover bytes absent from the
-supplied material. See the [export comparison](export-comparison.md) for the
-documented distinction.
-
-Terms, privacy notices, and operation consent must accurately describe the
-implemented deployment. Free use and a user waiver do not eliminate mandatory
-legal duties. Cloud storage, authenticated hosting, retention and deletion rules,
-crash durability, and resume remain open work. Public distribution requires a
-separate owner decision and legal review.
-
-## Evidence
-
-This brief consolidates the [Blueprint v0.2](../provenance/blueprint-v0.2-snapshot.md)
-and the owner's repository, engineering, organization, contact, and legal
-instructions on 2026-11-12. See the
-[decision register](../governance/decision-register.md) for the status of each
-choice.
+Live identity-provider registration, a selected host or tunnel, actual ChatGPT
+interaction, authorized real-export validation, deployment-specific retention,
+qualified legal review, and public release remain separate acceptance gates.
+The [roadmap](roadmap.md) records their current status.

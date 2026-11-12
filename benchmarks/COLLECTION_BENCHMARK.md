@@ -1,5 +1,11 @@
 # Collection Reference Benchmark
 
+**Historical reference:** These are the original 0.2.0-era observations for the
+exact source aggregate recorded below. They are retained as evidence, not
+attributed to the current private-service implementation. See the
+[private service benchmark](PRIVATE_SERVICE_BENCHMARK.md) for its separate
+workflow and measurement method.
+
 This reproducible local experiment measures the semantic collection workflow on
 synthetic data. It establishes an initial observation, not a release target or
 a comparison with the official ChatGPT exporter. No earlier semantic-collection

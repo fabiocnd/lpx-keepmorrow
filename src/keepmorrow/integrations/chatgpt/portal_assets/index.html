@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>LPX Keepmorrow — Preservation Workspace</title>
+  <link rel="stylesheet" href="/assets/portal.css">
+  <script src="/assets/portal.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a href="/" class="brand" aria-label="LPX Keepmorrow home"><span class="brand-mark">K</span><span>LPX <strong>Keepmorrow</strong><small>Preservation workspace</small></span></a>
+    <div class="header-actions"><span class="badge" id="mode">Private pilot</span><button id="logout" class="secondary" hidden>Sign out</button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Keep the evidence. Keep your choices.</p>
+      <h1>Your history, preserved with care.</h1>
+      <p>Work with material you explicitly supply. Preserve original bytes, inspect historical revisions, and recover a verified selection into a new destination.</p>
+      <div class="principles"><span>Original sources stay unchanged</span><span>Every scope needs your approval</span><span>Missing material stays visible</span></div>
+    </section>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <section id="login-panel" class="panel narrow" hidden>
+      <p class="eyebrow">Private access</p><h2>Open your workspace</h2>
+      <p id="login-description">Sign in to review your available scopes. Signing in does not accept policies or start processing.</p>
+      <a id="oauth-login" class="button" hidden>Sign in with your configured identity provider</a>
+      <form id="operator-login" hidden>
+        <label for="operator-key">Local operator key</label>
+        <input id="operator-key" name="key" type="password" autocomplete="current-password" required maxlength="64">
+        <p class="help">Use the key in the owner-only file created during local setup. Never paste it into a conversation.</p>
+        <button type="submit">Open local workspace</button>
+      </form>
+    </section>
+    <div id="workspace" hidden>
+      <nav class="section-nav" aria-label="Workspace sections"><a href="#access">01 · Access</a><a href="#collections">02 · Collections</a><a href="#intake">03 · Intake</a><a href="#operations">04 · Operations</a></nav>
+      <section class="panel" id="access">
+        <div class="section-heading"><div><p class="eyebrow">01 / Your decisions</p><h2>Authorize a specific scope</h2></div><button id="refresh" class="secondary">Refresh workspace</button></div>
+        <p>Choose the resource and actions you intend to authorize. Policy acceptance, content eligibility, and operation review are separate decisions. Nothing is selected for you.</p>
+        <form id="scope-form">
+          <label for="scope-resource">Resource</label><select id="scope-resource" required></select>
+          <fieldset id="scope-actions"><legend>Permitted actions</legend></fieldset>
+          <button type="submit">Review this access request</button>
+        </form>
+        <details><summary>Current access grants</summary><div id="grants" class="card-list"></div></details>
+      </section>
+      <section class="panel" id="collections">
+        <div class="section-heading"><div><p class="eyebrow">02 / Evidence before conclusions</p><h2>Inspect a collection</h2></div></div>
+        <p>Each collection is an immutable generation. A matching manifest establishes consistency; it does not prove account completeness or publisher authenticity.</p>
+        <div class="form-grid"><div><label for="collection-resource">Collection generation</label><select id="collection-resource"></select></div><div><label for="search-text">Literal text search</label><input id="search-text" type="search" maxlength="1024" placeholder="Search supplied conversation text"></div></div>
+        <div class="button-row"><button id="browse">Browse conversations</button><button id="search" class="secondary">Search</button><button id="verify" class="secondary">Verify collection</button></div>
+        <div id="collection-results" class="results" aria-live="polite"></div>
+        <button id="more-conversations" class="secondary" hidden>Next conversation page</button>
+        <div id="revision-results" class="results"></div>
+        <div class="selection" id="selection" hidden>
+          <h3>Prepare a new output</h3><p id="selection-count"></p>
+          <div class="button-row"><button id="recover">Prepare selected recovery</button><button id="package" class="secondary">Prepare collection package</button></div>
+          <details><summary>Record an explicit association</summary>
+            <form id="association-form"><p>Select exactly one conversation above. Classification creates another generation.</p>
+              <label for="association-state">Association</label><select id="association-state"><option value="association_unknown">Unknown</option><option value="standalone_confirmed">Confirmed standalone</option><option value="project_confirmed">Confirmed project</option></select>
+              <label for="project-id">Project identifier (only for a confirmed project)</label><input id="project-id" maxlength="256">
+              <label for="association-reason">Reason for this decision</label><textarea id="association-reason" maxlength="1024" required></textarea>
+              <button type="submit" class="secondary">Prepare association decision</button>
+            </form>
+          </details>
+        </div>
+      </section>
+      <section class="panel" id="intake">
+        <p class="eyebrow">03 / Explicitly supplied material</p><h2>Add an export or recovery package</h2>
+        <p>Authorize workspace upload access first. Choosing a file alone does not upload it. Review the selected content for the declared recipients before proceeding.</p>
+        <form id="upload-form"><label for="upload-file">Selected ZIP file</label><input id="upload-file" type="file" accept=".zip,application/zip" required><p class="help" id="upload-limit"></p><button type="submit">Upload the selected file</button></form>
+        <div id="upload-receipt" class="receipt" hidden></div>
+        <form id="intake-form" hidden>
+          <label for="intake-kind">Operation</label><select id="intake-kind"><option value="import">Import a supplied ChatGPT export</option><option value="unpack">Verify and unpack a Keepmorrow recovery package</option></select>
+          <label for="account-namespace">Source account label</label><input id="account-namespace" value="my-supplied-export" maxlength="256"><p class="help">A stable label distinguishes captures. It does not need to contain an email address.</p>
+          <label for="extend-resource">Capture destination</label><select id="extend-resource"><option value="">Create a new collection</option></select>
+          <button type="submit">Prepare an operation for review</button>
+        </form>
+      </section>
+      <section class="panel" id="operations">
+        <div class="section-heading"><div><p class="eyebrow">04 / Review, then execute</p><h2>Operation control</h2></div><button id="refresh-operations" class="secondary">Refresh status</button></div>
+        <form id="open-plan-form" class="inline-form"><label for="plan-id">Plan prepared in ChatGPT or this workspace</label><div class="button-row"><input id="plan-id" placeholder="plan_…" maxlength="128" required><button type="submit" class="secondary">Open plan</button></div></form>
+        <div id="plan-review" class="review" hidden><h3>Review the exact operation</h3><div id="plan-details"></div><p>This operation writes a new output. It does not overwrite or delete the original source. Inspect any reported gaps before relying on a recovery.</p><label class="check"><input id="approve-plan" type="checkbox"><span>I authorize this exact operation and selected scope.</span></label><div class="button-row"><button id="start-plan" disabled>Approve and start</button><button id="decline-plan" class="secondary">Decline</button></div></div>
+        <div id="operation-list" class="card-list" aria-live="polite"></div><button id="more-operations" class="secondary" hidden>Older operations</button>
+        <h3>Verified package downloads</h3><p class="help">A package needs a separate download grant for its exact generation. Downloads expire; completed collections remain until the operator removes them.</p><div id="downloads" class="card-list"></div>
+      </section>
+    </div>
+  </main>
+  <dialog id="consent-dialog" aria-labelledby="consent-title">
+    <form id="consent-form"><p class="eyebrow">A deliberate choice</p><h2 id="consent-title">Review access and processing</h2><div id="consent-details"></div>
+      <p><a href="/policies/terms" target="_blank" rel="noopener">Read the Terms of Use</a> · <a href="/policies/privacy" target="_blank" rel="noopener">Read the Privacy Notice</a></p>
+      <p class="help">Private information can remain in preserved bytes, names, and output copies. Native project relationships and files absent from the supplied material may not be recoverable. Mandatory legal rights remain applicable.</p>
+      <label class="check"><input name="accepted_terms" type="checkbox"><span>I have had the opportunity to read and agree to the displayed Terms of Use.</span></label>
+      <label class="check"><input name="acknowledged_privacy" type="checkbox"><span>I have reviewed the displayed Privacy Notice and the stated recipients and retention.</span></label>
+      <label class="check"><input name="authorized_scope" type="checkbox"><span>I authorize only the displayed resource generation, purposes, and actions.</span></label>
+      <label class="check"><input name="eligible_content" type="checkbox"><span id="eligibility-copy">I have authority to process this selection and have reviewed its eligibility for the stated recipients.</span></label>
+      <div class="button-row"><button id="accept-consent" type="submit" disabled>Accept this scope</button><button id="decline-consent" type="button" class="secondary">Decline</button></div>
+    </form>
+  </dialog>
+  <footer><div><strong>LPX Keepmorrow</strong><p>Lopix Neural Inc. · Engineering lead: Fabio de Sousa Lopes</p></div><div><a href="mailto:fabio@lopixneural.com">fabio@lopixneural.com</a><p>Private development pilot · Proprietary source · No model training</p></div></footer>
+</body>
+</html>

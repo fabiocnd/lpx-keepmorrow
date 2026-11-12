@@ -6,6 +6,7 @@ Copyright 2026 Lopix Neural Inc. All rights reserved.
 from __future__ import annotations
 
 from ..archive.model import ArchiveError
+from ..control import checkpoint
 
 
 def check_json_budget(data: bytes, *, max_bytes: int, max_depth: int, max_tokens: int) -> None:
@@ -32,7 +33,9 @@ def check_json_budget(data: bytes, *, max_bytes: int, max_depth: int, max_tokens
 
     depth = tokens = 0
     in_string = escaped = in_atom = False
-    for byte in data:
+    for offset, byte in enumerate(data):
+        if offset & 65535 == 0:
+            checkpoint()
         if in_string:
             if escaped:
                 escaped = False

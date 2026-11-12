@@ -1,0 +1,22 @@
+{
+  "mode": "oauth",
+  "state_directory": "/var/lib/keepmorrow",
+  "policy_directory": "/etc/keepmorrow/policies",
+  "public_origin": "https://keepmorrow.example.com",
+  "port": 8765,
+  "oauth_issuer": "https://identity.example.com/",
+  "oauth_jwks_uri": "https://identity.example.com/.well-known/jwks.json",
+  "browser_oauth": {
+    "client_id": "replace-with-the-registered-browser-client",
+    "authorization_endpoint": "https://identity.example.com/authorize",
+    "token_endpoint": "https://identity.example.com/oauth/token",
+    "client_secret_env": "LPX_BROWSER_CLIENT_SECRET"
+  },
+  "principals": [
+    {"issuer": "https://identity.example.com/", "subject": "replace-with-the-verified-user-subject"}
+  ],
+  "resources": [],
+  "max_upload_bytes": 134217728,
+  "max_storage_bytes": 4294967296,
+  "retention_seconds": 86400
+}

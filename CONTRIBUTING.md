@@ -7,13 +7,18 @@ This is a private, proprietary repository. Access permits only the work
 authorized by its owner; it does not grant a public redistribution license. The
 product's intended free, nonmonetized use is a separate product decision.
 
+The owner now plans an open-source transition. The release license has not yet
+been selected or adopted, and repository visibility has not changed. Follow the
+current [LICENSE](LICENSE) until the chosen release and contribution terms are
+formally adopted; this direction alone is not a new license grant.
+
 ## Before changing the repository
 
 Read [AGENTS.md](AGENTS.md), the
 [Golden Coding Standard](docs/engineering/golden-coding-standard.md), and the
 relevant product or architecture contract. Identify the requirement and expected
-behavior before choosing an implementation. Keep historical source snapshots
-intact and record subsequent decisions separately.
+behavior before choosing an implementation. Preserve relevant historical
+engineering evidence and record subsequent decisions separately.
 
 All newly authored project content uses US English. Original imported material
 retains its original bytes and language. Use synthetic examples for development.
@@ -33,25 +38,49 @@ retains its original bytes and language. Use synthetic examples for development.
 
 Use an imperative US-English commit subject that describes the effect, for
 example, `Reject duplicate manifest paths`. Explain the reason in the body when
-it is not apparent from the diff. Attribute commits honestly. When acting on
-Fabio's behalf, use `Fabio de Sousa Lopes <fabio@lopixneural.com>`.
+it is not apparent from the diff. Use the actual author's identity and preserve
+accurate attribution for contributed work.
 
 ## Validation
 
-The initial reference code uses Python's standard library and `unittest`.
-Run the commands documented in the current README for the supported environment.
-For a source-layout checkout, the basic test invocation is:
+The preservation core and durable operation engine use Python's standard
+library. The optional private service adds the pinned MCP, HTTP, and identity
+dependencies; its companion interface has a separate locked Node package.
+Run the commands appropriate to the changed boundary from the repository root.
+The basic source-layout check is:
 
 ```bash
 PYTHONPATH=src python -m unittest discover -s tests -v
+python -m compileall -q src tests benchmarks
 ```
 
-Record the interpreter version, exact command, and result. Do not interpret a
-passing unit suite as evidence of complete MVP behavior, cloud integration, or
-performance at production scale. Follow the
+For the complete optional Python service on the recorded Python 3.12 environment:
+
+```bash
+python -m pip install -c requirements/chatgpt-dev-py312.constraints.txt '.[chatgpt]'
+PYTHONPATH=src python -m unittest discover -s tests -v
+```
+
+When changing interface code, follow [the UI build and validation instructions](ui/chatgpt/README.md)
+and regenerate its bundled asset and third-party notices. When changing legal
+policy bytes, run `python scripts/build_policy_assets.py` and inspect the
+resulting package copies. Version or digest changes invalidate existing
+acceptance evidence as described by the access contract; never silently preserve
+an old acceptance against changed policy text.
+
+Record the interpreter/tool versions, exact commands, pass/skip/failure counts,
+and relevant source revision. A skipped optional test was not executed. Treat
+local correctness, a remote CI run, live provider/account integration, and a
+measured host operating envelope as separate evidence. Follow the
 [Performance Policy](docs/engineering/performance-policy.md) when making a
 performance claim and the [AI Evaluation Plan](docs/ai/evaluation-plan.md) when
 changing a model-assisted feature.
+
+Use [Validation and Release Evidence](docs/engineering/validation.md) for the
+current commands and CI jobs. Historical 0.1.0 and 0.2.0 verification records
+remain evidence for their recorded revisions; update the current
+[private pilot record](docs/engineering/private-pilot-validation.md) with new
+results instead of rewriting old counts.
 
 ## Review expectations
 
@@ -59,10 +88,17 @@ Use the pull request template when opening a pull request. State the concrete
 problem, resulting behavior, verification, and remaining risks. Reviewers should
 be able to trace changes to their requirement and inspect the relevant evidence.
 
-An authorized initial import or repository setup may be committed directly as
-part of the owner's request. Later work should follow the repository's actual
-branch rules. This document does not claim that branch protection, required
-reviews, or automated gates are already configured.
+For service changes, inspect the trust boundary explicitly: authenticated
+principals come from verified credentials; human acceptance and plan review
+writers stay outside model-callable tools; publication authorization shares the
+grant-revocation transaction; attempt ownership and byte reservations last until
+the executor and private cleanup finish. Document each public API's side
+effects, ownership, errors, bounds, and relevant complexity. Comments should
+explain those invariants and tradeoffs rather than repeat the next statement.
+
+Follow the repository's configured branch rules. This document does not claim
+that branch protection, required reviews, or automated gates are already
+configured.
 
 Do not add dependencies, model calls, analytics, network access, or a new
 integration merely for convenience. Explain the need and record the resulting

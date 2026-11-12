@@ -1,13 +1,6 @@
-* text=auto
-*.py text eol=lf
-*.md text eol=lf
-*.json text eol=lf
-*.toml text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-*.sh text eol=lf
-*.ps1 text eol=lf
-*.png binary
-*.jpg binary
-*.zip binary
-*.pdf binary
+# Keep authored text reproducible across supported checkout platforms.
+* text=auto eol=lf
+
+# Preserve complete upstream license text, including its original trailing space.
+ui/chatgpt/THIRD-PARTY-NOTICES.txt whitespace=-blank-at-eol
+src/keepmorrow/integrations/chatgpt/assets/THIRD-PARTY-NOTICES.txt whitespace=-blank-at-eol

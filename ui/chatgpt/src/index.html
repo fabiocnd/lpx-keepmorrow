@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>LPX Keepmorrow</title>
+  <style>/* KEEP_CSS */</style>
+</head>
+<body>
+  <main class="workspace" aria-labelledby="workspace-title">
+    <header class="header">
+      <div class="identity"><span class="mark" aria-hidden="true">K</span><div>
+        <p class="eyebrow">LOPIX NEURAL</p><h1 id="workspace-title">Keepmorrow</h1>
+      </div></div>
+      <span class="badge">Private workspace</span>
+    </header>
+    <p class="introduction">Your preserved conversations, with their history intact.</p>
+    <div id="status" class="status" role="status" aria-live="polite">Connecting to your workspace…</div>
+
+    <section class="portal-panel" aria-labelledby="portal-title">
+      <div><h2 id="portal-title">You control what is processed.</h2>
+        <p>Manage consent, upload files, review operations, and download verified packages in the secure portal.</p></div>
+      <button id="portal" type="button" class="secondary" disabled>Open secure portal <span aria-hidden="true">↗</span></button>
+    </section>
+
+    <section class="section" aria-labelledby="collections-title">
+      <div class="section-heading"><h2 id="collections-title">Collections</h2>
+        <button id="load-collections" type="button" class="quiet" disabled>Load authorized collections</button></div>
+      <div class="controls">
+        <div class="field"><label for="collection">Collection and generation</label>
+          <select id="collection" disabled><option value="">Load collections to begin</option></select></div>
+        <button id="browse" type="button" disabled>Browse conversations</button>
+        <button id="verify" type="button" class="secondary" disabled>Verify collection</button>
+      </div>
+      <button id="more-collections" type="button" class="quiet" hidden>Load more collections</button>
+      <p id="coverage" class="helper">Only explicitly supplied material is available. Account completeness is not asserted.</p>
+      <form id="search-form" class="search" role="search">
+        <label for="query">Search preserved text</label>
+        <div class="search-row"><input id="query" name="query" type="search" maxlength="1024" placeholder="Search a phrase across retained revisions" disabled>
+          <button id="search" type="submit" disabled>Search</button></div>
+      </form>
+      <div id="conversations" class="results" aria-live="polite"><p class="empty">Select a collection to explore its preserved history.</p></div>
+      <button id="more-conversations" type="button" class="secondary" hidden>Next conversations</button>
+    </section>
+
+    <section id="revision-section" class="section" aria-labelledby="revision-title" hidden>
+      <div class="section-heading"><h2 id="revision-title">Revision</h2><button id="close-revision" type="button" class="quiet">Close revision</button></div>
+      <p id="revision-context" class="helper"></p>
+      <div id="messages" class="messages"></div>
+      <button id="more-messages" type="button" class="secondary" hidden>Next message nodes</button>
+    </section>
+
+    <section class="section operations-section" aria-labelledby="operations-title">
+      <div class="section-heading"><div><h2 id="operations-title">Operations</h2>
+        <p class="helper">Progress and cancellation stay separate from collection reads.</p></div>
+        <button id="load-operations" type="button" class="quiet" disabled>Refresh operations</button></div>
+      <div id="operations"><p class="empty">Refresh to inspect your reviewed operations.</p></div>
+      <button id="more-operations" type="button" class="quiet" hidden>Earlier operations</button>
+    </section>
+    <footer>LPX Keepmorrow · Lopix Neural Inc.<span>Preserved bytes and historical revisions remain distinct.</span></footer>
+  </main>
+  <script type="module">/* KEEP_SCRIPT */</script>
+</body>
+</html>

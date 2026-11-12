@@ -1,13 +1,18 @@
 # Performance Policy
 
-**Owner:** Lopix Neural Inc.  
-**Engineering lead:** Fabio de Sousa Lopes  
-**Effective date:** 2026-11-12  
+**Owner:** Lopix Neural Inc.
+
+**Engineering lead:** Fabio de Sousa Lopes
+
+**Effective date:** 2026-11-12
+
 **Status:** Required methodology for performance-sensitive work
 
 LPX Keepmorrow prioritizes correct preservation and verifiable recovery. A
 performance optimization must retain those properties. No production throughput,
-latency, memory, or cost target has been approved in this foundation.
+latency, memory, or cost target has been qualified for the private service. Its
+configured rejection ceilings and storage reservations are explicit controls;
+they are not measured service-level commitments.
 
 ## Define the workload before choosing a target
 
@@ -35,6 +40,13 @@ Include extra passes, duplicate buffers, serialization, integrity checks, and
 temporary disk use. A function's time complexity alone does not characterize
 end-to-end performance. Do not remove a necessary verification pass without an
 equivalent integrity argument and test evidence.
+
+For the private service, include SQLite admission and authorization, immutable
+generation copies, upload staging, package revalidation, operation-workspace
+cleanup, and retained-output growth. Separate synchronous execution from queue
+wait and control-plane observation. A terminal status may become visible before
+the executor releases its cleanup reservation; measure the resulting admission
+behavior instead of assuming the worker is already idle.
 
 ## Establish a reproducible measurement
 
@@ -92,7 +104,9 @@ only when they can detect a meaningful regression with stable workloads and a
 justified tolerance. Timing-sensitive assertions on shared CI machines require
 careful interpretation and should not replace controlled measurements.
 
-This policy does not claim that a benchmark suite or performance gate is already
-installed. Record actual tools and measured baselines as they are introduced.
-Every public performance claim must identify the relevant version, workload,
+The repository contains separate archive, collection, and private-service
+[benchmark harnesses](../../benchmarks/README.md). Their recorded results apply
+only to their source hashes, workloads, and measurement boundaries. They do not
+establish an automatic performance acceptance gate or a qualified production
+envelope. Every performance claim must identify the relevant version, workload,
 environment, and measurement limits.

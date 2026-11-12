@@ -1,7 +1,7 @@
 # LPX Keepmorrow Terms of Use
 
 **DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
-**Terms version:** `2026-11-12-draft.2`
+**Terms version:** `2026-11-12-draft.3`
 **Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
@@ -42,7 +42,7 @@ Optional processing requires a separate choice. Access to the core local archive
 operation must not depend on permission for advertising, model training, optional
 analytics, or other processing unnecessary for that operation.
 
-## 3. What the Current Reference Application Does
+## 3. What the Current Development Application Does
 
 The application reads supported regular files, directories, and ZIP exports that
 you select. It preserves original files, builds a catalog under an experimental
@@ -58,16 +58,27 @@ contains derived conversation records and available bound files. It excludes who
 recognized conversation export documents to avoid including unrelated conversations;
 it does not inspect or redact the internal contents of arbitrary selected attachments.
 
-An optional MCP development adapter can return deliberately requested catalog
-information to a locally connected client. It is restricted to loopback operation,
-configured collection identifiers, and read operations. It is not an authenticated
-hosted product or an installed ChatGPT connection.
+The private service adds an authenticated portal, scoped acceptance records,
+reviewed background operations, temporary upload intake, and verified portable
+recovery packages. Local operator mode remains on loopback and has no MCP
+endpoint. OAuth mode requires an explicitly configured identity provider and
+permits an authorized MCP client to request accepted content. The account
+connection and production deployment remain separate release gates; their
+presence in the source does not establish that either has occurred.
+
+The portal must display the selected resource, exact generation, permitted
+actions, policies, and recipients before acceptance. An upload is a separately
+authorized transfer into the configured operator's environment. Import,
+association, recovery, packaging, and unpacking require an additional review of
+the exact prepared operation. A model-supplied flag cannot replace these
+interactions. A transfer acknowledgment establishes receipt and local integrity
+only, not completeness of the source account or retention by another provider.
 
 This release does not enumerate a ChatGPT account, recreate native ChatGPT
-Projects, perform model inference, upload content, or delete source files.
-Source selection does not give the application authority to follow arbitrary
-links or obtain content from another service. A future integration requires its
-own documented capabilities and authorization.
+Projects, perform model inference, or delete source files. It does not fetch
+arbitrary source URLs or execute attachments. The original loopback development
+adapter remains available for synthetic development; it is not the authenticated
+service and must not be exposed remotely.
 
 Supported formats, resource limits, platform restrictions, and known limitations
 form part of the release documentation. An operation may fail or reject a source
@@ -127,9 +138,9 @@ or that the original source was authentic. A matching manifest and payload can
 both have been changed by an attacker. The current release does not provide a
 digital signature or remote integrity verification.
 
-An upload acknowledgment, if a future connector supplies one, must be
-distinguished from verification of bytes at the remote destination. The current
-reference application makes no remote verification claim.
+The service's upload and download checks concern bytes held in its configured
+environment. Successful delivery does not prove that another device has retained
+a durable copy. Verify a downloaded recovery package before relying on it.
 
 ## 7. Privacy, Retention, and Sensitive Material
 
@@ -152,12 +163,20 @@ use it for undisclosed purposes, or ignore security duties.
 
 ## 8. Optional Services and Destructive Actions
 
-Cloud storage, AI assistance, a production ChatGPT connection, and telemetry are
-not enabled in this release. The local MCP development adapter is not permission
-to expose private collections through a public endpoint. Before introducing remote processing, the
-Company must disclose its purpose, selected information, recipients, material
-retention consequences, and relevant risks and obtain the required separate
-authorization.
+The private integration implements the technical boundary for an explicitly
+configured OAuth service and ChatGPT connection. It does not automatically
+select a hosting provider, activate an account connection, or authorize public
+distribution. Before real remote processing, the actual operator must disclose
+the hosting location, selected information, recipients, retention consequences,
+and material risks, and obtain the appropriate scoped authorization. The legacy
+loopback development adapter must never substitute for that boundary.
+
+The service applies current resource grants again before disclosing content.
+Revocation committed before publication authorization prevents that publication.
+If authorization committed first, a verified private output may finish; future
+delivery still requires authorization. Revocation does not recall bytes already
+sent to ChatGPT or another recipient, or silently delete completed collections.
+AI inference, training, advertising, and automatic telemetry are not implemented.
 
 No acceptance under these Terms authorizes deletion, overwrite, move, or mutation
 of original source material. If a future release offers such an action, it must

@@ -21,6 +21,8 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import BinaryIO, Iterator
 
+from ..control import checkpoint, temporary_parent
+
 from ..archive.filesystem import open_regular, safe_directory, scan_tree
 from ..archive.model import ArchiveError, Limits, validate_relative_path
 
@@ -135,6 +137,7 @@ def _preflight_directory(source: BinaryIO, size_bytes: int, limits: Limits) -> _
     remaining = central_bytes
     observed_count = 0
     while remaining:
+        checkpoint()
         if remaining < _CENTRAL.size or observed_count >= limits.max_entries:
             raise ArchiveError("The ZIP central directory is malformed or exceeds entry limits.")
         header = _CENTRAL.unpack(_read_exact(source, _CENTRAL.size))
@@ -209,6 +212,7 @@ def _plan_members(
     members: list[_Member] = []
     total_bytes = 0
     for info in entries:
+        checkpoint()
         if (info.filename != info.orig_filename or info.flag_bits & ~_SUPPORTED_FLAGS
                 or info.extract_version > 20):
             raise ArchiveError("The ZIP uses unsupported names, flags, encryption, or extraction features.")
@@ -253,6 +257,7 @@ def _plan_members(
     if not physical and end.central_offset != 0:
         raise ArchiveError("An empty ZIP contains unsupported prefixed data.")
     for member in physical:
+        checkpoint()
         if member.info.header_offset < previous_end:
             raise ArchiveError("ZIP members overlap one another.")
         previous_end = member.record_end
@@ -279,6 +284,7 @@ def _extract_member(source: BinaryIO, member: _Member, output: BinaryIO | None, 
             output.write(block)
 
     while remaining:
+        checkpoint()
         block = _read_exact(source, min(limits.chunk_bytes, remaining))
         remaining -= len(block)
         if inflater is None:
@@ -286,6 +292,7 @@ def _extract_member(source: BinaryIO, member: _Member, output: BinaryIO | None, 
             continue
         pending = block
         while pending:
+            checkpoint()
             previous_length = len(pending)
             expanded = inflater.decompress(pending, min(limits.chunk_bytes, info.file_size - count + 1))
             consume(expanded)
@@ -299,6 +306,7 @@ def _extract_member(source: BinaryIO, member: _Member, output: BinaryIO | None, 
         # compressed input is consumed. Drain those bytes under the same budget
         # before deciding whether the stream reached its actual end marker.
         while not inflater.eof:
+            checkpoint()
             expanded = inflater.decompress(b"", min(limits.chunk_bytes, info.file_size - count + 1))
             consume(expanded)
             if not expanded:
@@ -342,7 +350,7 @@ def prepared_export(source: Path, *, limits: Limits | None = None) -> Iterator[P
         if initial.st_size > active_limits.max_file_bytes:
             raise ArchiveError("The source ZIP exceeds the configured file-byte limit.")
         _check_source(input_file, selected, initial)
-        with tempfile.TemporaryDirectory(prefix="keepmorrow-export-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="keepmorrow-export-", dir=temporary_parent()) as temporary:
             directory = Path(temporary)
             try:
                 end = _preflight_directory(input_file, initial.st_size, active_limits)
@@ -352,9 +360,11 @@ def prepared_export(source: Path, *, limits: Limits | None = None) -> Iterator[P
                         raise ArchiveError("The ZIP index changed or has inconsistent entry counts.")
                     directories, members = _plan_members(input_file, entries, end, active_limits)
                     for path in directories:
+                        checkpoint()
                         (directory / path).mkdir()
                     actual_bytes = 0
                     for member in members:
+                        checkpoint()
                         if member.is_directory:
                             actual_bytes += _extract_member(input_file, member, None, active_limits)
                         else:

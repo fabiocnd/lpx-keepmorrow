@@ -35,18 +35,18 @@ keepmorrow_demo="$(mktemp -d)"
 
 PYTHONPATH=src python -m keepmorrow create \
   examples/synthetic-input "$keepmorrow_demo/archive" \
-  --accept-terms 2026-11-12-draft.2 \
-  --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 \
+  --accept-privacy 2026-11-12-draft.3
 
 PYTHONPATH=src python -m keepmorrow verify \
   "$keepmorrow_demo/archive" \
-  --accept-terms 2026-11-12-draft.2 \
-  --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 \
+  --accept-privacy 2026-11-12-draft.3
 
 PYTHONPATH=src python -m keepmorrow restore \
   "$keepmorrow_demo/archive" "$keepmorrow_demo/restored" \
-  --accept-terms 2026-11-12-draft.2 \
-  --accept-privacy 2026-11-12-draft.2
+  --accept-terms 2026-11-12-draft.3 \
+  --accept-privacy 2026-11-12-draft.3
 ```
 
 Read the referenced legal documents before supplying acceptance. Their current status is a development draft; including explicit acceptance does not represent legal approval of that draft or a public launch. The command does not remember agreement across operations. Existing destinations are rejected. The destination parent must already exist and must be outside the source directory.
@@ -100,7 +100,14 @@ with one additional handle at a time. Linux retains its path-stat inventory.
 
 The implementation rejects observed symlinks, including symlink ancestors, and detects ordinary source changes through descriptor and inventory checks. It is designed for stable, user-controlled source and destination trees. It does not provide a filesystem-wide snapshot, defend against a hostile process replacing ancestor directories between operations, or support concurrent mutation of the same tree. Atomic publication is a visibility boundary; no `fsync`-based crash-durability guarantee is implemented.
 
-Handled failures remove the operation's own temporary staging tree. A hard process kill or system crash may leave a `.keepmorrow-*` directory. Automatic restart, abandoned-staging discovery, durable job checkpoints, and cancellation/resume are not implemented. No existing destination is deleted as part of cleanup.
+Handled failures remove the core operation's own temporary staging tree. Scoped
+execution checkpoints support cooperative cancellation and an authorization callback
+immediately before publication. Direct CLI use has no persistent operation journal;
+a hard process stop can leave staging remnants. The private service routes those
+temporary paths into journal-owned workspaces and implements bounded restart
+reconciliation, described in [operation journal](operation-journal.md). Neither
+mode implements per-file resume or payload power-loss durability. Cleanup never
+deletes an existing source or destination to make an operation succeed.
 
 SHA-256 comparisons establish consistency with the manifest that was supplied. They do not authenticate an archive publisher or detect an attacker replacing both the payload and its manifest. Digital signatures, an independently trusted manifest digest, encryption at rest, and remote integrity verification remain separate work.
 

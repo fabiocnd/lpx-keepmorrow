@@ -19,10 +19,10 @@ that must not already exist. An optional `--previous` argument extends a verifie
 full collection from the same namespace into another new destination. Source
 directories, source ZIPs, and previous generations remain unchanged.
 
-Every user-facing processing command requires the exact current terms and
+Every CLI processing command requires the exact current terms and
 privacy versions before inspecting selected content. The current declarations
-are `--accept-terms 2026-11-12-draft.2` and
-`--accept-privacy 2026-11-12-draft.2`. They record a local operation-scoped
+are `--accept-terms 2026-11-12-draft.3` and
+`--accept-privacy 2026-11-12-draft.3`. They record a local operation-scoped
 declaration, not authenticated identity or legal enforceability. See the
 [consent boundary](consent-boundary.md) and [legal draft status](../../legal/README.md).
 
@@ -36,8 +36,10 @@ overwritten.
 Publication uses the archive core's supported atomic no-replace operation. It
 establishes an atomic visibility boundary, not `fsync`-based crash durability.
 Handled failures and cancellation remove the operation's staging output. A hard
-process kill can leave temporary files. Durable jobs, automatic resume, and
-abandoned-staging recovery are not implemented.
+process stop in direct CLI use can leave temporary files. The service adds
+operation-owned workspaces and restart reconciliation around this core; automatic
+per-file resume and payload power-loss durability remain unimplemented. See the
+[operation journal](operation-journal.md) for the service-specific protocol.
 
 ## 2. Experimental source profile
 
@@ -274,6 +276,11 @@ Projects, sidebar entries, or account settings is not implemented.
 
 ## 7. Resource and performance contract
 
+The table describes reusable core defaults. The private service applies lower
+limits, including a 512 MiB collection payload and a default 128 MiB upload. Its
+HTTP authorization, transfer, reservation, and retention contract is documented
+separately in the [service runbook](../operations/private-service-runbook.md).
+
 | Boundary | Default ceiling |
 | --- | --- |
 | Archive entries, including directories | 10,000 |
@@ -343,3 +350,12 @@ completeness. Argument syntax errors use argparse's normal exit behavior.
 - [Collection operations](../../src/keepmorrow/catalog/service.py)
 - [Archive assembly](../../src/keepmorrow/archive/assembly.py)
 - [Reference core limitations](reference-core.md)
+
+## Service integration
+
+Version 0.3.0 invokes this unchanged collection format through authenticated
+scopes, reviewed plans, and operation-owned temporary workspaces. Scoped execution
+checkpoints allow cooperative cancellation, while a publication callback fences
+service authorization before the core publishes a new path. Ordinary CLI use
+retains its explicit per-invocation acceptance contract. See the
+[operation journal](operation-journal.md) and [transfer contract](transfer-contract.md).

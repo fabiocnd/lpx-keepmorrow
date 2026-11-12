@@ -4,19 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lpx-keepmorrow"
-version = "0.2.0"
-description = "Verifiable local archives, conversation history, and experimental ChatGPT export intake"
+version = "0.3.0"
+description = "Verifiable preservation with scoped consent, durable operations, and a private ChatGPT integration"
 requires-python = ">=3.11"
 authors = [{name = "Fabio de Sousa Lopes", email = "fabio@lopixneural.com"}]
 license = {text = "Proprietary. Copyright 2026 Lopix Neural Inc. All rights reserved."}
 dependencies = []
 
 [project.optional-dependencies]
-chatgpt = ["mcp==1.29.0"]
+chatgpt = ["mcp==1.29.0", "PyJWT[crypto]==2.13.0", "cryptography==50.0.0", "httpx==0.28.1", "starlette==1.6.0", "uvicorn==0.52.1"]
 
 [project.scripts]
 keepmorrow = "keepmorrow.cli:main"
+keepmorrow-service = "keepmorrow.application.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+keepmorrow = ["policies/*.md", "integrations/chatgpt/assets/*", "integrations/chatgpt/portal_assets/*"]
 

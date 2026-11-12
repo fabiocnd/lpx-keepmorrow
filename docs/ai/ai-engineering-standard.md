@@ -1,9 +1,13 @@
 # AI Engineering Standard
 
-**Owner:** Lopix Neural Inc.  
-**Engineering lead:** Fabio de Sousa Lopes  
-**Contact:** fabio@lopixneural.com  
-**Effective date:** 2026-11-12  
+**Owner:** Lopix Neural Inc.
+
+**Engineering lead:** Fabio de Sousa Lopes
+
+**Contact:** fabio@lopixneural.com
+
+**Effective date:** 2026-11-12
+
 **Status:** Policy for future model-assisted features; no runtime model selected
 
 LPX Keepmorrow's preservation core must operate without a model. Optional AI may
@@ -11,6 +15,13 @@ help explain supplied material, propose organization, generate derived summaries
 or improve retrieval. Every such output remains a labeled derivative with
 provenance. The presence of this policy does not implement an AI feature,
 authorize a provider, or select a production model.
+
+Version 0.3.0 exposes deterministic tools and a companion interface to ChatGPT.
+The Keepmorrow backend does not implement inference, embeddings, training, or a
+model-driven preservation pipeline. The host model may request a tool action;
+authenticated identity, grants, input validation, exact plan review, and
+publication authorization remain outside that model. Integration with a model
+host does not establish an implemented or evaluated AI feature in this project.
 
 ## 1. Keep authority in deterministic code
 
@@ -70,13 +81,20 @@ paths, resource identifiers, destinations, and budgets after generation and
 before execution. An embedded URL or model-generated destination is not user
 authorization to access it.
 
+An operation's input handle, digest, immutable generation, selection, and
+authorization scope must match its canonical reviewed plan. Generated tool
+arguments cannot create a human acceptance receipt, record a trusted review,
+change a filesystem destination, or revive a revoked grant. Future AI features
+must retain the deterministic service boundaries already implemented.
+
 ## 5. Preserve user control and privacy
 
 Process only the material needed for the selected task. An archive import does
 not implicitly authorize sending the archive to an external model or training
 on its contents. Document processing location, data sent, provider terms,
 retention, deletion, and operational ownership before enabling that integration.
-Use the user's existing authorization without demanding redundant confirmations.
+Require renewed authorization when the data scope, recipient, purpose, or
+applicable policy changes beyond the existing grant.
 
 Do not use private conversations for training, fine-tuning, demonstrations, or
 evaluation without authorization for that use. Synthetic fixtures are the
