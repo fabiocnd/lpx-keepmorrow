@@ -1,0 +1,4 @@
+Synthetic preservation note
+
+Preserve original bytes before generating any derived description.
+This document contains no private conversation or personal data.

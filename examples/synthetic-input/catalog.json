@@ -1,0 +1,201 @@
+{
+  "fixture_format": "lpx-keepmorrow.synthetic-catalog",
+  "fixture_version": 1,
+  "synthetic": true,
+  "provider": "synthetic",
+  "source_account": "synthetic-account-1",
+  "projects": [
+    {
+      "id": "project-aurora",
+      "title": "Aurora Research",
+      "evidence": {
+        "kind": "synthetic_source_metadata",
+        "reference": "fixture-project-list"
+      }
+    },
+    {
+      "id": "project-harbor",
+      "title": "Harbor Design",
+      "evidence": {
+        "kind": "synthetic_source_metadata",
+        "reference": "fixture-project-list"
+      }
+    }
+  ],
+  "source_snapshots": [
+    {
+      "id": "snapshot-1",
+      "captured_at": "2026-01-01T00:00:00Z",
+      "conversation_ids": [
+        "conversation-1",
+        "conversation-2",
+        "conversation-3",
+        "conversation-4"
+      ]
+    },
+    {
+      "id": "snapshot-2",
+      "captured_at": "2026-01-02T00:00:00Z",
+      "conversation_ids": [
+        "conversation-1"
+      ]
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conversation-1",
+      "title": "Archive design alternatives",
+      "association": {
+        "state": "project_confirmed",
+        "project_id": "project-aurora",
+        "evidence": {
+          "kind": "synthetic_source_metadata",
+          "reference": "snapshot-1/project-aurora"
+        }
+      },
+      "revisions": [
+        {
+          "id": "revision-1",
+          "snapshot_ids": [
+            "snapshot-1",
+            "snapshot-2"
+          ],
+          "messages": [
+            {
+              "id": "message-1",
+              "parent_id": null,
+              "role": "user",
+              "text": "Compare preservation approaches."
+            },
+            {
+              "id": "message-2a",
+              "parent_id": "message-1",
+              "role": "assistant",
+              "text": "Preserve the supplied source bytes first."
+            },
+            {
+              "id": "message-2b",
+              "parent_id": "message-1",
+              "role": "assistant",
+              "text": "Keep derived views separate from originals."
+            }
+          ],
+          "artifact_ids": [
+            "artifact-note",
+            "artifact-missing-image"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conversation-2",
+      "title": "Navigation prototype",
+      "association": {
+        "state": "project_confirmed",
+        "project_id": "project-harbor",
+        "evidence": {
+          "kind": "synthetic_source_metadata",
+          "reference": "snapshot-1/project-harbor"
+        }
+      },
+      "revisions": [
+        {
+          "id": "revision-2",
+          "snapshot_ids": [
+            "snapshot-1"
+          ],
+          "messages": [
+            {
+              "id": "message-3",
+              "parent_id": null,
+              "role": "user",
+              "text": "Group records by explicit evidence."
+            }
+          ],
+          "artifact_ids": []
+        }
+      ]
+    },
+    {
+      "id": "conversation-3",
+      "title": "Independent checklist",
+      "association": {
+        "state": "standalone_confirmed",
+        "project_id": null,
+        "evidence": {
+          "kind": "synthetic_user_decision",
+          "reference": "fixture-decision-1"
+        }
+      },
+      "revisions": [
+        {
+          "id": "revision-3",
+          "snapshot_ids": [
+            "snapshot-1"
+          ],
+          "messages": [
+            {
+              "id": "message-4",
+              "parent_id": null,
+              "role": "user",
+              "text": "This conversation is intentionally standalone."
+            }
+          ],
+          "artifact_ids": []
+        }
+      ]
+    },
+    {
+      "id": "conversation-4",
+      "title": "Unresolved association",
+      "association": {
+        "state": "association_unknown",
+        "project_id": null,
+        "evidence": {
+          "kind": "insufficient_source_metadata",
+          "reference": "snapshot-1"
+        }
+      },
+      "revisions": [
+        {
+          "id": "revision-4",
+          "snapshot_ids": [
+            "snapshot-1"
+          ],
+          "messages": [
+            {
+              "id": "message-5",
+              "parent_id": null,
+              "role": "user",
+              "text": "The source export has no project field; membership remains unknown."
+            }
+          ],
+          "artifact_ids": []
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-note",
+      "availability": "stored",
+      "relative_path": "artifacts/research-note.txt",
+      "media_type": "text/plain",
+      "evidence": {
+        "kind": "supplied_fixture_file",
+        "reference": "artifacts/research-note.txt"
+      }
+    },
+    {
+      "id": "artifact-missing-image",
+      "availability": "not_supplied",
+      "relative_path": null,
+      "original_name": "diagram.png",
+      "media_type": "image/png",
+      "evidence": {
+        "kind": "synthetic_message_reference",
+        "reference": "conversation-1/revision-1"
+      }
+    }
+  ]
+}

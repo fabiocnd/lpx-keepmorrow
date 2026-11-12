@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:lpx:keepmorrow:directory-archive:1",
+  "title": "LPX Keepmorrow Directory Archive Manifest v1",
+  "description": "Structural schema. Canonical ordering, path portability, parent topology, case-fold uniqueness, and configurable resource limits also require runtime validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "scope",
+    "hash_algorithm",
+    "directories",
+    "files"
+  ],
+  "properties": {
+    "format": {
+      "const": "lpx-keepmorrow.directory"
+    },
+    "version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "scope": {
+      "const": "explicitly_supplied_directory"
+    },
+    "hash_algorithm": {
+      "const": "sha256"
+    },
+    "directories": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "files": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "size_bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64,
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Relative POSIX-style NFC path, at most 4096 UTF-8 bytes and 64 components. Each component is at most 240 UTF-8 bytes. Runtime rejects reserved device names, Unicode control/format/surrogate characters, trailing dots/spaces, and case-fold collisions.",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[/]$)[^<>:\"\\\\|?*\\u0000-\\u001f\\u007f-\\u009f]+$"
+    }
+  }
+}

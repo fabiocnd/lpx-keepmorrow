@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lpx-keepmorrow"
+version = "0.1.0"
+description = "Deterministic local preservation reference core for LPX Keepmorrow"
+requires-python = ">=3.11"
+authors = [{name = "Fabio de Sousa Lopes", email = "fabio@lopixneural.com"}]
+license = {text = "Proprietary. Copyright 2026 Lopix Neural Inc. All rights reserved."}
+dependencies = []
+
+[project.scripts]
+keepmorrow = "keepmorrow.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

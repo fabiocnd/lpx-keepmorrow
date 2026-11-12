@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "directory_snapshot_expectations": {
+    "files": 2,
+    "directories": 1,
+    "byte_identical_recovery": true
+  },
+  "future_semantic_parser_expectations": {
+    "projects": 2,
+    "logical_conversations": 4,
+    "conversation_revisions": 4,
+    "source_snapshots": 2,
+    "conversation_capture_occurrences": 5,
+    "message_nodes": 6,
+    "project_confirmed": 2,
+    "standalone_confirmed": 1,
+    "association_unknown": 1,
+    "branched_conversations": 1,
+    "stored_artifacts": 1,
+    "not_supplied_artifacts": 1
+  },
+  "implementation_note": "The reference core preserves these files as opaque bytes. It does not yet calculate the semantic expectations."
+}

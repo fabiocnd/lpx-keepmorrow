@@ -1,0 +1,76 @@
+{
+  "measured_at": "2026-11-12T10:31:32.850994+00:00",
+  "python": "3.12.14",
+  "platform": "Linux",
+  "machine": "x86_64",
+  "workload": {
+    "files": 8,
+    "bytes_per_file": 4194304,
+    "total_bytes": 33554432,
+    "repetitions": 3
+  },
+  "measurement_notes": [
+    "Wall time includes tracemalloc overhead; allocation peaks cover Python-tracked memory only.",
+    "Filesystem cache is not flushed. This is a warm-cache local experiment.",
+    "Logical throughput uses source byte count; create and restore perform additional verification reads.",
+    "No fsync, cold-storage measurement, remote transfer, or release guarantee is represented."
+  ],
+  "samples": {
+    "create": [
+      {
+        "seconds": 0.1720017799998459,
+        "python_peak_bytes": 2119240,
+        "logical_mib_per_second": 186.04458628293656
+      },
+      {
+        "seconds": 0.15397181600019394,
+        "python_peak_bytes": 2117184,
+        "logical_mib_per_second": 207.830243425587
+      },
+      {
+        "seconds": 0.15403265100030694,
+        "python_peak_bytes": 2117592,
+        "logical_mib_per_second": 207.7481611345911
+      }
+    ],
+    "verify": [
+      {
+        "seconds": 0.03745500299919513,
+        "python_peak_bytes": 2109672,
+        "logical_mib_per_second": 854.3584951972276
+      },
+      {
+        "seconds": 0.02836936800122203,
+        "python_peak_bytes": 2109680,
+        "logical_mib_per_second": 1127.9771899966745
+      },
+      {
+        "seconds": 0.03179780800019216,
+        "python_peak_bytes": 2109680,
+        "logical_mib_per_second": 1006.3586772964544
+      }
+    ],
+    "restore": [
+      {
+        "seconds": 0.1923322630009352,
+        "python_peak_bytes": 2115020,
+        "logical_mib_per_second": 166.37874218661068
+      },
+      {
+        "seconds": 0.18943063799997617,
+        "python_peak_bytes": 2115051,
+        "logical_mib_per_second": 168.9272671931983
+      },
+      {
+        "seconds": 0.18986476399913954,
+        "python_peak_bytes": 2114988,
+        "logical_mib_per_second": 168.54101480433212
+      }
+    ]
+  },
+  "median_seconds": {
+    "create": 0.15403265100030694,
+    "verify": 0.03179780800019216,
+    "restore": 0.18986476399913954
+  }
+}
