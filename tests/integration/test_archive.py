@@ -1,6 +1,7 @@
 """Exercise byte preservation, corruption detection, and safe failure paths."""
 
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -11,7 +12,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from keepmorrow.archive import ArchiveError, Limits, create_archive, restore_archive, verify_archive
-from keepmorrow.archive.filesystem import copy_tree
+from keepmorrow.archive.filesystem import copy_tree, scan_tree, stream_file
 from keepmorrow.cli import main
 from keepmorrow.consent import CURRENT_PRIVACY_VERSION, CURRENT_TERMS_VERSION
 
@@ -50,6 +51,16 @@ class ArchiveTests(unittest.TestCase):
         create_archive(self.source, second)
         self.assertEqual((self.archive / "manifest.json").read_bytes(), (second / "manifest.json").read_bytes())
 
+    def test_executable_filename_extensions_preserve_bytes_without_execution(self) -> None:
+        names = ("sample.exe", "sample.bat", "sample.cmd", "sample.com")
+        for name in names:
+            (self.source / name).write_bytes(self.data)
+        create_archive(self.source, self.archive)
+        restored = self.root / "restored"
+        restore_archive(self.archive, restored)
+        for name in names:
+            self.assertEqual((restored / name).read_bytes(), self.data)
+
     def test_incomplete_directory_entry_metadata_preserves_stable_files(self) -> None:
         original_scandir = os.scandir
 
@@ -60,6 +71,9 @@ class ArchiveTests(unittest.TestCase):
                 self.entry = entry
                 self.name = entry.name
                 self.path = entry.path
+
+            def __getattr__(self, name: str):
+                return getattr(self.entry, name)
 
             def stat(self, *, follow_symlinks: bool = True) -> SimpleNamespace:
                 info = self.entry.stat(follow_symlinks=follow_symlinks)
@@ -76,6 +90,36 @@ class ArchiveTests(unittest.TestCase):
             create_archive(self.source, self.archive)
             self.assertTrue(verify_archive(self.archive).verified)
         self.assertEqual((self.archive / "payload/notes/data.bin").read_bytes(), self.data)
+
+    def test_windows_inventory_handles_distinct_path_and_descriptor_change_times(self) -> None:
+        class WindowsMetadata:
+            """Model Windows path metadata without changing the opened file."""
+
+            name = "nt"
+
+            def __init__(self, *, change_identity: bool = False) -> None:
+                self.change_identity = change_identity
+
+            def __getattr__(self, name: str):
+                return getattr(os, name)
+
+            def stat(self, path, *, follow_symlinks: bool = True) -> SimpleNamespace:
+                info = os.stat(path, follow_symlinks=follow_symlinks)
+                return SimpleNamespace(st_dev=info.st_dev,
+                                       st_ino=info.st_ino + int(self.change_identity),
+                                       st_mode=info.st_mode | 0o111, st_size=info.st_size,
+                                       st_mtime_ns=info.st_mtime_ns,
+                                       st_ctime_ns=info.st_ctime_ns + 1)
+
+        with patch("keepmorrow.archive.filesystem.os", WindowsMetadata()):
+            inventory = scan_tree(self.source, Limits())
+            state = next(item for item in inventory.files if item.path == "notes/data.bin")
+            record = stream_file(self.source, state, Limits())
+        self.assertEqual(record.size_bytes, len(self.data))
+        self.assertEqual(record.sha256, hashlib.sha256(self.data).hexdigest())
+        with patch("keepmorrow.archive.filesystem.os", WindowsMetadata(change_identity=True)):
+            with self.assertRaisesRegex(ArchiveError, "changed during inventory"):
+                scan_tree(self.source, Limits())
 
     def test_replacement_after_inventory_cancels_publication(self) -> None:
         def replace_before_copy(source, destination, inventory, limits):

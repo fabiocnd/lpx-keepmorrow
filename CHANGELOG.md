@@ -19,6 +19,8 @@
 
 - Obtain complete filesystem identity during Windows inventory before checking
   opened source files for replacement or mutation.
+- Use consistent Windows descriptor timestamp semantics and account for
+  filename-derived mode bits without weakening subsequent mutation checks.
 
 ### Scope
 

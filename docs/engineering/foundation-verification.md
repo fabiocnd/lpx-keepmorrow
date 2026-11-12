@@ -38,14 +38,30 @@ Directory-entry metadata on Windows omitted the device and file identifiers
 needed for comparison with an opened file descriptor. Valid source files were
 therefore incorrectly rejected as changed after inventory.
 
-Inventory now obtains complete metadata with `os.stat(..., follow_symlinks=False)`.
-All six source-mutation signature fields remain checked. Two behavioral
-regressions cover incomplete directory-entry metadata and replacement of a source
-file after inventory, including refusal and staging cleanup.
+The first correction used complete no-follow path metadata. Its
+[CI run](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43207866542)
+passed on both Ubuntu jobs and Windows with Python 3.11, while Windows with
+Python 3.14 still failed. The remaining issue was incompatible path and
+descriptor change-time semantics, documented in
+[CPython issue 157671](https://github.com/python/cpython/issues/157671).
 
-The full local command above passed **40 tests with no failures or skips** after
-this correction. A successful Windows rerun has not yet been established by this
-version of the record.
+Windows inventory now obtains regular-file metadata from an opened descriptor.
+Before accepting that metadata, it binds the no-follow path observation to the
+descriptor using device and inode identity, size, modification time, and mode.
+Only filename-derived execute bits are excluded from that cross-API mode
+comparison. File type and read/write bits remain checked. All six fields of the
+full descriptor signature remain checked after inventory and during reads.
+
+Regressions cover incomplete directory-entry metadata, divergent timestamp and
+mode semantics, replacement during and after inventory, staging cleanup, and
+byte-preserving round trips for executable filename extensions without executing
+their contents. The full local command above passed **42 tests with no failures
+or skips** after these corrections. Complete remote verification of this revision
+remains pending.
+
+The Windows inventory requires one additional metadata-only open/stat/close
+cycle per regular file per scan, with one additional handle at a time. The Linux
+metadata path is unchanged. No Windows performance measurement is claimed.
 
 ## Measured performance
 
@@ -67,8 +83,8 @@ established.
 ## Reviewed limitations
 
 - Windows publication behavior is implemented but has not been executed locally.
-- The initial Windows CI failure is corrected locally; remote verification of
-  the correction remains pending.
+- Windows with Python 3.11 passed the intermediate CI run. Verification of the
+  complete correction across the configured matrix remains pending.
 - No hostile concurrent ancestor-replacement defense or fsync crash-durability
   guarantee is implemented.
 - Source conversations and native project relationships are not semantically

@@ -82,7 +82,15 @@ Recovery validates the manifest and archive inventory first. It then copies into
 
 Verification reports expected file count and expected total bytes. Missing, changed, unexpected, and unreadable-or-changing files are explicit report categories. Malformed manifests, unsupported paths, symbolic links, unsupported file types, and resource-limit violations fail the operation. Ordinary directories and regular files are the only supported filesystem entries. Hard-linked source files are copied as independent files; hard-link relationships are not preserved.
 
-Publication uses Linux `renameat2` with `RENAME_NOREPLACE`, or Windows' no-replacement rename behavior. Unsupported runtime or filesystem primitives fail explicitly. An existing destination, including an empty directory created by a competing process, is never intentionally replaced. Linux behavior is exercised in this development environment. The Windows branch is implemented but has not been executed here. Other operating systems do not currently support create/restore publication; no cross-platform execution claim is made for them.
+Publication uses Linux `renameat2` with `RENAME_NOREPLACE`, or Windows' no-replacement rename behavior. Unsupported runtime or filesystem primitives fail explicitly. An existing destination, including an empty directory created by a competing process, is never intentionally replaced. Local development validation runs on Linux; the [foundation verification record](../engineering/foundation-verification.md) records inspected Linux and Windows CI outcomes. Other operating systems do not currently support create/restore publication; no execution claim is made for them.
+
+Windows inventory records regular-file metadata through a guarded descriptor so
+that inventory and read-time checks use the same timestamp semantics. The
+no-follow path observation is bound to that descriptor before its full signature
+is accepted. Filename-derived execute bits are masked only for the cross-API mode
+comparison; the complete descriptor signature remains authoritative afterward.
+This adds one metadata-only open/stat/close cycle per file per scan on Windows,
+with one additional handle at a time. Linux retains its path-stat inventory.
 
 The implementation rejects observed symlinks, including symlink ancestors, and detects ordinary source changes through descriptor and inventory checks. It is designed for stable, user-controlled source and destination trees. It does not provide a filesystem-wide snapshot, defend against a hostile process replacing ancestor directories between operations, or support concurrent mutation of the same tree. Atomic publication is a visibility boundary; no `fsync`-based crash-durability guarantee is implemented.
 

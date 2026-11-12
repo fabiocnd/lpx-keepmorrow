@@ -41,8 +41,9 @@ it is not interpreted as a complete product catalog.
 
 ## Run the reference core
 
-Use Python 3.11 or later. Linux is locally validated; Windows is implemented
-and configured for CI but has not been validated in this session. Other platforms
+Use Python 3.11 or later. Local development validation runs on Linux; the
+[foundation verification record](docs/engineering/foundation-verification.md)
+records the actual Linux and Windows CI results and their limits. Other platforms
 currently refuse archive creation and restoration. There are no third-party
 runtime dependencies.
 
@@ -84,7 +85,7 @@ python -m compileall -q src tests benchmarks
 ```
 
 The [foundation verification record](docs/engineering/foundation-verification.md)
-records 38 passing local tests and the measured synthetic workload.
+records local test results, inspected CI outcomes, and the measured synthetic workload.
 See [validation](docs/engineering/validation.md) and
 [performance policy](docs/engineering/performance-policy.md) for evidence
 requirements. The GitHub Actions workflow is configured for Linux and Windows;

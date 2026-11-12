@@ -31,6 +31,8 @@ The following current implementation references were reviewed on 2026-11-12:
 
 - [Creating a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository).
 - [Python directory-entry metadata and Windows identity limitations](https://docs.python.org/3.14/library/os.html#os.DirEntry.stat).
+- [CPython issue 157671: Windows path and descriptor change-time semantics](https://github.com/python/cpython/issues/157671).
+- CPython 3.14.7 Windows mode construction: [path stat](https://github.com/python/cpython/blob/v3.14.7/Modules/posixmodule.c) and [descriptor stat](https://github.com/python/cpython/blob/v3.14.7/Python/fileutils.c).
 - [actions/checkout v7.0.1 commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1).
 - [actions/setup-python v7.1.0 commit](https://github.com/actions/setup-python/commit/6d4fd22b20465ccc0f7354476588e8df7c9ca0e0).
 

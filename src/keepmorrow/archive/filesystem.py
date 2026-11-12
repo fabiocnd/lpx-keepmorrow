@@ -112,6 +112,21 @@ def scan_tree(root: Path, limits: Limits) -> Inventory:
                     directories.append(relative)
                     pending.append((Path(entry.path), relative))
                 elif stat.S_ISREG(info.st_mode):
+                    if os.name == "nt":
+                        # Windows path stat may expose creation time as ctime,
+                        # while fstat exposes metadata change time. Bind the
+                        # no-follow path identity before recording the complete
+                        # descriptor signature used by subsequent read checks.
+                        with open_regular(current / entry.name) as source:
+                            descriptor_info = os.fstat(source.fileno())
+                        # Path stat also synthesizes execute bits from filename
+                        # extensions. Keep type and read/write bits comparable.
+                        if (not os.path.samestat(info, descriptor_info)
+                                or (info.st_mode & ~0o111) != (descriptor_info.st_mode & ~0o111)
+                                or info.st_size != descriptor_info.st_size
+                                or info.st_mtime_ns != descriptor_info.st_mtime_ns):
+                            raise ArchiveError("A source file changed during inventory.")
+                        info = descriptor_info
                     if info.st_size > limits.max_file_bytes:
                         raise ArchiveError("A source file exceeds the configured byte limit.")
                     total_bytes += info.st_size
