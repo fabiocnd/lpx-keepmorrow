@@ -126,6 +126,16 @@ configuration, or the behavior of an unreviewed deployment.
 
 ## Operation and workspace evidence
 
+### CI scheduling boundary
+
+The corrected Ubuntu/Python 3.11 runner remained in progress with zero reported
+steps for more than ten minutes and retained the legacy workflow concurrency
+group. The workflow's group was migrated from the old reference-core namespace
+to a versioned preservation-service namespace. Branch-level cancellation remains
+enabled within the new group. All six jobs, their commands, assertions, platform
+matrix, dependency pins, and timeouts remain unchanged. The subsequent complete
+run is required before recording a full-matrix success.
+
 The focused operation and workspace command was:
 
 ```sh

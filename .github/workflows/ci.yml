@@ -10,7 +10,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: reference-core-${{ github.workflow }}-${{ github.ref }}
+  # Keep branch-level cancellation within this service validation contract.
+  # A stalled runner in the legacy core group must not retain its admission slot.
+  group: preservation-service-v3-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
