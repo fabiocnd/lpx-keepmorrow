@@ -14,7 +14,7 @@ dependencies = []
 
 [project.optional-dependencies]
 # The preservation CLI needs only the standard library; network adapters opt in.
-chatgpt = ["mcp==1.29.0", "PyJWT[crypto]==2.13.0", "cryptography==50.0.0", "httpx==0.28.1", "starlette==1.6.0", "uvicorn==0.52.1"]
+chatgpt = ["mcp==1.29.0", "PyJWT[crypto]==2.15.1", "cryptography==50.0.0", "httpx==0.28.1", "starlette==1.6.0", "uvicorn==0.52.1"]
 
 [project.scripts]
 keepmorrow = "keepmorrow.cli:main"
