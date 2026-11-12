@@ -57,7 +57,8 @@ path and identifies the decisions needed before public distribution.
 - [ ] Exercise backup/restore, revocation, incident handling, and rollback on that host.
 - [ ] Measure larger representative workloads and overload on the selected hardware.
 - [ ] Validate any platform file-transfer capability before adding it to the interface.
-- [ ] Inspect all final CI jobs and retain exact release evidence.
+- [x] Inspect the complete six-job CI matrix and retain its exact source and results.
+  Repeat the required checks for any subsequent release change.
 
 A journal provides process-restart reconciliation; per-file resume and payload
 power-loss durability remain unimplemented. Neither a source release nor a

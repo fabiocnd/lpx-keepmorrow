@@ -10,7 +10,7 @@
 
 **Release:** 0.3.0 reference service
 
-**Status:** Local and hosted validation; five corrected jobs passed, one awaiting runner steps
+**Status:** Complete hosted CI matrix passed; live integration and release gates remain open
 
 This record separates implemented and locally exercised behavior from evidence
 that requires the intended deployment host, identity provider, ChatGPT account,
@@ -20,6 +20,35 @@ substitute for those observations.
 An open-source transition is planned. The release license has not yet been
 selected or adopted, and the current source license remains in effect. Source
 publication is a separate decision from deploying or connecting the service.
+
+## Complete hosted CI matrix
+
+[Workflow run 43247833522](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43247833522)
+completed successfully for commit
+`f7cc7dcadc0b19f2f777b0887a63e491539b4a3e`. All **six jobs passed**. The workflow
+metadata and each job's decoded log were inspected; the table reports executed
+tests separately from skips.
+
+| Job and exact runtime | Recorded result |
+| --- | --- |
+| Ubuntu, CPython 3.11.18 | 331 discovered; 276 passed, 55 skipped; 4.937 seconds |
+| Ubuntu, CPython 3.14.10 | 331 discovered; 276 passed, 55 skipped; 5.636 seconds |
+| Windows Server 2025, CPython 3.11.9 | 331 discovered; 273 passed, 58 skipped; 54.488 seconds |
+| Windows Server 2025, CPython 3.14.10 | 331 discovered; 273 passed, 58 skipped; 35.843 seconds |
+| Complete optional service, CPython 3.12.16 | 331 passed, zero skips; 6.530 seconds |
+| MCP Apps interface, Node.js 24.22.2 and npm 11.19.1 | 28 interface tests passed, zero skips, in 1.929308 seconds; eight Playwright synthetic-host tests passed in 30.7 seconds |
+
+Python compilation, canonical policy comparison, private wheel construction,
+TypeScript checking, and bundled-asset comparison also passed in their
+respective jobs. The Windows logs did not contain the previously observed
+unclosed-database warning. Standard-library jobs intentionally omit optional
+service dependencies; the complete optional-service job executes those checks.
+
+This run establishes the configured matrix for the named commit. A subsequent
+documentation commit requires its own run record if its CI outcome is reported.
+Successful synthetic tests do not establish a live ChatGPT connection, a
+deployed identity provider, representative-export completeness, or a production
+capacity envelope.
 
 ## Recorded local validation
 
@@ -58,7 +87,7 @@ follow its [build and validation instructions](../../ui/chatgpt/README.md).
 Browser execution was not completed locally. Hosted synthetic browser evidence
 is recorded separately below.
 
-## Initial hosted CI and fixture correction
+## Historical initial CI and fixture correction
 
 [Workflow run 43244942226](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43244942226)
 executed source commit `fed82b5eddd4cd6235187d6fd688ac3d079aa5d4`. The job logs
@@ -91,7 +120,7 @@ All 49 operation and workspace tests passed in each original Windows job. The
 unavailable named pipes, a case-insensitive filesystem that cannot construct the
 collision fixture, and the POSIX permission/link contract.
 
-## Corrected hosted CI checkpoint
+## Historical corrected CI checkpoint
 
 [Workflow run 43245680709](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43245680709)
 executed commit `9cadba7aa692410e9d99fd7d3483a8a1f350295f`, including the explicit
@@ -115,6 +144,16 @@ identified commit; it does not substitute for the pending job. Any later run
 must be recorded against its own commit and inspected outcomes. A documentation
 commit does not retroactively expand this checkpoint.
 
+### CI scheduling boundary
+
+The corrected Ubuntu/Python 3.11 runner remained in progress with zero reported
+steps for more than ten minutes and retained the legacy workflow concurrency
+group. The workflow's group was migrated from the old reference-core namespace
+to a versioned preservation-service namespace. Branch-level cancellation remains
+enabled within the new group. All six jobs, their commands, assertions, platform
+matrix, dependency pins, and timeouts remained unchanged. The complete matrix
+recorded above provides the subsequent execution evidence.
+
 ## Synthetic browser artifact review
 
 Retained screenshots from the initial hosted browser run were visually reviewed
@@ -125,16 +164,6 @@ screenshots do not establish a live ChatGPT connection, external identity-provid
 configuration, or the behavior of an unreviewed deployment.
 
 ## Operation and workspace evidence
-
-### CI scheduling boundary
-
-The corrected Ubuntu/Python 3.11 runner remained in progress with zero reported
-steps for more than ten minutes and retained the legacy workflow concurrency
-group. The workflow's group was migrated from the old reference-core namespace
-to a versioned preservation-service namespace. Branch-level cancellation remains
-enabled within the new group. All six jobs, their commands, assertions, platform
-matrix, dependency pins, and timeouts remain unchanged. The subsequent complete
-run is required before recording a full-matrix success.
 
 The focused operation and workspace command was:
 
