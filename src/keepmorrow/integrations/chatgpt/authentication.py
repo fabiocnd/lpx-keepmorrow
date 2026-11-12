@@ -222,6 +222,12 @@ class ConfiguredTokenVerifier:
         return result
 
     async def _key(self, identifier: str, *, refresh: bool = False) -> rsa.RSAPublicKey | None:
+        """Resolve a configured-provider key without extending a stale cache.
+
+        Cache lifetime and refresh throttling use monotonic time independently
+        of the UTC clock that validates token claims. The refresh lock also
+        makes the cooldown apply across concurrent requests.
+        """
         now = self._monotonic()
         if not isinstance(now, (int, float)) or not math.isfinite(now):
             return None
@@ -309,11 +315,17 @@ class ConfiguredTokenVerifier:
                     or not _text(header.get("kid"), 128) or "crit" in header
                     or "b64" in header or "jku" in header or "x5u" in header or "jwk" in header):
                 return None
+            # Unsigned fields are an early rejection filter only. A principal
+            # is returned only after signature, issuer, and audience validation
+            # against operator-configured keys; token-provided key URLs are refused.
             client_id, scopes = self._validate_claim_shape(claims)
             self._validate_current_time(claims)
             key = await self._key(header["kid"])
             if key is None:
                 return None
+            # Use the strict integer claims and injected UTC clock above instead
+            # of the library's wall clock. Signature and issuer/audience checks
+            # remain enabled in both decode attempts.
             options = {
                 "require": ["iss", "aud", "sub", "exp", "iat"],
                 "verify_exp": False, "verify_iat": False, "verify_nbf": False,

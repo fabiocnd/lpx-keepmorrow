@@ -102,7 +102,9 @@ because the upload ledger is a different database.
 Pending jobs, interrupted jobs, and terminal jobs whose executor has not
 returned remain reserved. A persisted `worker_released` flag prevents early
 release even when completion has already been recorded. Cleanup ambiguity
-retains that hold and stops new worker claims until startup recovery succeeds.
+classified as `OperationCleanupRequired` retains that hold and stops new worker
+claims until startup recovery succeeds. The metadata-error boundary is described
+in the restart and ownership section below.
 
 Status responses contain opaque operation and plan IDs, state, parameter
 digest, timestamps, attempt count, cancellation/publication flags, bounded error
@@ -207,6 +209,14 @@ Handled completion removes only this owned workspace. Startup cleanup requires
 both its database record and matching marker. Unknown directories are preserved.
 Missing, conflicting, or incomplete markers require operator review; the code
 never invents replacement ownership evidence to enable deletion.
+
+Filesystem and ownership cleanup failures are classified as
+`OperationCleanupRequired`. The initial cleanup-ledger read and final ledger
+deletion use transactions outside that classification boundary. A source review
+identified a possible early reservation release if the initial read fails
+transiently and subsequent worker database calls recover. This sequence has not
+been reproduced in a test; its failure-injection qualification is recorded in
+the [source comment review](../engineering/source-comment-review.md).
 
 The output inspector runs outside the SQLite transaction while the exclusive
 worker lock remains held. It returns `None` only after establishing that the

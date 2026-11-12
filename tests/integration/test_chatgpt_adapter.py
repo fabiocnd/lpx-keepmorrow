@@ -1,4 +1,8 @@
-"""Exercise the optional MCP adapter through real SDK client/server sessions."""
+"""Exercise the legacy synthetic adapter through SDK client/server sessions.
+
+In-memory streams and ASGI transport test protocol behavior independently of
+the actual ChatGPT host or a deployed authenticated service.
+"""
 
 from contextlib import ExitStack
 from datetime import timedelta

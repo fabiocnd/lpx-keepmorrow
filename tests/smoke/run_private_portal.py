@@ -3,7 +3,8 @@
 Initialize a fresh service with ``--operator synthetic-pilot`` before running
 this script. All content and acceptance gestures are synthetic test fixtures;
 the report never establishes human acceptance, OAuth, or ChatGPT installation.
-The runner accesses no databases or real data. On Linux, ``--launch-service``
+The runner uses HTTP for service state and generates all input content itself.
+On Linux, ``--launch-service``
 owns a child server in the command's network namespace and requires a pristine
 directory created by the initializer. This harness restriction does not change
 the application's separately tested Linux and Windows support.
@@ -210,6 +211,7 @@ class PortalSmoke:
         return value
 
     def consent(self, resource: str, generation: str, actions: list[str]) -> JSON:
+        """Exercise synthetic acceptance, refusal, and single-use replay checks."""
         prepared = self.document("POST", "/api/consent/prepare", json={
             "resource_id": resource, "generation": generation, "actions": actions,
         })
@@ -224,6 +226,7 @@ class PortalSmoke:
         return prepared
 
     def operate(self, kind: str, resource: str, generation: str, parameters: JSON) -> JSON:
+        """Review one synthetic plan, prove idempotent start, and poll its outcome."""
         self.stage = kind
         plan = self.document("POST", "/api/operations/prepare", json={
             "kind": kind, "resource_id": resource, "generation": generation, "parameters": parameters,
@@ -261,6 +264,12 @@ class PortalSmoke:
 
     def verify_download(self, payload: bytes, expected_manifest: str, selected_key: str,
                         binaries: dict[str, bytes]) -> JSON:
+        """Reconcile the bounded package inventory and its exact selected bytes.
+
+        Verification is independent of the server's success status. Every file
+        must match the enclosed manifest, and the selected binary fixtures must
+        also match their independently generated originals.
+        """
         self.stage = "download_integrity"
         with zipfile.ZipFile(io.BytesIO(payload), "r") as archive:
             infos = archive.infolist()

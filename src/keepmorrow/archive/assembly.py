@@ -36,7 +36,9 @@ class ArchiveAssembly:
     A failed add operation invalidates the entire assembly, even if its caller
     catches the exception. This prevents an incomplete copy from becoming a
     successful archive. Instances are neither concurrent writers nor resumable
-    jobs. Payload I/O is O(B); metadata uses O(N + P) memory, where P is path size.
+    jobs. Payload I/O is O(B) for B supplied bytes; metadata uses O(N + P) memory
+    for N entries and P total path characters. Final ordering adds O(N log N)
+    comparisons, and verification performs a separate payload read.
     """
 
     def __init__(self, payload: Path, destination: Path, limits: Limits) -> None:
@@ -76,11 +78,12 @@ class ArchiveAssembly:
         directories: tuple[str, ...],
         files: tuple[tuple[str, int], ...],
     ) -> tuple[str, ...]:
-        """Validate only new paths; repeated small additions stay linear in N.
+        """Validate new paths without rescanning the complete accumulated inventory.
 
         Existing directories can be shared as parents. Files and differently
         spelled case-fold equivalents cannot be shared or overwritten. Ancestor
         work is bounded by the portable path contract's 64-component limit.
+        Only newly required directories are sorted for this addition.
         """
         planned: dict[str, tuple[str, bool]] = {}
 
@@ -234,7 +237,8 @@ def assembling_archive(destination: Path, *, limits: Limits | None = None) -> It
     Each successful addition writes source bytes once. Context exit performs a
     separate verification read, canonical manifest validation, and the same
     atomic no-replace publication used by ordinary archive creation. Failures,
-    including cancellation, remove only this operation's staging directory.
+    including cancellation, target only this operation's staging directory for
+    cleanup; filesystem cleanup failures propagate to the caller.
     This is an atomic visibility boundary, not fsync-based crash durability.
     """
     active_limits = limits or Limits()

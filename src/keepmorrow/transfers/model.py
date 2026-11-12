@@ -35,7 +35,11 @@ def _positive_integers(value: object) -> None:
 
 @dataclass(frozen=True, slots=True)
 class UploadLimits:
-    """Reserve the declared size, or the maximum size for an unknown stream."""
+    """Admission ceilings for payload bytes, live objects, and upload lifetime.
+
+    Intake reserves the declared size, or max_upload_bytes for an unknown
+    stream. These logical reservations are not filesystem allocation quotas.
+    """
 
     max_upload_bytes: int = GIB
     max_owner_bytes: int = 2 * GIB
@@ -53,7 +57,11 @@ class UploadLimits:
 
 @dataclass(frozen=True, slots=True)
 class UploadRecord:
-    """Opaque receipt; display metadata never selects a storage path."""
+    """Owned receipt whose display metadata never selects a storage path.
+
+    The handle identifies staged bytes; it grants no authority on its own.
+    Transport adapters decide which internal ownership fields may be disclosed.
+    """
 
     upload_id: str
     owner_id: str
@@ -94,7 +102,12 @@ class PackageLimits:
 
 @dataclass(frozen=True, slots=True)
 class PackageResult:
-    """Local package and collection verification, without a remote-delivery claim."""
+    """Local container and collection evidence, without a remote-delivery claim.
+
+    sha256 identifies the encoded ZIP; manifest_sha256 identifies its exact
+    enclosed manifest bytes. File and directory counts describe payload entries
+    rather than the additional wrapper paths.
+    """
 
     size_bytes: int
     sha256: str
@@ -116,5 +129,6 @@ class PackageResult:
 
 
 def checkpoint_if_requested(checkpoint: Checkpoint | None) -> None:
+    """Invoke a caller-supplied cooperative boundary without reclassifying failure."""
     if checkpoint is not None:
         checkpoint()

@@ -1,8 +1,8 @@
 """Measure the private service with isolated, deterministic synthetic inputs.
 
-The parent launches one fresh interpreter. The child runs the same workflow
-three times against one service instance, preserving earlier outputs so that
-warm runs include the growing metadata ledger. Browser, OAuth, HTTP transport,
+The parent launches one fresh interpreter. By default, the child runs the same
+workflow three times against one service instance, preserving earlier outputs
+so that warm runs include the growing metadata ledger. Browser, OAuth, HTTP transport,
 and genuine human acceptance are outside this experiment.
 
 Copyright 2026 Lopix Neural Inc. All rights reserved.
@@ -195,6 +195,11 @@ def _disk_category(relative: Path) -> str:
 
 
 def _disk_snapshot(root: Path) -> dict[str, Any]:
+    """Observe regular-file sizes in the synthetic root without atomicity.
+
+    Concurrent renames can omit or double-count a file. Allocation figures use
+    st_blocks when available and exclude directory and filesystem metadata.
+    """
     totals = {name: {"logical_bytes": 0, "allocated_bytes": 0, "files": 0} for name in DISK_CATEGORIES}
     pending = [root]
     disappeared, errors, symlinks = 0, 0, 0
@@ -267,6 +272,7 @@ class DiskSampler:
         self._sample()
 
     def report(self) -> dict[str, Any]:
+        """Summarize samples; category maxima need not occur simultaneously."""
         return {
             "before": self.samples[0], "after": self.samples[-1], "sample_count": len(self.samples),
             "peak_observed_logical_bytes": max(item["logical_bytes"] for item in self.samples),
@@ -302,6 +308,12 @@ def _timing_summary(samples: list[float]) -> dict[str, float | int | None]:
 
 
 class Workflow:
+    """Measure one service instance through direct calls and synthetic decisions.
+
+    The driver exercises application costs and byte-preservation assertions.
+    It does not measure network transport, a live issuer, or human interaction.
+    """
+
     def __init__(self, service: Any, principal: Any, root: Path, timeout_seconds: float) -> None:
         self.service, self.principal, self.root = service, principal, root
         self.timeout_seconds = timeout_seconds
@@ -319,6 +331,12 @@ class Workflow:
         )
 
     def execute_plan(self, resource_id: str, generation: str, parameters: Any) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Measure through terminal status, which can precede executor cleanup.
+
+        A subsequent content stage records its own bounded admission retries.
+        Samples are grouped by the state returned from status; the worker may
+        advance before or during the following listing.
+        """
         control_samples: list[dict[str, Any]] = []
 
         def execute() -> dict[str, Any]:
@@ -363,6 +381,7 @@ class Workflow:
         return snapshot, measured
 
     def content(self, execute: Callable[[], Any]) -> tuple[Any, dict[str, Any]]:
+        """Include bounded busy retries in the measured content-stage duration."""
         from keepmorrow.operations import OperationBusy
 
         retries = 0

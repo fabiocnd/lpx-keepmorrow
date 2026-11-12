@@ -1,4 +1,8 @@
-"""Bounded deterministic catalog browsing and literal text search."""
+"""Bounded responses over previously validated, authorized catalog documents.
+
+These pure query helpers do not load archives or establish caller permission.
+The service must verify source integrity and authorization at its own boundary.
+"""
 
 from __future__ import annotations
 
@@ -17,6 +21,12 @@ def browse_catalog(
     project_id: str | None = None, association_state: str | None = None,
     limits: CatalogLimits | None = None,
 ) -> Document:
+    """Page filtered conversation summaries in the catalog's retained order.
+
+    Effective associations are resolved across the complete catalog before
+    filtering. Pagination bounds returned entries and bytes, not the number of
+    records inspected or the temporary list of matching conversations.
+    """
     active = limits or CatalogLimits()
     if type(offset) is not int or offset < 0 or type(limit) is not int or not 1 <= limit <= active.max_results:
         raise CatalogError("Catalog pagination is outside its supported range.")
@@ -59,8 +69,11 @@ def search_catalog(
 ) -> Document:
     """Search all retained revisions literally; input is never regex or executable.
 
-    O(T) scanning is explicit for this bounded local milestone. Returned text is
-    user-requested result content, not operational telemetry or an AI summary.
+    Scanning processes the examined text and case-folds each current field;
+    no persistent search index is maintained. Result limits bound disclosure,
+    while excerpts contain leading text rather than a match-centered window.
+    Returned text is requested source-derived content, not operational telemetry
+    or an AI summary.
     """
     active = limits or CatalogLimits()
     if not isinstance(query, str) or not query.strip() or len(query) > active.max_query_characters:
@@ -102,7 +115,13 @@ def read_revision(
     document: Document, conversation_key: str, *, revision_id: str | None = None,
     offset: int = 0, limit: int = 50, limits: CatalogLimits | None = None,
 ) -> Document:
-    """Return a bounded graph page, explicitly identifying omitted text or edges."""
+    """Return a graph page with explicit text, edge, and revision-list truncation.
+
+    Without an explicit revision, select its most recently supplied occurrence.
+    Node order preserves the catalog representation and is not a flattened
+    conversation timeline. Missing selections and insufficient byte budgets
+    raise CatalogError instead of returning an apparent successful empty result.
+    """
     active = limits or CatalogLimits()
     if type(offset) is not int or offset < 0 or type(limit) is not int or not 1 <= limit <= active.max_results:
         raise CatalogError("Revision pagination is outside its supported range.")

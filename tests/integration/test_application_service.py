@@ -1,4 +1,8 @@
-"""End-to-end owned intake, reviewed execution, recovery, and delivery contracts."""
+"""Exercise intake, reviewed execution, recovery, and delivery through the service.
+
+The fixture calls application APIs directly and records synthetic acceptance.
+HTTP interaction and trusted browser gestures have separate integration tests.
+"""
 
 from __future__ import annotations
 
@@ -42,6 +46,7 @@ class ApplicationServiceTests(unittest.TestCase):
         self.addCleanup(self.service.stop_worker)
 
     def accept(self, resource_id: str, generation: str, actions: list[str]):
+        """Persist a fixture receipt without claiming an actual human gesture."""
         grant = self.service.prepare_consent(self.owner, resource_id=resource_id, generation=generation, actions=actions)
         self.service.access.accept_grant(
             self.owner, grant_id=grant.grant_id, expected_grant_version=grant.grant_version,
@@ -50,6 +55,7 @@ class ApplicationServiceTests(unittest.TestCase):
         return grant
 
     def finish(self, plan):
+        """Await successful publication and resource release in this serial fixture."""
         self.service.operations.record_human_review(
             self.owner.principal_id, plan.plan_id, parameter_digest=plan.parameter_digest,
             interaction_id="review_" + uuid.uuid4().hex,

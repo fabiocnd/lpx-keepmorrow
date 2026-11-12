@@ -8,10 +8,12 @@ version = "0.3.0"
 description = "Verifiable preservation with scoped consent, durable operations, and a private ChatGPT integration"
 requires-python = ">=3.11"
 authors = [{name = "Fabio de Sousa Lopes", email = "fabio@lopixneural.com"}]
+# Keep release metadata consistent with LICENSE when a source license is adopted.
 license = {text = "Proprietary. Copyright 2026 Lopix Neural Inc. All rights reserved."}
 dependencies = []
 
 [project.optional-dependencies]
+# The preservation CLI needs only the standard library; network adapters opt in.
 chatgpt = ["mcp==1.29.0", "PyJWT[crypto]==2.13.0", "cryptography==50.0.0", "httpx==0.28.1", "starlette==1.6.0", "uvicorn==0.52.1"]
 
 [project.scripts]

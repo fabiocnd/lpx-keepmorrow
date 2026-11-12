@@ -25,6 +25,7 @@ class ConfigurationError(ValueError):
 
 
 def https_url(value: object, *, origin_only: bool = False) -> str:
+    """Validate configured URL syntax without resolving or contacting its host."""
     if not isinstance(value, str) or len(value) > 2048:
         raise ConfigurationError("A bounded HTTPS URL is required.")
     try:
@@ -41,6 +42,12 @@ def https_url(value: object, *, origin_only: bool = False) -> str:
 
 @dataclass(frozen=True, slots=True)
 class Resource:
+    """Bind an owner and manifest digest to an operator-controlled location.
+
+    Construction validates metadata only. It does not inspect stored bytes,
+    establish their integrity, or grant permission to read them.
+    """
+
     resource_id: str
     generation: str
     principal_id: str
@@ -58,6 +65,8 @@ class Resource:
 
 @dataclass(frozen=True, slots=True)
 class BrowserOAuth:
+    """Describe a registered browser client without storing its secret value."""
+
     client_id: str
     authorization_endpoint: str
     token_endpoint: str
@@ -78,6 +87,12 @@ class BrowserOAuth:
 
 @dataclass(frozen=True, slots=True)
 class ServiceConfiguration:
+    """Validate private-service policy without provisioning external resources.
+
+    Storage limits are logical admission budgets, not filesystem quotas. HTTPS
+    endpoints and identities still require separate deployment verification.
+    """
+
     state_directory: Path
     policy_directory: Path
     public_origin: str
@@ -133,6 +148,7 @@ class ServiceConfiguration:
 
     @property
     def resource_url(self) -> str:
+        """Return the resource identifier; operator mode does not serve MCP."""
         return self.public_origin + "/mcp"
 
     @property
@@ -141,6 +157,7 @@ class ServiceConfiguration:
         return 4 * self.max_upload_bytes
 
     def principal(self, issuer: str, subject: str) -> Principal:
+        """Resolve an already authenticated identity against the exact allowlist."""
         candidate = Principal(issuer, subject)
         for principal in self.principals:
             if principal == candidate:
@@ -149,6 +166,11 @@ class ServiceConfiguration:
         raise AccessDenied()
 
     def policies(self) -> tuple[PolicySet, dict[str, bytes]]:
+        """Read bounded policy documents and bind their exact bytes to digests.
+
+        Version markers identify the expected document set. They do not establish
+        legal approval; the trusted portal presents these same bytes for review.
+        """
         root = safe_directory(self.policy_directory)
         documents: dict[str, bytes] = {}
         for key, name in (("terms", "terms-of-use.md"), ("privacy", "privacy-notice.md")):

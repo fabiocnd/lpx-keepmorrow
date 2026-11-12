@@ -81,6 +81,12 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _execute(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    """Dispatch an already accepted request and preserve its coverage outcome.
+
+    Callers must check the policy versions before entering this boundary.
+    A partial semantic result remains distinct from failed byte verification;
+    neither outcome establishes the completeness of the source account.
+    """
     if args.operation == "verify":
         if args.collection:
             collection = load_collection(args.archive)
@@ -121,6 +127,14 @@ def _execute(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Execute one local request after explicit policy-version acceptance.
+
+    Parsed requests emit JSON to stdout on completion or stderr on a handled
+    refusal. Exit codes distinguish success (0), a failed archive-verification
+    report (1), invalid or refused execution (2), partial semantic coverage (3), and
+    interruption (130). Argument syntax errors use argparse's normal handling.
+    The receipt records a local declaration, not an authenticated user identity.
+    """
     args = _parser().parse_args(argv)
     # Parsing paths does not inspect them. Exact policy versions are checked
     # before resolving a source, loading a catalog, or creating a staging tree.

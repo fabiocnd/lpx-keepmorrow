@@ -1,3 +1,6 @@
+// Serve a fixed synthetic host and built resource on loopback for browser tests.
+// This fixture provides no authentication or preservation service and is not a
+// deployment entry point. Requests cannot select arbitrary filesystem paths.
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { build } from "esbuild";

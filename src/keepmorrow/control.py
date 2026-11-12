@@ -69,7 +69,9 @@ def execution_scope(
 
     Nested scopes inherit the parent's temporary root when no new root is
     specified, so changing a checkpoint cannot move private bytes to global
-    temporary storage accidentally.
+    temporary storage accidentally. Checkpoint and publication callbacks are
+    replaced, not inherited. Exceptions propagate while the prior context is
+    restored; the caller remains responsible for rollback and resource cleanup.
     """
     if not callable(checkpoint) or (before_publish is not None and not callable(before_publish)):
         raise TypeError("Execution controls require callable checkpoints.")

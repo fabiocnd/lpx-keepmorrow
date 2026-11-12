@@ -63,9 +63,12 @@ for the implemented pilot.
 ## 4. Human acceptance and lineage
 
 Account linking, policy acceptance, processing scope, and exact operation review
-are separate decisions. The portal displays the current version and digest of
-each policy, resource/generation, actions, purpose, recipient, and expiration.
-No checkbox is preselected. No MCP tool can record acceptance or approve a plan.
+are separate decisions. The consent preparation view displays the current
+version and digest of each policy, resource/generation, actions, purpose,
+recipient, and eligibility declaration. The service enforces grant expiration,
+but the preparation response does not currently include its timestamp; that
+presentation gap remains part of live consent qualification. No checkbox is
+preselected. No MCP tool can record acceptance or approve a plan.
 
 An active operation remains bound to its exact reviewed grant/version/receipt.
 A completed generation can remain accessible after an earlier scope expires only
@@ -109,8 +112,11 @@ principal, parameters, input digest, exact scope, and reservation. One deliberat
 review authorizes one new operation. Replaying the same key and canonical intent
 returns the existing operation; changing intent under that key fails.
 
-The exclusive worker retains its OS lock and reservation until its executor and
-cleanup finish. Cancellation is cooperative. Metadata status/cancellation remain
+The exclusive worker holds its OS lock during live executor work. Terminal
+status can precede cleanup and reservation release. A failure classified as
+`OperationCleanupRequired` retains the reservation and stops new claims; the
+[operation protocol](operation-journal.md) explains the separate metadata-error
+boundary. Cancellation is cooperative. Metadata status/cancellation remain
 outside the heavy-content slot. Startup recovers proven owned scratch and upload
 pins, reconciles publication, and only then performs retention cleanup.
 

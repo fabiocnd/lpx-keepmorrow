@@ -24,12 +24,18 @@ from .service import manifest_digest
 
 
 def _write_new(path: Path, data: bytes) -> None:
+    """Create a new file exclusively; an interrupted write requires local review."""
     descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0), 0o600)
     with os.fdopen(descriptor, "wb") as stream:
         stream.write(data)
 
 
 def _initialize(args) -> dict[str, object]:
+    """Initialize a fresh operator instance without overwriting existing state.
+
+    Setup is not a multi-file transaction. Partial state remains available for
+    explicit operator inspection rather than being removed or silently reused.
+    """
     root = args.directory.absolute()
     safe_directory(root.parent)
     root.mkdir(mode=0o700)
@@ -52,6 +58,7 @@ def _initialize(args) -> dict[str, object]:
 
 
 def _registration(args) -> dict[str, object]:
+    """Verify an explicitly selected collection and write a separate configuration."""
     require_acceptance(args.accept_terms, args.accept_privacy, "verify")
     configuration = load_configuration(args.configuration)
     principal = next((item for item in configuration.principals if item.subject == args.subject), None)
@@ -76,6 +83,7 @@ def _registration(args) -> dict[str, object]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Dispatch explicit local setup and loopback server lifecycle commands."""
     parser = argparse.ArgumentParser(prog="keepmorrow-service", description="Initialize or run the private preservation pilot.")
     commands = parser.add_subparsers(dest="command", required=True)
     initialize = commands.add_parser("init", help="Create a new local service directory without reading source content.")
@@ -114,6 +122,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 import uvicorn
                 from ..integrations.chatgpt.application import create_application
                 app = create_application(configuration)
+                # External HTTPS requires an operator-managed proxy or tunnel.
+                # Forwarded headers do not override this process's trust boundary.
                 uvicorn.run(app, host="127.0.0.1", port=configuration.port, access_log=False,
                             log_level="warning", proxy_headers=False, server_header=False,
                             limit_concurrency=32, timeout_keep_alive=5)

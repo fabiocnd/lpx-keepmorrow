@@ -21,11 +21,13 @@ if TYPE_CHECKING:
 
 
 def create_application(configuration: ServiceConfiguration) -> "Starlette":
-    """Create an inert ASGI application; its lifespan owns the exclusive worker.
+    """Initialize configured local stores and compose the ASGI application.
 
-    The socket remains loopback in both modes. OAuth deployments require a
-    separately selected authenticated HTTPS transport or supported private
-    tunnel. A local operator key never enables remote MCP authentication.
+    Construction creates or validates service state without starting a worker.
+    The ASGI lifespan owns worker startup, maintenance, and shutdown. The CLI
+    binds loopback; OAuth deployments additionally require a selected HTTPS
+    transport or supported private tunnel. A local operator key never enables
+    remote MCP authentication.
     """
     import anyio
     from starlette.routing import Mount
@@ -78,6 +80,8 @@ def create_application(configuration: ServiceConfiguration) -> "Starlette":
                     finally:
                         tasks.cancel_scope.cancel()
             finally:
+                # Request cancellation cannot transfer ownership of a live
+                # executor. Finish the bounded shutdown attempt under shielding.
                 with anyio.CancelScope(shield=True):
                     stopped = await anyio.to_thread.run_sync(service.stop_worker, abandon_on_cancel=False)
                 if not stopped:

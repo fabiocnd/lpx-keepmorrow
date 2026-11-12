@@ -52,6 +52,8 @@ class ImportLimits:
 
 @dataclass(frozen=True, slots=True)
 class ImportIssue:
+    """Bounded interpretation finding with source location rather than copied text."""
+
     code: str
     source_path: str | None
     record_index: int | None
@@ -66,6 +68,8 @@ class ImportIssue:
 
 @dataclass(frozen=True, slots=True)
 class SourceDocument:
+    """Preserved JSON identity and the parser's accounting for attempted records."""
+
     path: str
     sha256: str
     size_bytes: int
@@ -83,6 +87,8 @@ class SourceDocument:
 
 @dataclass(frozen=True, slots=True)
 class MessageNode:
+    """Supported graph fields; omitted source content remains in the original file."""
+
     id: str
     parent_id: str | None
     children_ids: tuple[str, ...]
@@ -99,6 +105,8 @@ class MessageNode:
 
 @dataclass(frozen=True, slots=True)
 class ArtifactReference:
+    """Availability evidence with byte identity only when inventory-bound."""
+
     reference_id: str
     node_id: str
     kind: str
@@ -120,6 +128,8 @@ class ArtifactReference:
 
 @dataclass(frozen=True, slots=True)
 class ConversationRevision:
+    """One namespaced source occurrence and its deterministically derived graph."""
+
     conversation_key: str
     source_id: str
     revision_id: str
@@ -155,6 +165,8 @@ class ConversationRevision:
 
 @dataclass(frozen=True, slots=True)
 class ParsedCapture:
+    """Interpretation of the supplied inventory, without an account-coverage claim."""
+
     account_namespace: str
     capture_id: str
     status: str

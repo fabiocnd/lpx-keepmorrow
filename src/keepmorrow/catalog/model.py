@@ -68,11 +68,17 @@ def json_bytes(document: object) -> bytes:
 
 
 def content_digest(document: object) -> str:
+    """Hash the exact catalog JSON representation, including its final newline."""
     return hashlib.sha256(json_bytes(document)).hexdigest()
 
 
 def encoded_size(document: object, maximum: int) -> int:
-    """Charge retained metadata before a complete serialized copy is allocated."""
+    """Measure UTF-8 JSON bytes, including the newline, and reject excess output.
+
+    Iteration avoids allocating the complete serialized document solely to
+    measure it. Individual encoded values and the caller's input object graph
+    still occupy memory; this is a byte-budget check, not a process-memory cap.
+    """
     size = 1
     encoder = json.JSONEncoder(ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
     try:
@@ -88,6 +94,7 @@ def encoded_size(document: object, maximum: int) -> int:
 
 
 def validate_namespace(value: object) -> str:
+    """Validate a local provenance label without treating it as authentication."""
     namespace = _text(value, "account namespace", 256)
     if not namespace.strip() or any(ord(character) < 32 for character in namespace):
         raise CatalogError("The account namespace must be a nonempty, printable local label.")
@@ -131,7 +138,12 @@ def _enum(value: object, allowed: set[str] | frozenset[str], label: str) -> str:
 
 
 def parse_collection(data: bytes, manifest: Manifest, limits: CatalogLimits) -> Document:
-    """Validate an untrusted derivative against the verified payload inventory."""
+    """Decode bounded metadata and reconcile it with a verified payload inventory.
+
+    The caller must establish the manifest's file-byte integrity separately.
+    The returned document is caller-owned mutable metadata; parsing neither
+    reads the source archive nor grants permission to disclose its contents.
+    """
     if len(data) > limits.max_catalog_bytes:
         raise CatalogError("The collection catalog exceeds its byte limit.")
     try:
@@ -180,6 +192,11 @@ def parse_collection(data: bytes, manifest: Manifest, limits: CatalogLimits) -> 
 
 
 def validate_association(value: object) -> Document:
+    """Validate association shape and return the same object without rewriting it.
+
+    A recognized state and evidence object establish representation validity,
+    not independent proof of historical membership in a source-platform project.
+    """
     association = _object(value, "association")
     state = association.get("state")
     if not isinstance(state, str) or state not in ASSOCIATION_STATES:
@@ -196,8 +213,10 @@ def validate_association(value: object) -> Document:
 def validate_collection(document: object, manifest: Manifest, limits: CatalogLimits) -> None:
     """Check identity, graph topology, provenance, and exact artifact bindings.
 
-    Lookup tables make validation linear in nodes, edges, files, and occurrences.
-    The input-byte ceiling bounds JSON parsing before these semantic checks.
+    Hash-based indexes avoid repeated scans of nodes, edges, files, and
+    occurrences. Text validation, identity hashing, and decision serialization
+    also process their input bytes. The caller must enforce JSON allocation
+    budgets before calling this function on decoded untrusted data.
     """
     root = _object(document, "collection")
     if (root.get("format") != COLLECTION_FORMAT or type(root.get("version")) is not int
@@ -423,6 +442,11 @@ def validate_collection(document: object, manifest: Manifest, limits: CatalogLim
 
 
 def collection_summary(document: Document) -> Document:
+    """Count retained records and references without inferring account completeness.
+
+    Repeated capture bytes and artifact references are counted as represented;
+    these totals do not claim physical deduplication or unique binary content.
+    """
     counts: Document = {
         "capture_count": len(document["captures"]),
         "unique_source_count": len({item["source_fingerprint"] for item in document["captures"]}),
@@ -449,7 +473,12 @@ def collection_summary(document: Document) -> Document:
 
 
 def effective_associations(document: Document) -> dict[str, Document]:
-    """Use the most recently supplied occurrence, then explicit operator decisions."""
+    """Resolve supplied-occurrence order, then apply explicit decisions in order.
+
+    Capture order and record position determine recency, not source timestamps.
+    Values reference association objects in the validated document; callers
+    must treat them as read-only or copy them before creating a derivative.
+    """
     positions = {capture["capture_id"]: index for index, capture in enumerate(document["captures"])}
     result: dict[str, Document] = {}
     for conversation in document["conversations"]:

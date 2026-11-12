@@ -179,6 +179,7 @@ class OperationStore:
     def get_plan(
         self, principal_id: str, plan_id: str, *, connection: sqlite3.Connection | None = None,
     ) -> OperationPlan:
+        """Revalidate the owner's canonical plan, including historical expired plans."""
         require_opaque_id(principal_id)
         require_opaque_id(plan_id)
         if connection is None:
@@ -278,6 +279,7 @@ class OperationStore:
     def get(
         self, principal_id: str, operation_id: str, *, connection: sqlite3.Connection | None = None,
     ) -> OperationSnapshot:
+        """Read owned journal state; content-disclosure checks belong to the service."""
         require_opaque_id(principal_id)
         require_opaque_id(operation_id)
         if connection is None:
@@ -291,7 +293,8 @@ class OperationStore:
 
         A service may add retained outputs and upload bytes in an admission
         callback using the same transaction. Completed output retention remains
-        a separate storage-policy responsibility.
+        a separate storage-policy responsibility. Terminal jobs remain charged
+        while their synchronous executor or unresolved cleanup retains ownership.
         """
         if connection is None:
             with self.database.transaction(immediate=False) as current:
@@ -324,6 +327,12 @@ class OperationStore:
             return tuple(self._snapshot(row) for row in rows)
 
     def request_cancel(self, principal_id: str, operation_id: str) -> CancellationReceipt:
+        """Record cancellation intent without joining or releasing the executor.
+
+        Queued work can cancel immediately. Active work stops cooperatively
+        before publication authorization; a committed publication decision is
+        preserved and its eventual disclosure still requires current access.
+        """
         require_opaque_id(principal_id)
         require_opaque_id(operation_id)
         with self.database.transaction() as connection:
@@ -385,11 +394,16 @@ class OperationStore:
             return self._snapshot(self._operation(connection, principal_id, operation_id))
 
     def acquire_worker(self) -> WorkerSession:
+        """Acquire process ownership; startup recovery must precede new claims."""
         from .worker import WorkerSession
         return WorkerSession.acquire(self)
 
     def claim(self, session: WorkerSession) -> OperationAttempt | None:
-        """Reserve one attempt; the session remains occupied until its executor returns."""
+        """Claim the oldest eligible job and retain the session until executor return.
+
+        Expired queued plans are retired here. The executor must independently
+        recheck current authorization before reading content or publishing it.
+        """
         from .worker import OperationAttempt
         with session._guard:
             session._require_idle(self)
@@ -438,6 +452,12 @@ class OperationStore:
             return attempt
 
     def checkpoint(self, attempt: OperationAttempt, *, verifying: bool = False) -> None:
+        """Check ownership and cancellation; optionally enter the verifying state.
+
+        This method inspects no output bytes. Grant validation remains the
+        service's responsibility, and cancellation is effective only before this
+        attempt commits publication authorization.
+        """
         if type(verifying) is not bool:
             raise OperationError("The verification checkpoint flag must be boolean.")
         attempt._session._require_attempt(attempt)
@@ -498,7 +518,12 @@ class OperationStore:
         )
 
     def complete(self, attempt: OperationAttempt, result: VerifiedResult) -> OperationSnapshot:
-        """Record verified output after no-replacement publication has succeeded."""
+        """Record caller-verified output for the exact authorized publication.
+
+        The caller must already have published and verified the filesystem
+        output; this method inspects metadata only. Executor reservations remain
+        held until the synchronous callback and its cleanup have returned.
+        """
         result_json = self._result_json(result)
         attempt._session._require_attempt(attempt)
         with self.database.transaction() as connection:
@@ -570,6 +595,8 @@ class OperationStore:
             with self.database.transaction() as connection:
                 now = self._now()
                 self._require_worker(connection, session)
+                # The new session already owns the OS lock, proving the prior
+                # executor is gone. Metadata epochs alone cannot prove that.
                 connection.execute("UPDATE km_operations SET worker_released = 1 WHERE worker_released = 0")
                 rows = connection.execute(
                     _SELECT_OPERATION
@@ -677,6 +704,8 @@ class OperationStore:
             raise OperationError("The stored authorization scope is invalid.") from error
         parameters = parse_parameters(row["kind"], document["parameters"])
         encoded = canonical_document(principal_id, parameters, scope, document["reservation_bytes"])
+        # Preserve both canonical encoding and digest identity. Parsing equivalent
+        # JSON alone would not establish the exact bytes bound to the review.
         if parameter_digest(encoded) != row["parameter_digest"] or encoded.decode("ascii") != row["canonical_json"]:
             raise OperationError("The stored operation plan digest does not match its parameters.")
         return OperationPlan(
@@ -780,6 +809,8 @@ class OperationStore:
     def _finish_verified(
         connection: sqlite3.Connection, row: sqlite3.Row, result: VerifiedResult, result_json: str, now: float,
     ) -> None:
+        # Publication status and executor release are separate transitions.
+        # Keep worker_released unchanged until the synchronous executor returns.
         state = "partial" if result.coverage_gaps else "completed"
         connection.execute(
             "UPDATE km_operations SET state = ?, result_json = ?, error_code = NULL, reconciled = 1, "

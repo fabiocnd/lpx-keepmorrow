@@ -54,6 +54,11 @@ class OperationTests(unittest.TestCase):
         )
 
     def session(self):
+        """Own and clean up attempts driven synchronously by this store fixture.
+
+        The test thread stands in for a returned executor. Production code must
+        retain ownership until its actual worker callback and cleanup unwind.
+        """
         session = self.store.acquire_worker()
         self.store.reconcile(session, lambda snapshot: None)
 

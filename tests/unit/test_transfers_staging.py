@@ -14,6 +14,11 @@ from keepmorrow.transfers import TransferError, TransferLimitExceeded, UploadLim
 
 
 def _receive_until_terminated(root: str, ready) -> None:
+    """Expose a committed intake reservation before the parent kills this child.
+
+    Normal exception cleanup must not run: restart recovery needs the partial
+    filesystem and ledger state left by an interrupted process.
+    """
     class InterruptedStream(io.BytesIO):
         def read(self, size: int = -1) -> bytes:
             ready.put(True)

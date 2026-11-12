@@ -1,3 +1,5 @@
+// Challenge the presentation boundary with malformed envelopes and untrusted
+// strings; server authorization and archive integrity have separate test suites.
 import assert from "node:assert/strict";
 import test from "node:test";
 import { associationLabel, collectionRef, integer, items, portalUrl, responseData } from "../src/contracts.ts";

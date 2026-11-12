@@ -1,8 +1,13 @@
-/** Bounded presentation contracts for authenticated server results. */
+/**
+ * Validate fields used by the companion before allocating or rendering a page.
+ * These checks bound presentation data; the service remains authoritative for
+ * identity, consent, resource ownership, and archive integrity.
+ */
 
 export type Document = Record<string, unknown>;
 export interface CollectionRef { collection_id: string; generation: string }
 export interface ToolReply { structuredContent?: unknown; isError?: boolean | undefined }
+/** Transport supplied by the connected host; credentials never enter this API. */
 export interface ToolClient {
   callServerTool(request: { name: string; arguments: Document }): Promise<ToolReply>;
   openLink(request: { url: string }): Promise<{ isError?: boolean | undefined }>;
@@ -16,6 +21,8 @@ export function object(value: unknown): Document {
 }
 
 export function text(value: unknown, maximum = 4096): string {
+  // JavaScript length counts UTF-16 code units. Encoded-byte limits remain a
+  // separate server contract and cannot be inferred from this display bound.
   if (typeof value !== "string" || value.length > maximum) {
     throw new Error("The server returned an unsupported text field.");
   }
@@ -40,6 +47,8 @@ export function responseData(reply: ToolReply): Document {
   const envelope = object(reply.structuredContent);
   if (envelope.response_version !== 2) throw new Error("This interface requires the current Keepmorrow server.");
   if (envelope.status === "error" || reply.isError) {
+    // Display fixed categories, never arbitrary server exception text that
+    // could contain private paths, credentials, or submitted content.
     const code = typeof envelope.error_code === "string" ? envelope.error_code : "request_failed";
     const messages: Record<string, string> = {
       access_denied: "Access is unavailable. Review your current permissions in the secure portal.",
@@ -61,6 +70,8 @@ export function collectionRef(value: Document): CollectionRef {
 }
 
 export function portalUrl(value: unknown): string {
+  // The configured server supplies this address. Scheme and credential checks
+  // constrain its shape; they do not establish trust in an arbitrary URL.
   const candidate = new URL(text(value, 2048));
   const loopback = candidate.hostname === "127.0.0.1" || candidate.hostname === "localhost";
   if ((candidate.protocol !== "https:" && !(candidate.protocol === "http:" && loopback))

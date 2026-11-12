@@ -42,6 +42,7 @@ def validate_token(value: object) -> str:
 
 
 def validate_action(value: object) -> str:
+    """Require a bounded action identifier without changing its spelling."""
     if not isinstance(value, str) or _ACTION.fullmatch(value) is None:
         raise AccessError("Access actions require a supported operation identifier.")
     return value
@@ -68,6 +69,7 @@ def validate_actions(values: Iterable[str]) -> frozenset[str]:
 
 
 def validate_timestamp(value: object) -> int:
+    """Require supported UTC Unix seconds; booleans are not timestamps."""
     if type(value) is not int or not 0 <= value <= 253402300799:
         raise AccessError("Timestamps must be UTC Unix seconds in the supported range.")
     return value
@@ -114,7 +116,7 @@ class Principal:
 
 @dataclass(frozen=True, slots=True)
 class PolicySet:
-    """The exact version and bytes displayed by the trusted acceptance surface."""
+    """Versions and digests binding acceptance to the displayed policy bytes."""
 
     terms_version: str
     terms_sha256: str
@@ -139,7 +141,11 @@ class PolicySet:
 
 @dataclass(frozen=True, slots=True)
 class Grant:
-    """An immutable allowed scope; its monotonic version changes on revocation."""
+    """An immutable snapshot of administrative permission, not human acceptance.
+
+    Revocation advances the persisted grant version. Previously returned
+    snapshots remain historical observations and cannot authorize later access.
+    """
 
     grant_id: str
     principal_id: str

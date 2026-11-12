@@ -12,6 +12,7 @@ UMask=0077
 WorkingDirectory=/var/lib/keepmorrow
 ExecStart=/opt/keepmorrow/venv/bin/keepmorrow-service serve --configuration /etc/keepmorrow/service.json
 EnvironmentFile=/etc/keepmorrow/credentials.env
+# Restart invokes journal reconciliation; it does not establish power-loss durability.
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=60
@@ -19,6 +20,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
+# Keep state, outputs, and owned scratch under this root on one filesystem.
 ReadWritePaths=/var/lib/keepmorrow
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 LockPersonality=true

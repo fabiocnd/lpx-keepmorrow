@@ -31,7 +31,12 @@ UI_RESOURCE = "ui://keepmorrow/workspace-v1.html"
 def create_pilot_server(
     service: PreservationService, verifier: "TokenVerifier", *, ui_html: str,
 ) -> "FastMCP":
-    """Build an OAuth resource server; configuration alone does not deploy it."""
+    """Build the authenticated tools and resource around an existing service.
+
+    The caller supplies verified UI assets, the token verifier, and service
+    lifespan management. Tool creation neither starts the content worker nor
+    establishes a live ChatGPT installation.
+    """
     import anyio
     from mcp.server.fastmcp import FastMCP
     from mcp.server.auth.middleware.auth_context import get_access_token
@@ -75,6 +80,8 @@ def create_pilot_server(
     security = {"securitySchemes": [{"type": "oauth2", "scopes": ["keepmorrow:access"]}]}
 
     def principal():
+        # Identity comes only from the SDK's verified request token. Source
+        # account labels and model-supplied arguments cannot select a principal.
         token = get_access_token()
         if token is None or token.subject is None or token.claims is None:
             raise AccessDenied()
@@ -133,6 +140,9 @@ def create_pilot_server(
                 "terms_url": origin + "/policies/terms", "privacy_url": origin + "/policies/privacy",
                 "scope": "explicitly_supplied_eligible_material", "native_chatgpt_restore": False}
 
+    # These docstrings are exposed to MCP clients as tool descriptions. Keep
+    # model-facing instructions consistent with the independently enforced
+    # portal consent, operation-review, and resource authorization boundaries.
     @server.tool(annotations=read, meta=security, structured_output=False)
     async def access_status() -> CallToolResult:
         """Show current policy and accepted scope metadata without opening collection content.

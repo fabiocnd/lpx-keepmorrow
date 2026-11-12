@@ -5,6 +5,8 @@ import { Workspace } from "./workspace.ts";
 const app = new App({ name: "LPX Keepmorrow", version: "0.3.0" }, {}, { strict: true });
 const workspace = new Workspace(app);
 
+// Register notifications before connecting so initial host context and tool
+// metadata cannot race handler installation during the SDK handshake.
 app.ontoolresult = (result) => workspace.acceptToolResult(result);
 app.onhostcontextchanged = (context) => {
   if (context.theme) applyDocumentTheme(context.theme);

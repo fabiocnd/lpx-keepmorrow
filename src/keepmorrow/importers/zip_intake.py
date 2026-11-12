@@ -38,7 +38,11 @@ _SUPPORTED_FLAGS = 0x080E  # UTF-8, data descriptor, and deflate level hints.
 
 @dataclass(frozen=True, slots=True)
 class PreparedExport:
-    """A scoped extraction and, for ZIP input, the unchanged original ZIP path."""
+    """Borrowed input paths valid within the prepared_export context.
+
+    A directory input remains caller-owned. For ZIP input, directory names a
+    temporary extraction and original_zip names the source container, not a copy.
+    """
 
     directory: Path
     original_zip: Path | None
@@ -206,6 +210,12 @@ def _local_record(source: BinaryIO, info: zipfile.ZipInfo, central_offset: int) 
 def _plan_members(
     source: BinaryIO, entries: list[zipfile.ZipInfo], end: _EndRecord, limits: Limits,
 ) -> tuple[tuple[str, ...], tuple[_Member, ...]]:
+    """Reconcile names, implicit parents, and physical record ranges before writes.
+
+    The central-directory preflight bounds the entry objects passed here.
+    Canonical output order and physical-overlap checks require separate sorts;
+    neither declared sizes nor central metadata alone authorize extraction.
+    """
     declared: set[str] = set()
     paths: dict[str, bool] = {}
     folded_paths: dict[str, str] = {}
@@ -266,7 +276,12 @@ def _plan_members(
 
 
 def _extract_member(source: BinaryIO, member: _Member, output: BinaryIO | None, limits: Limits) -> int:
-    """Bound actual inflation and reject streams hidden by false size metadata."""
+    """Bound actual inflation and reject streams hidden by false size metadata.
+
+    Count expanded bytes and verify the ZIP CRC even for directory entries.
+    CRC establishes the container's checksum contract; archive preservation
+    independently records and verifies SHA-256 identities afterward.
+    """
     info = member.info
     source.seek(member.data_offset)
     remaining = info.compress_size
@@ -331,8 +346,9 @@ def prepared_export(source: Path, *, limits: Limits | None = None) -> Iterator[P
 
     Preserve ``original_zip`` while inside the context, then finish publishing
     only after context exit has rechecked source identity and timestamps. The
-    temporary directory is removed on normal completion and exceptions, including
-    cancellation. A hard process kill can leave temporary files. Like the archive
+    ZIP extraction is cleaned on context exit, including cancellation, subject
+    to filesystem cleanup errors. Directory inputs are borrowed and never
+    removed. A hard process kill can leave temporary files. Like the archive
     core, this API assumes stable, user-controlled directory ancestors.
     """
     active_limits = limits or Limits()

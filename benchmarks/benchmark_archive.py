@@ -31,6 +31,11 @@ def positive_int(value: str) -> int:
 
 
 def measure(operation: Callable[[], object]) -> tuple[float, int]:
+    """Return wall time and peak Python-traced bytes for a successful call.
+
+    Tracing overhead is included in elapsed time. The allocation peak excludes
+    process memory outside tracemalloc and must not be reported as peak RSS.
+    """
     tracemalloc.start()
     start = time.perf_counter()
     operation()

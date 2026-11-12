@@ -52,6 +52,12 @@ class CollectionResult:
 
 @dataclass(frozen=True, slots=True)
 class LoadedCollection:
+    """Verified generation with caller-owned decoded metadata, not a live snapshot.
+
+    Freezing this wrapper does not freeze its nested document. Callers must
+    recheck source identity when later work can observe concurrent changes.
+    """
+
     root: Path
     manifest: Manifest
     document: Document
@@ -78,8 +84,10 @@ def load_collection(
 ) -> LoadedCollection:
     """Verify all supplied archive bytes before trusting a persisted catalog.
 
-    Queries deliberately pay this O(B) integrity cost. A future authenticated
-    index cache needs a separate invalidation and trust contract.
+    Queries deliberately reread B payload bytes and retain an inventory of N
+    entries; inventory ordering adds O(N log N) comparisons. Semantic decoding
+    and validation have their own configured metadata budgets. A future cache
+    requires a separate invalidation and trust contract.
     """
     active_limits = limits or Limits()
     semantic_limits = catalog_limits or CatalogLimits()
@@ -289,6 +297,9 @@ def import_exports(
     Identical logical revisions share one normalized record, while each supplied
     capture retains its provenance and bytes. This is not content-addressed blob
     storage: extending a generation copies its prior captures into the new one.
+    The destination must be new, and a previous generation must use the same
+    explicit provenance namespace. Parser gaps remain in the result even when
+    every supplied byte was preserved successfully.
     """
     namespace = validate_namespace(account_namespace)
     active_limits = limits or Limits()
@@ -330,6 +341,8 @@ def associate_conversation(
 
     Source associations remain unchanged. The decision is operator-supplied
     evidence, not authenticated identity or a historical platform assertion.
+    The decision history is chained into the new catalog while prior capture
+    bytes are copied and checked; the existing generation is never edited.
     """
     semantic_limits = catalog_limits or CatalogLimits()
     association = {"state": state, "project_id": project_id,
@@ -372,6 +385,10 @@ def recover_selection(
     Whole source JSON documents can contain unrelated conversations and are
     deliberately excluded. Their provenance remains recorded; full originals
     remain recoverable from the parent collection with ordinary restore.
+    Bound attachments are copied whole and are not internally redacted. This
+    selection boundary therefore does not certify every attachment's content.
+    Choose explicit conversation keys or one confirmed project; a revision
+    filter applies only to a single selected conversation.
     """
     semantic_limits = catalog_limits or CatalogLimits()
     if isinstance(conversation_keys, (str, bytes)) or not isinstance(conversation_keys, Sequence):

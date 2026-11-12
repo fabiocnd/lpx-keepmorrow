@@ -21,6 +21,8 @@ from ...persistence import SQLiteDatabase
 
 @dataclass(frozen=True, slots=True)
 class HumanSession:
+    """Validated session metadata; ``session_id`` is a digest, not a cookie."""
+
     session_id: str
     principal_id: str
     expires_at: int
@@ -60,10 +62,17 @@ class HumanSessions:
 
     @staticmethod
     def csrf(token: str) -> str:
+        """Derive the mutation challenge without exposing the session cookie."""
         HumanSessions._digest(token)
         return hashlib.sha256(b"lpx-keepmorrow.csrf.v1\x00" + token.encode("ascii")).hexdigest()
 
     def create(self, principal_id: str, *, expires_at: int) -> str:
+        """Return one opaque cookie and retain only its digest and owner.
+
+        The session expires no later than the supplied authentication deadline
+        or fifteen minutes from creation. Expired sessions are removed before
+        applying the global admission cap.
+        """
         validate_token(principal_id)
         if type(expires_at) is not int:
             raise AccessDenied()
@@ -81,6 +90,11 @@ class HumanSessions:
         return token
 
     def require(self, token: str, *, csrf: str | None = None) -> HumanSession:
+        """Resolve a live cookie and optionally verify its mutation challenge.
+
+        Route handlers decide whether CSRF is mandatory. This check establishes
+        browser identity, not permission to read content or approve an operation.
+        """
         try:
             digest = self._digest(token)
             if csrf is not None and not hmac.compare_digest(self.csrf(token), csrf):
@@ -94,6 +108,11 @@ class HumanSessions:
         return HumanSession(row["session_id"], row["principal_id"], row["expires_at"])
 
     def challenge(self, session: HumanSession, *, kind: str, object_id: str, document_digest: str) -> str:
+        """Bind a short-lived gesture to the live session and exact document.
+
+        Revalidate the session within the insertion transaction so a stale
+        in-memory session cannot create a challenge after logout or expiration.
+        """
         for value in (kind, object_id, document_digest):
             validate_token(value)
         token = secrets.token_hex(32)
@@ -120,7 +139,12 @@ class HumanSessions:
         self, session: HumanSession, token: str, *, kind: str, object_id: str,
         document_digest: str, connection: sqlite3.Connection | None = None,
     ) -> str:
-        """Consume one exact gesture, optionally with the acceptance transaction."""
+        """Consume one exact gesture, optionally with the acceptance transaction.
+
+        Matching and consumption share a write transaction. A supplied connection
+        must belong to this database and retain the caller's transaction so a
+        failed acceptance can roll back challenge consumption with its receipt.
+        """
         digest = self._digest(token)
         for value in (kind, object_id, document_digest):
             validate_token(value)
@@ -145,6 +169,11 @@ class HumanSessions:
         return "interaction_" + digest
 
     def end(self, token: str) -> None:
+        """Remove a browser session and its ephemeral challenges.
+
+        Durable grants and acceptance evidence have separate lifetimes; signing
+        out does not rewrite those records or imply scope revocation.
+        """
         with self.database.transaction() as connection:
             connection.execute("DELETE FROM km_human_sessions WHERE session_id = ?", (self._digest(token),))
 

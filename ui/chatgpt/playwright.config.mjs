@@ -2,6 +2,8 @@ import { defineConfig } from "@playwright/test";
 import { existsSync } from "node:fs";
 
 const chromiumPath = process.env.KEEPMORROW_CHROMIUM ?? (existsSync("/usr/bin/chromium") ? "/usr/bin/chromium" : undefined);
+// Own the fixed-port fixture server for each run. Reusing an unrelated process
+// would make screenshots and assertions describe an unverified application.
 export default defineConfig({
   testDir: "./tests",
   testMatch: "*.spec.mjs",

@@ -99,6 +99,10 @@ class AccessStore:
     reserved for the authenticated, CSRF-protected human interaction boundary.
     Never expose that method as a model tool or use a model-supplied Boolean as
     evidence that the interaction occurred.
+
+    A supplied connection joins the caller's active transaction on this database.
+    Otherwise, each method owns and closes its transaction. This distinction
+    allows grant checks and publication decisions to share one commit boundary.
     """
 
     def __init__(
@@ -177,8 +181,8 @@ class AccessStore:
         """Create a new administrative scope without creating human acceptance.
 
         The caller owns resource eligibility and the server's purpose/recipient
-        vocabulary. These bounded identifiers must never be paths, tokens, or
-        content supplied by a model. Changing scope creates a new grant; this
+        vocabulary. These bounded identifiers must never be paths, credentials,
+        or arbitrary source content. Changing scope creates a new grant; this
         API does not silently broaden or reactivate an existing grant.
         """
         principal_id = self._principal(principal)
@@ -248,8 +252,8 @@ class AccessStore:
     ) -> HumanAcceptance:
         """Record a separately verified human action for a selected scope.
 
-        The trusted HTTP boundary must first authenticate the human, validate its
-        session and CSRF challenge, display these exact policy bytes and scope,
+        The trusted HTTP boundary must first authenticate the requester, validate
+        the session and CSRF challenge, display these exact policy bytes and scope,
         and verify the deliberate submission. interaction_id is that boundary's
         single-use opaque interaction reference, not proof by itself. This
         method enforces replay, scope, version, expiry, and policy consistency;
@@ -465,6 +469,7 @@ class AccessStore:
         The first revocation advances its version. Repeating a revocation without
         an expected version is idempotent. Scope cannot be restored through a
         new acceptance; renewed permission requires a new administrative grant.
+        Historical records remain retained; this method does not delete content.
         """
         self._principal(principal)
         validate_token(grant_id)
@@ -492,7 +497,11 @@ class AccessStore:
     def revoke_acceptance(
         self, principal: Principal, *, acceptance_id: str, connection: sqlite3.Connection | None = None
     ) -> None:
-        """Withdraw one receipt; other separately accepted scopes remain distinct."""
+        """Withdraw one receipt while retaining its historical metadata.
+
+        Other current receipts can still authorize overlapping actions. Revoking
+        the administrative grant withdraws every receipt attached to that grant.
+        """
         principal_id = self._principal(principal)
         validate_token(acceptance_id)
         with self._connection(connection, write=True) as current:

@@ -16,6 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # These jobs preserve the standard-library core contract. Optional adapter
+  # tests execute separately with their complete pinned dependency set.
   validation:
     name: ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
@@ -68,6 +70,7 @@ jobs:
           python tests/smoke/run_private_portal.py --configuration "$RUNNER_TEMP/keepmorrow-http-pilot/service.json" --launch-service > "$RUNNER_TEMP/keepmorrow-http-smoke.json"
           cat "$RUNNER_TEMP/keepmorrow-http-smoke.json"
       - name: Retain sanitized HTTP pilot evidence
+        # Never upload the initialized instance, operator key, or state stores.
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:

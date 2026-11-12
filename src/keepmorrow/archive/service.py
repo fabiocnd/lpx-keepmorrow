@@ -34,7 +34,7 @@ def _staging(destination: Path) -> Iterator[Path]:
         if os.path.lexists(destination):
             raise ArchiveError("The destination appeared during processing; publication was canceled.")
         # Publication never replaces a competing destination. Atomic visibility
-        # still does not establish crash durability; this slice does not fsync.
+        # still does not establish crash durability; payloads are not fsynced.
         publish_directory(stage, destination)
     finally:
         if stage.exists():
@@ -98,6 +98,8 @@ def verify_archive(archive: Path, *, limits: Limits | None = None) -> Verificati
     A matching self-contained manifest proves local consistency. It does not
     authenticate the publisher or detect an attacker replacing both bytes and
     hashes. Trust must come from a separately secured manifest or signature.
+    Missing or changed payload entries become report findings where possible;
+    invalid manifests, unsafe trees, and resource-limit violations raise instead.
     """
     active_limits = limits or Limits()
     root = safe_directory(archive)
@@ -117,7 +119,14 @@ def load_manifest(archive: Path, *, limits: Limits | None = None) -> Manifest:
 
 
 def create_archive(source: Path, destination: Path, *, limits: Limits | None = None) -> Manifest:
-    """Preserve every supported supplied file and directory, then verify copies."""
+    """Preserve supplied regular-file bytes and directories in a new archive.
+
+    The source must remain stable. Copy-time hashes and a separate staged read
+    establish local consistency before no-replace publication. File permissions
+    and timestamps are not part of the preserved directory-archive contract.
+    Failures leave the source untouched and attempt cleanup of this operation's
+    private stage; filesystem cleanup errors can also propagate.
+    """
     active_limits = limits or Limits()
     root = safe_directory(source)
     target = destination_path(destination, root)
@@ -136,7 +145,12 @@ def create_archive(source: Path, destination: Path, *, limits: Limits | None = N
 
 
 def restore_archive(archive: Path, destination: Path, *, limits: Limits | None = None) -> Manifest:
-    """Restore verified bytes into a new directory; preserve the archive itself."""
+    """Recover verified payload bytes into a new directory without altering source.
+
+    Verify before copying, compare copy-time records, and independently reread
+    the staged recovery before publication. Recovery recreates ordinary files
+    and directories, not source-platform state or original filesystem metadata.
+    """
     active_limits = limits or Limits()
     root = safe_directory(archive)
     target = destination_path(destination, root)

@@ -57,6 +57,12 @@ def _browse(
     collection: LoadedCollection, *, offset: int, limit: int, project_id: str | None,
     association_state: str | None, revision_offset: int, revision_limit: int,
 ) -> dict[str, Any]:
+    """Project bounded summaries from a collection already verified by the caller.
+
+    The revision lookup retains references for all conversations; paginating the
+    response does not make archive verification or catalog memory page-sized.
+    Source evidence stays in the collection while response fields are shortened.
+    """
     result = catalog_query.browse_catalog(
         collection.document, offset=offset, limit=limit,
         project_id=project_id, association_state=association_state,
@@ -133,6 +139,8 @@ def create_server(registry: Mapping[str, Path], *, port: int = 8765) -> "FastMCP
         readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False,
     )
 
+    # Tool function docstrings below are published as MCP descriptions. Treat
+    # their wording as client-facing protocol metadata when revising this module.
     def reply(
         operation: str, *, receipt: AcceptanceReceipt | None = None,
         collection_id: str | None = None, data: dict[str, Any] | None = None,

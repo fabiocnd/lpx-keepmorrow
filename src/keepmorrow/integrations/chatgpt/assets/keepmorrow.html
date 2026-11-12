@@ -1,11 +1,15 @@
 <!doctype html>
+<!-- Authored template. The build inserts bundled CSS and JavaScript at the
+     KEEP_CSS and KEEP_SCRIPT markers; edit this source, not the packaged HTML. -->
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <title>LPX Keepmorrow</title>
-  <style>:root {
+  <style>/* Host-provided typography is optional; local theme values keep the companion
+   readable before host context arrives and in the synthetic test host. */
+:root {
   color-scheme: light;
   font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   color: #233934;
@@ -30,6 +34,7 @@ button.secondary { background: var(--surface); color: var(--accent); border-colo
 button.quiet { background: transparent; color: var(--accent); font-size: 13px; padding: 8px 5px; }
 button.danger { color: #a13325; background: var(--surface); border-color: #e3b7ad; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+/* Visibility state must override later flex/grid rules for inactive controls. */
 [hidden] { display: none !important; }
 .workspace { max-width: 1040px; margin: auto; padding: 25px; }
 .header, .identity, .section-heading, .controls, .portal-panel, .search-row, .operation-heading { display: flex; align-items: center; gap: 14px; }
@@ -66,6 +71,7 @@ select { text-overflow: ellipsis; }
 .conversation .helper, .operation .helper { margin: 6px 0; }
 .revision-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .revision-buttons button { font-size: 12px; min-height: 36px; text-align: left; max-width: 100%; overflow-wrap: anywhere; }
+/* Preserve source line breaks while allowing long untrusted tokens to wrap. */
 .excerpt, .message-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; font-size: 13px; }
 .excerpt { margin: 8px 0; color: var(--muted); }
 .messages { display: grid; gap: 11px; margin-bottom: 12px; }
@@ -108,6 +114,8 @@ footer { display: flex; flex-wrap: wrap; gap: 9px; justify-content: space-betwee
     <p class="introduction">Your preserved conversations, with their history intact.</p>
     <div id="status" class="status" role="status" aria-live="polite">Connecting to your workspace…</div>
 
+    <!-- Human acceptance and binary transfer use the independently authenticated
+         portal; this companion does not manufacture either decision. -->
     <section class="portal-panel" aria-labelledby="portal-title">
       <div><h2 id="portal-title">You control what is processed.</h2>
         <p>Manage consent, upload files, review operations, and download verified packages in the secure portal.</p></div>

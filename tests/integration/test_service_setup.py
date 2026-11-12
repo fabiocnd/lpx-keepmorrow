@@ -1,4 +1,8 @@
-"""Installed setup boundaries and the combined portal/MCP application."""
+"""Validate setup commands and the combined portal/MCP application in-process.
+
+These tests exercise the checked-out source. Wheel installation and a reachable
+deployment require their own recorded checks.
+"""
 
 from contextlib import redirect_stdout, redirect_stderr
 from dataclasses import replace

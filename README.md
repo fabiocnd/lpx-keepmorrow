@@ -43,27 +43,28 @@ bytes. Missing bytes remain an explicit gap.
 
 ## How this differs from ChatGPT's native export
 
-**ChatGPT prepares the account export; Keepmorrow works with the material you
-choose to supply afterward.** The native export can therefore be the input to
-Keepmorrow. If your goal is simply to keep an occasional downloaded copy, the
-native export and ordinary backup storage may already meet your needs.
+ChatGPT prepares the account export through its supported export process. [1]
+Keepmorrow works with the ZIP or directory you explicitly choose to supply
+afterward. It adds capture provenance, conversation revisions, integrity checks,
+reviewed association decisions, and selective recovery across repeated exports.
 
-| Question | Native ChatGPT export | LPX Keepmorrow 0.3.0 |
-| --- | --- | --- |
-| Where does the data come from? | OpenAI prepares eligible account data through its export process. [1] | You explicitly supply a downloaded ZIP or directory; Keepmorrow does not enumerate your account. |
-| What happens to the original download? | You receive a ZIP containing chat history and relevant account data. [1] | The original ZIP and supplied files are retained, with a manifest for subsequent byte verification. |
-| How are several exports handled? | You can retain each downloaded package. | Captures are reconciled into namespaced conversations and distinct revisions, while previous generations remain unchanged. |
-| What about projects and branches? | The available evidence depends on the actual exported data. | The supported parser retains message graphs and explicit project evidence; missing association information remains unknown. |
-| Can I read and search? | OpenAI documents an export viewer with reading and search for Edu exports. [2] | A standalone view, CLI, private portal, and MCP tools support bounded collection browsing, revision reading, and literal search. |
-| Are images and binary files included? | Edu documentation explicitly describes files and conversation assets; actual package contents must be checked. [2] | Every supplied regular file is preserved regardless of extension. A URL, thumbnail, or filename is not proof that the original binary is present. |
-| Can I recover only part of the collection? | Exported data can be used outside ChatGPT. | Selected recovery includes derived conversation records and exact bound artifacts, with declared omissions and integrity checks. |
-| Does this recreate my ChatGPT account? | Uploading exported JSON as reference does not recreate separate chats or restore the sidebar. [3] | Native chats, Projects, account settings, and sidebar reconstruction are outside the implemented scope. |
+This is useful when a project evolves through renamed conversations, alternative
+branches, and changing files. For an occasional downloaded copy, native export
+and ordinary backup storage may already meet your needs. Keepmorrow's purpose is
+to make ongoing preservation and selected recovery easier to inspect and verify.
 
-**Images and binaries:** Keepmorrow can preserve an image, PDF, spreadsheet,
-archive, or code file that was actually supplied. It cannot retrieve an absent
-original from a broken link, infer original bytes from a thumbnail, or regenerate
-a missing file. A selected binary is copied intact; its internal contents are not
-automatically redacted.
+**Images and binaries:** Keepmorrow preserves supplied regular files regardless
+of extension. OpenAI's Edu export documentation describes files and conversation
+assets, but the actual inventory must be checked for each supplied package. [2]
+A URL, thumbnail, or filename does not establish that the original binary is
+present. Keepmorrow cannot recover absent bytes from a broken link or regenerate
+a missing original. Selected attachments are copied intact; their internal
+contents are not automatically redacted.
+
+Recovery creates ordinary files and portable collections. It does not recreate
+native ChatGPT chats, Projects, account settings, or the sidebar. OpenAI also
+explains that uploading exported conversation JSON as reference does not recreate
+the original separate conversations. [3]
 
 The current parser is experimental and has been tested with synthetic exports.
 A representative authorized real export is still required before claiming
@@ -71,47 +72,6 @@ real-account compatibility. The ChatGPT-facing service and UI are implemented,
 but an actual ChatGPT connection has not been demonstrated. See the detailed
 [export comparison](docs/product/export-comparison.md) and
 [validation record](docs/engineering/private-pilot-validation.md).
-
-### Engineering assessment by workflow
-
-The scores below are **subjective engineering judgments on a 0–5 scale**. They
-compare native export followed by ordinary manual file management with the
-current Keepmorrow workflow. They express fit for the stated task; they are not
-benchmark results, an OpenAI rating, or proof of release readiness. The
-[complete rubric, assumptions, and weights](docs/product/export-comparison.md#subjective-engineering-assessment)
-are explicit in the project documentation. An undocumented native capability is
-not assumed absent.
-
-| Criterion | Native export + manual files | Keepmorrow 0.3.0 | Why the assessment differs |
-| --- | ---: | ---: | --- |
-| Acquisition and convenience | 5 | 2 | Native export provides the documented acquisition route; Keepmorrow adds setup, consent, and import. |
-| Repeated captures and revisions | 2 | 4 | Manual folders preserve snapshots; Keepmorrow implements capture provenance, namespaced identities, and distinct revisions. |
-| Evidence for project associations | 2 | 4 | Source metadata can be inspected manually; Keepmorrow records supported evidence, unknown states, and reviewed local decisions. |
-| Integrity verification and recovery evidence | 2 | 4 | Manual checks can be added; Keepmorrow integrates inventories, hashes, verification, and immutable generation boundaries. |
-| Selective recovery | 2 | 4 | Manual selection is possible; Keepmorrow packages a verified selected derivative with bound artifacts and declared omissions. |
-| Preservation of supplied binary files | 4 | 4 | Both can retain the binaries actually supplied. Neither receives credit for reconstructing missing original bytes. |
-| Current operational maturity | 5 | 1 | Native export is an available platform workflow; Keepmorrow still has real-account, export, deployment, browser, and legal gates. |
-
-Two transparent weightings produce different conclusions:
-
-| Priority | Native export + manual files | Keepmorrow 0.3.0 |
-| --- | ---: | ---: |
-| Ongoing preservation across repeated captures | **5.6 / 10** | **7.0 / 10** |
-| Occasional downloaded backup | **8.4 / 10** | **5.0 / 10** |
-
-The first weighting emphasizes revisions, integrity evidence, and selected
-recovery. The second emphasizes convenience, existing availability, and retaining
-supplied files. A weighted fit score does not remove any release gate or establish
-a performance advantage; the [service benchmark](benchmarks/PRIVATE_SERVICE_BENCHMARK.md)
-is a separate, local synthetic experiment.
-
-**Why Keepmorrow is interesting:** it connects repeated captures to explicit
-revision history, preserves evidence and uncertainty about organization, and
-makes selected recovery verifiable. That can help when a project evolves through
-renamed conversations, branches, and changing files. For an occasional backup,
-native export and ordinary storage remain the more direct workflow. The planned
-open-source transition could make the preservation rules and tests independently
-inspectable; publication and the exact license remain pending.
 
 Official sources reviewed November 12, 2026:
 

@@ -118,6 +118,11 @@ def _decode_json(data: bytes) -> dict[str, Any]:
 
 
 async def _body(request: Request) -> dict[str, Any]:
+    """Read bounded JSON metadata and reject ambiguous framing or duplicate fields.
+
+    The streaming byte cap applies even without Content-Length. Binary uploads
+    use a separate reader and must not pass through this buffered JSON path.
+    """
     content_type = _single_header(request, "content-type")
     if content_type is None or content_type.split(";", 1)[0].lower() != "application/json":
         raise _RequestError()
@@ -160,6 +165,13 @@ def _safe(endpoint: Callable[[Request], Awaitable[Response]]) -> Callable[[Reque
 
 
 class _PortalSecurity:
+    """Enforce the configured public authority before any mounted HTTP route.
+
+    A reverse proxy or tunnel must preserve the configured Host value. Browser
+    mutation routes additionally require an exact Origin and session-bound CSRF;
+    this outer middleware does not establish a user's identity or resource grant.
+    """
+
     def __init__(self, app: ASGIApp, *, origin: str) -> None:
         self.app, self.origin = app, origin
         self.host = urlsplit(origin).netloc
@@ -205,6 +217,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
     origin = configuration.public_origin
     secure = configuration.mode == "oauth"
     sessions = HumanSessions(service.database)
+    # Authorization attempts are bounded, process-local state. A restart
+    # invalidates unfinished browser sign-ins instead of persisting PKCE secrets.
     pending_oauth: dict[str, _OAuthAttempt] = {}
     upload_slots = threading.BoundedSemaphore(2)
     operator_digest: bytes | None = None
@@ -238,6 +252,7 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
             raise AccessDenied()
 
     def identity(request: Request, *, mutate: bool = False) -> tuple[Principal, HumanSession, str]:
+        """Require a live browser session; bearer-only requests cannot act here."""
         if mutate:
             require_origin(request)
         token = request.cookies.get(_SESSION_COOKIE)
@@ -253,6 +268,9 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
         response.set_cookie(_SESSION_COOKIE, token, max_age=900, secure=secure, httponly=True, samesite="lax", path="/")
 
     def policy_scope(grant: Grant) -> dict[str, Any]:
+        # Presentation and challenge hashing share this declaration, so the
+        # accepted actions, recipient, policy digests, and eligibility text cannot
+        # silently diverge from the values returned for human review.
         return {
             "grant_id": grant.grant_id, "grant_version": grant.grant_version,
             "resource_id": grant.resource_id, "generation": grant.generation,
@@ -345,6 +363,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
                 or not isinstance(code, str) or not 1 <= len(code) <= 4096
                 or any(ord(char) < 33 or ord(char) > 126 for char in code)):
             raise AccessDenied()
+        # Consume the browser-bound attempt before awaiting the token exchange.
+        # A duplicate callback cannot redeem the same local proof concurrently.
         attempt = pending_oauth.pop(state, None)
         if attempt is None or attempt.expires_at <= int(time.time()) or "error" in request.query_params:
             raise AccessDenied()
@@ -406,6 +426,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
             raise AccessDenied()
 
         def accept():
+            # Challenge consumption, scoped acceptance, and its retained context
+            # commit together. A rejected receipt leaves no partial acceptance.
             with service.database.transaction() as connection:
                 grant = service.access.get_grant(principal, grant_id=body["grant_id"], connection=connection)
                 expected = policy_scope(grant)
@@ -486,6 +508,9 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
             plan = current_plan(principal, request.path_params["plan_id"])
             if body["parameter_digest"] != plan.parameter_digest:
                 raise AccessDenied()
+            # Review recording is separate from challenge consumption. If its
+            # write fails, the UI must fetch a fresh challenge for the same plan;
+            # starting work still independently rechecks current authorization.
             interaction = sessions.consume(session, body["challenge"], kind="operation_review",
                                            object_id=plan.plan_id, document_digest=plan.parameter_digest)
             result = service.operations.record_human_review(principal.principal_id, plan.plan_id,
@@ -523,6 +548,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
         return _json(await run_in_threadpool(cancel))
 
     async def query(request: Request) -> Response:
+        # Reads use a CSRF-protected POST so selected identifiers and search text
+        # remain outside URLs and follow the same browser-origin boundary.
         principal, _, _ = await run_in_threadpool(identity, request, mutate=True)
         body = await _body(request)
         required = {"kind", "collection_id", "generation"}
@@ -593,6 +620,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
                 expected_size_bytes=int(length), checkpoint=check)
             return _json(result, status=201)
         finally:
+            # receive_stream waits for its synchronous receiver to unwind even
+            # after disconnect; only then may another request reuse this slot.
             upload_slots.release()
 
     async def download(request: Request) -> Response:
@@ -614,6 +643,8 @@ def create_portal(service: PreservationService, verifier: TokenVerifier | None =
         context = service.download(principal, resource, generation)
         stream, size = await run_in_threadpool(context.__enter__)
         try:
+            # Transfer the entered context to the response. Construction failure
+            # leaves ownership here; the response closes it after transmission.
             return VerifiedDownloadResponse(context, stream, size, check)
         except BaseException:
             await run_in_threadpool(context.__exit__, None, None, None)

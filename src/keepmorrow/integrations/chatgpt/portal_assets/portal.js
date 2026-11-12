@@ -4,10 +4,14 @@
 // Preserved text enters the DOM only through textContent. Browser sessions stay
 // in HttpOnly cookies; neither tokens nor selected file bytes enter localStorage.
 const byId = (id) => document.getElementById(id);
+// Versions fence delayed responses after selection or session changes. They
+// protect presentation consistency; server-side grants remain authoritative.
 const state = { session: null, config: null, resources: [], collections: [], consent: null,
   upload: null, plan: null, selected: new Set(), browseOffset: 0, operationCursor: null,
   workspaceVersion: 0, queryVersion: 0, consentVersion: 0, planVersion: 0, uploadVersion: 0 };
 const pendingControls = new WeakSet();
+// Submit only the reviewed declaration fields. Additional display metadata from
+// a newer server must not silently become an accepted processing instruction.
 const CONSENT_FIELDS = ["grant_id", "grant_version", "resource_id", "generation", "actions", "policies", "challenge",
   "purpose", "recipient", "eligibility_version", "eligibility_statement"];
 const CONSENT_CHECKS = ["accepted_terms", "acknowledged_privacy", "authorized_scope", "eligible_content"];
@@ -25,6 +29,8 @@ function show(message, error = false) {
 async function api(path, { method = "GET", body, headers = {} } = {}) {
   const options = { method, credentials: "same-origin", headers: { ...headers } };
   if (method !== "GET") options.headers["X-CSRF-Token"] = state.session?.csrf || "";
+  // Pass the browser-owned File directly; do not copy binary content into JSON,
+  // text, or browser storage. The server enforces the actual transfer limits.
   if (body instanceof File) options.body = body;
   else if (body !== undefined) {
     options.headers["Content-Type"] = "application/json";
@@ -73,6 +79,8 @@ function button(text, action, className = "secondary") {
 }
 
 async function run(action, control) {
+  // One pending action per control prevents duplicate submission without
+  // blocking unrelated status, cancellation, or scope-review controls.
   if (control && pendingControls.has(control)) return;
   const buttons = control?.tagName === "FORM" ? [...control.querySelectorAll('button[type="submit"], button:not([type])')]
     : control ? [control] : [];
@@ -278,6 +286,8 @@ async function openPlan(planId) {
   const version = ++state.planVersion;
   const prepared = await api(`/api/plans/${encodeURIComponent(planId)}`);
   if (version !== state.planVersion) throw new StaleSelection();
+  // Loading a prepared plan always requires a fresh visible approval. A prior
+  // selection or a model-created plan cannot preselect the user's decision.
   state.plan = { ...prepared, reviewed: false, reviewUncertain: false, reviewExpiresAt: 0,
     startRequested: false, idempotencyKey: null };
   byId("plan-id").value = state.plan.plan.plan_id;
@@ -423,6 +433,9 @@ bind("start-plan", "click", async () => {
   const review = state.plan;
   const plan = review.plan;
   const keyName = `keepmorrow-start-${plan.plan_id}`;
+  // Only the plan's retry identity is retained for this browser tab. Reusing it
+  // after a lost response lets the server resolve the original start instead of
+  // treating transport uncertainty as permission for another operation.
   if (!review.idempotencyKey) {
     try { review.idempotencyKey = sessionStorage.getItem(keyName); } catch { /* Storage can be unavailable in a private browser context. */ }
     if (!review.idempotencyKey) review.idempotencyKey = crypto.randomUUID();
@@ -456,6 +469,8 @@ bind("start-plan", "click", async () => {
     }
   }
   if (state.plan !== review || !byId("approve-plan").checked) throw new StaleSelection();
+  // Record intent before awaiting the network: a lost response cannot establish
+  // that execution never began, so later decline must direct the user to status.
   review.startRequested = true;
   syncApprovalControls();
   await api("/api/operations/start", { method: "POST", body: { plan_id: plan.plan_id, idempotency_key: review.idempotencyKey } });

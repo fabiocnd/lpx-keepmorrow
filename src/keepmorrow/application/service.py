@@ -44,10 +44,12 @@ ARCHIVE_LIMITS = Limits(max_total_bytes=512 * 1024**2, max_file_bytes=512 * 1024
 
 
 def workspace_id(principal: Principal) -> str:
+    """Derive a principal's virtual intake scope, never a filesystem location."""
     return "workspace_" + principal.principal_id.removeprefix("principal_")
 
 
 def manifest_digest(path: Path) -> str:
+    """Hash bounded manifest bytes without asserting payload integrity."""
     with open_regular(path / "manifest.json") as source:
         data = source.read(ARCHIVE_LIMITS.max_manifest_bytes + 1)
     if len(data) > ARCHIVE_LIMITS.max_manifest_bytes:
@@ -56,6 +58,7 @@ def manifest_digest(path: Path) -> str:
 
 
 def _file_digest(path: Path, maximum: int) -> tuple[str, int]:
+    """Stream a digest with byte limits and descriptor-metadata consistency checks."""
     digest, size = hashlib.sha256(), 0
     with open_regular(path) as source:
         before = os.fstat(source.fileno())
@@ -72,17 +75,18 @@ def _file_digest(path: Path, maximum: int) -> tuple[str, int]:
 
 
 def _coverage(collection: LoadedCollection) -> tuple[str, ...]:
+    """Summarize known interpretation gaps independently of byte verification."""
     gaps: set[str] = set()
     if collection.document["scope"] != "supplied_exports":
         gaps.add("selection_omissions")
+    # Source evidence and explicit decisions establish associations. A missing
+    # relationship must not become a confirmed project or standalone claim.
     if any(item["state"] == "association_unknown" for item in effective_associations(collection.document).values()):
         gaps.add("association_unknown")
     for capture in collection.document["captures"]:
         if capture["status"] != "complete":
             gaps.add("unsupported_records")
     for conversation in collection.document["conversations"]:
-        # Association is summarized from explicit source evidence or decisions;
-        # an unresolved relationship is never promoted to a confirmed project.
         for revision in conversation["revisions"]:
             for occurrence in revision["occurrences"]:
                 if any(item["status"] != "stored" for item in occurrence["artifacts"]):
@@ -96,6 +100,9 @@ class PreservationService:
     Paths originate only from configuration or server-generated output IDs.
     Source account labels remain provenance; they never determine ownership.
     Content admission and result delivery both recheck the exact grant.
+
+    Collection reads, worker execution, and package downloads share one slot.
+    Upload staging has its own bounded reservations and streaming lifecycle.
     """
 
     def __init__(self, configuration: ServiceConfiguration) -> None:
@@ -141,10 +148,12 @@ class PreservationService:
             raise AccessDenied() from None
 
     def start_worker(self) -> None:
+        """Acquire worker ownership, reconcile restart state, then run maintenance."""
         self.worker.start()
         self.maintenance()
 
     def stop_worker(self) -> bool:
+        """Request cancellation and shutdown; False retains live worker ownership."""
         return self.worker.shutdown(timeout_seconds=5, cancel_active=True)
 
     def _startup(self) -> None:
@@ -154,6 +163,11 @@ class PreservationService:
         self.uploads.recover_interrupted()
 
     def maintenance(self) -> dict[str, int]:
+        """Remove eligible temporary transfers while retaining collection history.
+
+        Package cleanup is skipped when the content slot is occupied. A later
+        invocation must retry it; this method is not a long-term metadata purge.
+        """
         removed_uploads = self.uploads.cleanup_expired()
         removed_packages = 0
         if self._io.acquire(blocking=False):
@@ -176,6 +190,7 @@ class PreservationService:
         return {"removed_uploads": removed_uploads, "removed_packages": removed_packages}
 
     def consent_options(self, principal: Principal, *, offset: int = 0) -> dict[str, Any]:
+        """Describe owned metadata and available scopes before content inspection."""
         items = self.resources.list_owned(principal, offset=offset)
         for item in items:
             item["actions"] = sorted({"download"} if item["kind"] == "package" else COLLECTION_ACTIONS)
@@ -194,6 +209,11 @@ class PreservationService:
     def prepare_consent(
         self, principal: Principal, *, resource_id: str, generation: str, actions: list[str],
     ) -> Grant:
+        """Create an eligible administrative grant for a separate human decision.
+
+        This call records no acceptance and opens no collection content. The
+        authenticated portal must present and confirm the exact proposed scope.
+        """
         self._require_metadata_capacity()
         if resource_id == workspace_id(principal) and generation == "workspace_v1":
             allowed = WORKSPACE_ACTIONS
@@ -250,6 +270,11 @@ class PreservationService:
     def list_collections(
         self, principal: Principal, *, after_grant_id: str | None = None, limit: int = 20,
     ) -> dict[str, Any]:
+        """List currently browsable generations without reading their payloads.
+
+        Pagination follows accepted grant IDs. Lineage filtering may produce a
+        short or empty page even when a continuation cursor remains available.
+        """
         grants = self.access.list_grants(principal, action="browse", after_grant_id=after_grant_id, limit=limit)
         items = []
         for grant in grants:
@@ -268,6 +293,13 @@ class PreservationService:
         self, principal: Principal, collection_id: str, generation: str, action: str,
         execute: Callable[[LoadedCollection], dict[str, Any]],
     ) -> dict[str, Any]:
+        """Verify one exact generation and invoke a trusted read callback.
+
+        Content-slot acquisition is nonblocking after the initial access checks.
+        The original grant and all required ancestors are checked again before the
+        computed result is returned. Revocation observed by those checks prevents
+        result delivery.
+        """
         decision = self._require(principal, collection_id, generation, action)
         resource = self.resources.resolve(principal, collection_id, generation)
         self._require_origin(principal, collection_id)
@@ -287,6 +319,13 @@ class PreservationService:
         self, principal: Principal, source: BinaryIO, *, display_name: str,
         expected_size_bytes: int | None = None,
     ) -> dict[str, Any]:
+        """Stage an authorized bounded stream and return its opaque upload receipt.
+
+        UploadStore owns reservation, hashing, and interrupted-write cleanup.
+        Scope is rechecked at checkpoints and before receipt delivery. A final
+        authorization failure attempts to discard the newly staged upload;
+        cleanup failures propagate and may require maintenance.
+        """
         decision = self._require(principal, workspace_id(principal), "workspace_v1", "upload")
         next_check = 0.0
 
@@ -314,6 +353,11 @@ class PreservationService:
     def prepare(
         self, principal: Principal, *, resource_id: str, generation: str, parameters: OperationParameters,
     ) -> OperationPlan:
+        """Bind typed intent to current scope without starting content execution.
+
+        Upload handles must already identify this principal's staged bytes.
+        A prepared plan still requires separate human review before admission.
+        """
         self._require_metadata_capacity()
         action = {ImportParameters: "import", RecoveryParameters: "recover", AssociationParameters: "associate",
                   PackageParameters: "package", UnpackParameters: "unpack"}.get(type(parameters))
@@ -371,6 +415,7 @@ class PreservationService:
             self._require(principal, workspace_id(principal), "workspace_v1", "import", connection=connection)
 
     def start(self, principal: Principal, plan_id: str, idempotency_key: str) -> dict[str, Any]:
+        """Admit reviewed intent once per principal/key and wake the bounded worker."""
         snapshot = self.operations.start(principal.principal_id, plan_id,
                                          idempotency_key=idempotency_key, authorize=self._authorize, admit=self._admit)
         self.worker.notify()
@@ -388,6 +433,11 @@ class PreservationService:
             raise OperationBusy("The configured managed-storage budget is exhausted.")
 
     def status(self, principal: Principal, operation_id: str) -> dict[str, Any]:
+        """Return owned job metadata, withholding output when scope is unavailable.
+
+        Terminal publication status can precede executor cleanup and reservation
+        release. This response does not establish immediate content-slot capacity.
+        """
         snapshot = self.operations.get(principal.principal_id, operation_id)
         result = snapshot.as_dict()
         try:
@@ -409,6 +459,7 @@ class PreservationService:
                               sum(item.size_bytes for item in collection.manifest.files), _coverage(collection))
 
     def _package_result(self, path: Path) -> VerifiedResult:
+        """Validate wrapper, ZIP bytes, and enclosed collection using owned scratch."""
         if {item.name for item in path.iterdir()} != {"manifest.json", "package.zip"}:
             raise ArchiveError("The delivery directory has unexpected entries.")
         with open_regular(path / "manifest.json") as source:
@@ -421,8 +472,8 @@ class PreservationService:
         digest, size = _file_digest(path / "package.zip", 1024**3)
         if digest != receipt["package"]["sha256"] or size != receipt["package"]["size_bytes"]:
             raise ArchiveError("The delivery artifact does not match its receipt.")
-        # A ZIP digest alone cannot prove the enclosed collection contract.
-        # Re-open and validate the unchanged package before reconciling a crash.
+        # A matching outer ZIP digest does not establish the enclosed collection
+        # contract. Extraction and independent validation are required as well.
         with tempfile.TemporaryDirectory(prefix="verify-package-", dir=temporary_parent(self.root / "scratch")) as folder:
             verified = unpack_collection(path / "package.zip", Path(folder) / "collection", archive_limits=ARCHIVE_LIMITS)
             gaps = _coverage(load_collection(Path(folder) / "collection", limits=ARCHIVE_LIMITS))
@@ -535,6 +586,13 @@ class PreservationService:
 
     @contextmanager
     def download(self, principal: Principal, resource_id: str, generation: str) -> Iterator[tuple[BinaryIO, int]]:
+        """Yield a locally revalidated package while retaining the content slot.
+
+        The stream and slot remain owned until the context exits. Access is
+        checked before yielding; the transport must recheck session, scope,
+        ancestors, and package expiry before and after each bounded disk read,
+        before yielding the frame.
+        """
         decision = self._require(principal, resource_id, generation, "download")
         resource = self.resources.resolve(principal, resource_id, generation)
         self._require_origin(principal, resource_id)

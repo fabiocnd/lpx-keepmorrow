@@ -90,8 +90,9 @@ def _file_link(links: dict[str, str], path: object, *, label: object | None = No
     url = links.get(path) if isinstance(path, str) else None
     if url is None:
         return f'<span>{text}</span> <span class="meta">(no matching supplied file)</span>'
-    # Download links keep HTML, SVG, and other active source formats out of this
-    # passive page. No source file is embedded, previewed, or evaluated here.
+    # Request a download for active source formats instead of embedding them in
+    # this passive view. Handling the downloaded file belongs to the browser;
+    # no source file is previewed or evaluated by this renderer.
     filename = str(path).rsplit("/", 1)[-1]
     return f'<a href="{_escaped(url)}" download="{_escaped(filename)}">{text}</a>'
 
@@ -264,6 +265,8 @@ def render_collection(document: dict[str, Any]) -> bytes:
         else:
             links_by_capture_id[capture_id] = links
     for capture_id in ambiguous_ids:
+        # A repeated capture identity cannot establish which occurrence owns a
+        # link. Suppress that mapping instead of choosing an arbitrary winner.
         links_by_capture_id.pop(capture_id, None)
     selected = (document.get("scope") == "selected_conversations"
                 or "selection" in str(document.get("format", "")))

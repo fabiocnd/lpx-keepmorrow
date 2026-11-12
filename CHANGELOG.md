@@ -9,6 +9,20 @@
   authorization/review checks, selected binary recovery, and revocation checks.
 - A CI step that runs this isolated workflow and retains only sanitized JSON
   evidence, together with operating instructions and observed pilot results.
+- A [source comment review record](docs/engineering/source-comment-review.md)
+  covering authored files, interface preservation, local validation, regenerated
+  distribution hashes, and separately identified implementation follow-ups.
+
+### Changed
+
+- Reviewed US English comments and docstrings across preservation, access,
+  operations, integrations, tests, benchmarks, and build/deployment configuration.
+  Clarified ownership, resource bounds, authorization, cleanup, and evidence
+  boundaries without changing executable statements or configuration values.
+- Preserved exposed MCP descriptions and regenerated the companion HTML through
+  its normal build after updating authored UI comments.
+- Removed the README's native-export comparison and scoring tables, rubric, and
+  weighted totals; retained a concise explanation of the preservation workflow.
 
 ### Fixed
 

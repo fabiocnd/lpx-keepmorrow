@@ -1,3 +1,5 @@
+// Produce the self-contained MCP resource and its identical wheel asset from
+// authored sources. Rebuild both outputs instead of editing generated copies.
 import { build } from "esbuild";
 import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -16,6 +18,8 @@ const result = await build({
   legalComments: "inline",
   metafile: true,
 });
+// A script-closing sequence inside bundled literals must not end the enclosing
+// HTML element. Function replacement also preserves literal dollar sequences.
 const javascript = result.outputFiles[0].text.replaceAll("</script", "<\\/script");
 const styles = await readFile(resolve(root, "src/styles.css"), "utf8");
 const template = await readFile(resolve(root, "src/index.html"), "utf8");

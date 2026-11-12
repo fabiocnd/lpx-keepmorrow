@@ -24,7 +24,12 @@ if TYPE_CHECKING:
 
 
 def _open_worker_lock(store: OperationStore) -> BinaryIO:
-    """Lock a stable owner-only sidecar; process death releases the OS lock."""
+    """Acquire a nonblocking OS lock on a stable local sidecar.
+
+    POSIX additionally requires owner-only permission bits. Windows uses its
+    byte-range lock; directory protection remains an operator responsibility.
+    Closing the stream or process exit releases the operating-system lock.
+    """
     path = store.database.path.with_name(store.database.path.name + ".operations.lock")
     descriptor: int | None = None
     stream: BinaryIO | None = None
@@ -63,7 +68,7 @@ def _open_worker_lock(store: OperationStore) -> BinaryIO:
 
 
 class WorkerSession:
-    """Hold the OS lock across every byte operation and its final publication.
+    """Retain process-exclusive worker ownership through execution and cleanup.
 
     There is no expiring lease: time alone must not admit a new worker while an
     old thread can still publish. A new epoch is allocated only after acquiring
@@ -84,6 +89,7 @@ class WorkerSession:
 
     @classmethod
     def acquire(cls, store: OperationStore) -> WorkerSession:
+        """Allocate a new journal epoch only after obtaining the live process lock."""
         stream = _open_worker_lock(store)
         token = uuid.uuid4().hex
         try:
@@ -130,6 +136,7 @@ class WorkerSession:
             self._claim_thread = None
 
     def close(self) -> None:
+        """Release an idle session; active executors must unwind before closure."""
         with self._guard:
             if self._closed:
                 return
@@ -157,6 +164,12 @@ class WorkerSession:
 
 @dataclass(frozen=True, slots=True)
 class OperationAttempt:
+    """An immutable handle usable only by its session's owning executor thread.
+
+    Store methods enforce token, epoch, state, and publication fences. Sharing
+    this object with another thread does not delegate execution authority.
+    """
+
     _store: OperationStore = field(repr=False)
     _session: WorkerSession = field(repr=False)
     operation_id: str
@@ -190,7 +203,7 @@ class OperationWorker:
     Status and cancellation use OperationStore directly and never wait for the
     worker slot. A shutdown timeout reports an active worker without releasing
     its lock or admitting replacement work. Exceptions are reduced to fixed
-    categories; their messages and tracebacks are never persisted or logged.
+    categories; this worker does not persist or log their messages or tracebacks.
     """
 
     def __init__(
@@ -222,7 +235,7 @@ class OperationWorker:
         self.last_error_code: str | None = None
 
     def start(self) -> None:
-        """Acquire exclusive ownership and reconcile before starting admission."""
+        """Acquire exclusive ownership and reconcile before starting execution."""
         with self._guard:
             if self._thread is not None:
                 raise OperationBusy("This worker has already been started.")
@@ -246,7 +259,12 @@ class OperationWorker:
         self._wake.set()
 
     def shutdown(self, *, timeout_seconds: float = 5, cancel_active: bool = False) -> bool:
-        """Stop new claims; return False if a live executor still owns resources."""
+        """Stop new claims and wait for cooperative worker exit.
+
+        False means the thread is still alive; ownership is not forcibly released.
+        The timeout bounds the join, not preceding cancellation or database work.
+        A cancellation request cannot roll back committed publication.
+        """
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 <= timeout_seconds <= 60 or type(cancel_active) is not bool):
             raise OperationError("The shutdown timeout or cancellation option is invalid.")
@@ -288,6 +306,8 @@ class OperationWorker:
                 except OperationCancelled:
                     self._record_failure(attempt, "cancelled")
                 except OperationCleanupRequired:
+                    # Completion may already be visible. Retain the byte charge
+                    # until startup recovery or operator review resolves cleanup.
                     retain_reservation = True
                     self.last_error_code = "workspace_cleanup_required"
                     self._record_failure(attempt, "cleanup_required")

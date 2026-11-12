@@ -1,3 +1,5 @@
+// Execute the authored portal script against controlled HTTP responses. These
+// synthetic form gestures validate UI behavior and are not human legal consent.
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -17,6 +19,8 @@ const settle = () => new Promise((resolve) => setImmediate(resolve));
 async function fixture() {
   const dom = new JSDOM(html, { url: "https://keepmorrow.example/portal", runScripts: "outside-only" });
   const { window } = dom;
+  // JSDOM does not implement browser scrolling or modal presentation. Stub only
+  // those surfaces; request sequencing and approval state use the actual script.
   window.HTMLElement.prototype.scrollIntoView = function () {};
   window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   window.HTMLDialogElement.prototype.close = function () { this.open = false; };

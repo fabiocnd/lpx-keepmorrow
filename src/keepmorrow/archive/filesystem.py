@@ -25,6 +25,8 @@ _RENAME_NOREPLACE = 1
 
 @dataclass(frozen=True, slots=True)
 class FileState:
+    """Observed file identity and metadata used to detect later source changes."""
+
     path: str
     size_bytes: int
     signature: tuple[int, int, int, int, int, int]
@@ -32,6 +34,8 @@ class FileState:
 
 @dataclass(frozen=True, slots=True)
 class Inventory:
+    """Canonical observed topology, including empty directories and file states."""
+
     directories: tuple[str, ...]
     files: tuple[FileState, ...]
 
@@ -41,7 +45,12 @@ def _signature(info: os.stat_result) -> tuple[int, int, int, int, int, int]:
 
 
 def safe_directory(path: Path) -> Path:
-    """Reject observed symlinks in the root and its existing ancestors."""
+    """Return an absolute directory path after checking each existing ancestor.
+
+    The checks reject observed links and non-directories. They do not pin the
+    ancestor chain against concurrent replacement; callers must control that
+    chain and keep it stable for the operation's lifetime.
+    """
     result = Path(os.path.abspath(path))
     for component in reversed((result, *result.parents)):
         info = component.lstat()
@@ -51,6 +60,11 @@ def safe_directory(path: Path) -> Path:
 
 
 def destination_path(path: Path, source: Path) -> Path:
+    """Require a new destination outside an already validated absolute source.
+
+    This admission check does not reserve the name. Publication must still use
+    a no-replace primitive to reject a destination created concurrently.
+    """
     result = Path(os.path.abspath(path))
     safe_directory(result.parent)
     if os.path.lexists(result):
@@ -61,11 +75,14 @@ def destination_path(path: Path, source: Path) -> Path:
 
 
 def publish_directory(stage: Path, destination: Path) -> None:
-    """Publish a staged tree without replacing a competing destination.
+    """Publish a staged file or directory without replacing a competing entry.
 
     Python's POSIX rename may replace an empty directory. Linux therefore uses
     RENAME_NOREPLACE; Windows already rejects an existing destination. Other
     platforms fail explicitly until an equivalent primitive has been verified.
+    The stage and destination must support a same-filesystem rename. The caller
+    owns failed-stage cleanup; this function neither copies across filesystems
+    nor flushes payload data for power-loss durability.
     """
     before_publication(stage, destination)
     if os.name == "nt":
@@ -90,10 +107,12 @@ def publish_directory(stage: Path, destination: Path) -> None:
 
 
 def scan_tree(root: Path, limits: Limits) -> Inventory:
-    """Inventory without following links; metadata memory is O(entry count).
+    """Inventory a stable ordinary tree without following observed entry links.
 
-    Entries are bounded while enumerating, before the final O(n log n) sort.
+    Metadata holds O(N) entries plus their path strings for N observed entries.
+    Entries are bounded while enumerating, before the final O(N log N) sort.
     Sorting a complete unbounded scandir result would defeat the entry limit.
+    File contents are not read; subsequent streaming establishes their hashes.
     """
     pending = [(root, "")]
     directories: list[str] = []
@@ -150,7 +169,12 @@ def scan_tree(root: Path, limits: Limits) -> Inventory:
 
 
 def open_regular(path: Path) -> BinaryIO:
-    """Open a regular file and refuse a leaf symlink on supported platforms."""
+    """Return a caller-owned binary stream for an observed regular file.
+
+    Refuse a leaf symlink at open time where O_NOFOLLOW is available, then
+    validate the opened descriptor. Ancestor stability remains the caller's
+    responsibility. The caller must close the returned stream.
+    """
     if not stat.S_ISREG(path.lstat().st_mode):
         raise ArchiveError("The input is not an ordinary file.")
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
@@ -165,7 +189,13 @@ def open_regular(path: Path) -> BinaryIO:
 
 
 def stream_file(root: Path, state: FileState, limits: Limits, output: BinaryIO | None = None) -> FileRecord:
-    """Hash and optionally copy a file with bounded memory and mutation checks."""
+    """Hash the observed file and optionally copy the same blocks to a sink.
+
+    Reading B payload bytes uses O(B) work and O(chunk_bytes) payload memory.
+    Descriptor metadata and the final byte count must match the inventory.
+    The optional caller-owned sink stays open and must consume complete writes;
+    it can contain partial output if reading, writing, or cancellation fails.
+    """
     digest = hashlib.sha256()
     count = 0
     with open_regular(root / state.path) as source:
@@ -185,6 +215,12 @@ def stream_file(root: Path, state: FileState, limits: Limits, output: BinaryIO |
 
 
 def copy_tree(source: Path, destination: Path, inventory: Inventory, limits: Limits) -> tuple[FileRecord, ...]:
+    """Copy into an existing empty stage, then recheck the complete source tree.
+
+    Files use exclusive creation and are hashed during copying. This helper
+    does not publish or remove the destination; its caller owns rollback after
+    any failure and independent verification before publication.
+    """
     for relative in inventory.directories:
         checkpoint()
         (destination / relative).mkdir()

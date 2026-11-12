@@ -1,4 +1,9 @@
-"""Exercise the real HTTP consent, review, upload, and delivery boundaries with synthetic data."""
+"""Exercise portal HTTP contracts through in-process ASGI clients.
+
+Inputs, gestures, and identity-provider responses are synthetic. Direct ASGI
+frames additionally expose disconnect and streaming boundaries without relying
+on a network socket or an authenticated external account.
+"""
 
 from contextlib import contextmanager
 from dataclasses import replace

@@ -7,6 +7,8 @@ const revision = "b".repeat(64);
 const conversation = "c".repeat(64);
 const title = scenario === "long" ? "A deliberately long preserved title ".repeat(12) : "A preserved design discussion";
 const hostile = '<img src=x onerror="window.sourceExecuted=true">';
+// Tests control deferred replies explicitly so concurrency scenarios do not
+// depend on a fast or slow browser. All records and errors are synthetic.
 const testState = {
   calls: [] as { name: string; arguments: Record<string, unknown> }[],
   links: [] as string[],

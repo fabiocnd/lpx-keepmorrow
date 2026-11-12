@@ -18,7 +18,7 @@ class OperationError(RuntimeError):
 
 
 class OperationBusy(OperationError):
-    """The bounded queue or the exclusive worker is already occupied."""
+    """The requested work cannot currently enter its resource or execution slot."""
 
 
 class OperationCancelled(OperationError):
@@ -42,6 +42,8 @@ OperationState: TypeAlias = Literal[
     "queued", "running", "verifying", "completed", "partial", "cancel_requested",
     "cancelled", "interrupted", "failed", "expired",
 ]
+# Terminal job state and executor ownership are independent. A finished
+# job can retain its reservation until workspace cleanup and callback return.
 TERMINAL_STATES = frozenset({"completed", "partial", "cancelled", "failed", "expired"})
 ACTIVE_STATES = frozenset({"running", "verifying", "cancel_requested"})
 PENDING_STATES = frozenset({"queued", "running", "verifying", "cancel_requested", "interrupted"})
@@ -127,6 +129,12 @@ class OperationLimits:
 
 @dataclass(frozen=True, slots=True)
 class AuthorizationScope:
+    """Bind active work to one generation, action, grant version, and receipt.
+
+    This value records the expected authorization fence. Its construction does
+    not establish current access; the service validates it in the transaction.
+    """
+
     resource_id: str
     generation: str
     grant_id: str
@@ -148,6 +156,12 @@ class AuthorizationScope:
 
 @dataclass(frozen=True, slots=True)
 class ImportParameters:
+    """Select staged bytes and optional prior-generation continuity.
+
+    The account namespace is source provenance, never authenticated ownership.
+    Input-handle ownership and digest equality are checked by the service.
+    """
+
     input_handle: str
     input_sha256: str
     account_namespace: str
@@ -163,6 +177,8 @@ class ImportParameters:
 
 @dataclass(frozen=True, slots=True)
 class RecoveryParameters:
+    """Select conversation identities or one project, with an optional exact revision."""
+
     conversation_keys: tuple[str, ...] = ()
     project_id: str | None = None
     revision_id: str | None = None
@@ -186,6 +202,8 @@ class RecoveryParameters:
 
 @dataclass(frozen=True, slots=True)
 class AssociationParameters:
+    """Describe a separate association decision without rewriting source evidence."""
+
     conversation_key: str
     state: str
     project_id: str | None
@@ -210,6 +228,8 @@ class PackageParameters:
 
 @dataclass(frozen=True, slots=True)
 class UnpackParameters:
+    """Bind package intake to an upload handle and digest for executor verification."""
+
     input_handle: str
     input_sha256: str
 
@@ -231,6 +251,7 @@ _PARAMETER_TYPES: dict[str, type[OperationParameters]] = {
 
 
 def parameter_document(parameters: OperationParameters) -> tuple[OperationKind, dict[str, Any]]:
+    """Encode exact supported parameter types with order-independent selections."""
     for kind, parameter_type in _PARAMETER_TYPES.items():
         if type(parameters) is parameter_type:
             result = {field.name: getattr(parameters, field.name) for field in fields(parameters)}
@@ -241,6 +262,7 @@ def parameter_document(parameters: OperationParameters) -> tuple[OperationKind, 
 
 
 def parse_parameters(kind: str, value: object) -> OperationParameters:
+    """Revalidate all stored parameter fields without inferring missing defaults."""
     parameter_type = _PARAMETER_TYPES.get(kind)
     if parameter_type is None or not isinstance(value, dict):
         raise OperationError("The stored operation parameter schema is unsupported.")
@@ -260,6 +282,11 @@ def parse_parameters(kind: str, value: object) -> OperationParameters:
 def canonical_document(
     principal_id: str, parameters: OperationParameters, scope: AuthorizationScope, reservation_bytes: int,
 ) -> bytes:
+    """Encode identity, intent, scope, and reservation as deterministic review bytes.
+
+    Plan IDs and timestamps are excluded so equivalent intent has the same
+    digest. Encoding alone neither grants access nor records human approval.
+    """
     require_opaque_id(principal_id)
     if not isinstance(scope, AuthorizationScope):
         raise OperationError("An explicit authorization scope is required.")
@@ -275,6 +302,8 @@ def canonical_document(
 
 @dataclass(frozen=True, slots=True)
 class OperationPlan:
+    """Immutable prepared intent; review and admission are separate state changes."""
+
     plan_id: str
     principal_id: str
     kind: OperationKind
@@ -297,6 +326,8 @@ class OperationPlan:
 
 @dataclass(frozen=True, slots=True)
 class HumanReview:
+    """Metadata for a trusted gesture bound to one exact plan digest."""
+
     review_id: str
     plan_id: str
     principal_id: str
@@ -308,6 +339,12 @@ class HumanReview:
 
 @dataclass(frozen=True, slots=True)
 class VerifiedResult:
+    """Report independent local output validation and any known coverage gaps.
+
+    Construction validates metadata shape only. The executor must verify actual
+    bytes first; this value is not evidence of remote delivery or account coverage.
+    """
+
     manifest_sha256: str
     file_count: int
     total_bytes: int
@@ -337,6 +374,12 @@ class VerifiedResult:
 
 @dataclass(frozen=True, slots=True)
 class OperationSnapshot:
+    """Observe persisted job state without promising released executor capacity.
+
+    Service boundaries must recheck disclosure authorization before returning
+    output metadata. Terminal status does not imply that cleanup has finished.
+    """
+
     operation_id: str
     principal_id: str
     plan_id: str
@@ -369,12 +412,20 @@ class OperationSnapshot:
 
 @dataclass(frozen=True, slots=True)
 class CancellationReceipt:
+    """Distinguish immediate cancellation, cooperative intent, and a passed cutoff."""
+
     operation: OperationSnapshot
     disposition: Literal["cancelled", "requested", "publication_committed", "already_terminal"]
 
 
 @dataclass(frozen=True, slots=True)
 class PublicationPermit:
+    """Identify a committed decision for one attempt and exact output digest.
+
+    The owning executor still holds the worker session through publication and
+    cleanup. This record is not a transferable capability or read authorization.
+    """
+
     operation_id: str
     output_id: str
     attempt_number: int

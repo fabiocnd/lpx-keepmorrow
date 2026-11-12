@@ -1,4 +1,6 @@
 <!doctype html>
+<!-- This independently authenticated document owns human consent and plan review.
+     The MCP companion opens it through the host instead of embedding its forms. -->
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
@@ -86,6 +88,8 @@
       </section>
     </div>
   </main>
+  <!-- Keep every acceptance input unchecked in the source. JavaScript resets
+       the form for each displayed scope; the server verifies the exact receipt. -->
   <dialog id="consent-dialog" aria-labelledby="consent-title">
     <form id="consent-form"><p class="eyebrow">A deliberate choice</p><h2 id="consent-title">Review access and processing</h2><div id="consent-details"></div>
       <p><a href="/policies/terms" target="_blank" rel="noopener">Read the Terms of Use</a> · <a href="/policies/privacy" target="_blank" rel="noopener">Read the Privacy Notice</a></p>

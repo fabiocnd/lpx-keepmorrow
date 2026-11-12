@@ -60,6 +60,7 @@ def _json_digest(document: object) -> str:
 
 
 def _source_reference() -> dict[str, Any]:
+    """Identify the measured worktree bytes independently of Git cleanliness."""
     paths = sorted((REPOSITORY / "src/keepmorrow").rglob("*.py"))
     paths.append(Path(__file__).resolve())
     files = {path.relative_to(REPOSITORY).as_posix(): _hash_file(path) for path in paths}
@@ -215,6 +216,7 @@ def _write_corpus(root: Path, conversations: int, messages: int) -> tuple[Path, 
 
 
 def _measure(operation: Callable[[], Any]) -> tuple[Any, dict[str, float | int]]:
+    """Trace one call after garbage collection, without cooling filesystem caches."""
     gc.collect()
     tracemalloc.start()
     started = time.perf_counter()
@@ -274,6 +276,13 @@ def _write_wide_export(root: Path, width: int) -> Path:
 
 
 def run_benchmark(conversations: int, messages: int, repetitions: int) -> dict[str, Any]:
+    """Measure synthetic generation workflows and verify their recorded scope.
+
+    Every repetition uses new output paths within one temporary root. Full
+    archive verification is included where the application performs it; fixture
+    creation and supplemental byte checks remain outside the timed stages.
+    Reported timing ratios describe these observations, not asymptotic proof.
+    """
     source_before = _source_reference()
     sys.path.insert(0, str(REPOSITORY / "src"))
     # Import only after the source snapshot is recorded. A changed snapshot at

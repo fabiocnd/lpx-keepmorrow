@@ -1,3 +1,5 @@
+// Exercise the installed SDK's real protocol over an in-memory transport. This
+// proves compatibility with the synthetic bridge, not a live ChatGPT connection.
 import assert from "node:assert/strict";
 import test from "node:test";
 import { App } from "@modelcontextprotocol/ext-apps";

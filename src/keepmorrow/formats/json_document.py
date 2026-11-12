@@ -10,9 +10,10 @@ from ..control import checkpoint
 
 
 def check_json_budget(data: bytes, *, max_bytes: int, max_depth: int, max_tokens: int) -> None:
-    """Check byte, lexical-token, and container-depth ceilings in O(B) time.
+    """Check byte, lexical-token, and container-depth ceilings for B input bytes.
 
-    This constant-space pass bounds allocation-driving syntax before a JSON
+    This O(B) pass uses constant auxiliary scan state beyond the supplied byte
+    buffer. It bounds allocation-driving syntax before a JSON
     decoder materializes containers and values. Quoted braces, escaped quotes,
     and whitespace do not inflate structural depth or token counts. Tokens
     conservatively include separators and closing delimiters; a configured

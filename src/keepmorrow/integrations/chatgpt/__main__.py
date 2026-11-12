@@ -13,6 +13,12 @@ from .server import create_server
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Run the legacy loopback adapter with an operator-supplied registry.
+
+    Registry loading reads configuration only. Collection access remains gated
+    by each development tool invocation; this entry point establishes no remote
+    identity or authenticated service session.
+    """
     parser = argparse.ArgumentParser(
         prog="python -m keepmorrow.integrations.chatgpt",
         description="Run read-only development MCP tools on 127.0.0.1; authenticated deployment is separate.",

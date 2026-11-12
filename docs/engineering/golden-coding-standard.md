@@ -151,6 +151,13 @@ Review comments when behavior changes. Do not leave aspirational guarantees in
 comments when the implementation does not establish them. Explain an unusual
 optimization and its measured reason near the relevant code or linked decision.
 
+Some apparently descriptive text participates in executable or published
+contracts. Framework-consumed docstrings, lint/type directives, doctest examples,
+template build markers, and license notices require their own preservation
+checks. A comment-only review MUST preserve those contracts unless their change
+is explicitly intended and validated. Regenerate derived assets through the
+documented build; do not hand-edit generated output.
+
 ## 7. Tests must challenge behavior
 
 Tests MUST assert externally meaningful properties and failures, rather than

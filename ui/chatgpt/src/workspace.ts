@@ -8,6 +8,8 @@ import {
 } from "./contracts.ts";
 
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, content = "", className = ""): HTMLElementTagNameMap[K] {
+  // Imported titles and message bodies are plain text even when they contain
+  // markup or URLs. Creating a node never activates preserved source content.
   const node = document.createElement(tag);
   node.textContent = content;
   node.className = className;
@@ -32,6 +34,11 @@ const OPERATION_STATES = new Set([
   "cancelled", "interrupted", "failed", "expired",
 ]);
 
+/**
+ * Coordinate one view's bounded reads and operation controls through the host.
+ * Selection versions discard stale replies; they do not cancel server work.
+ * Human consent, plan review, and file transfer remain in the trusted portal.
+ */
 export class Workspace {
   private readonly client: ToolClient;
   private portal: string | null = null;
@@ -86,6 +93,8 @@ export class Workspace {
   }
 
   async ready(): Promise<void> {
+    // Establish available metadata without choosing a collection or reading
+    // its contents on the user's behalf.
     this.connected = true;
     this.controls();
     await this.run("access", async () => this.renderAccess(await this.call("access_status")));
@@ -141,6 +150,8 @@ export class Workspace {
   }
 
   private async run(group: string, task: () => Promise<void>): Promise<void> {
+    // Suppress duplicate work within a group without queuing browser requests.
+    // Operation controls remain usable while a content read occupies its group.
     if (!this.connected || this.requests.has(group)) return;
     this.requests.add(group);
     this.controls();
@@ -171,6 +182,8 @@ export class Workspace {
       const candidates = items(data.items, 50).map(collectionRef);
       const combined = append ? [...this.collections, ...candidates] : candidates;
       const unique = new Map(combined.map((item) => [item.collection_id + ":" + item.generation, item]));
+      // Cap the selector's retained references independently of server paging.
+      // The displayed count describes this view, not all account collections.
       this.collections = [...unique.values()].slice(0, 200);
       this.collectionCursor = data.next_grant_id === null || data.next_grant_id === undefined ? null : text(data.next_grant_id, 128);
       const selector = byId<HTMLSelectElement>("collection");

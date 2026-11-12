@@ -1,4 +1,8 @@
-"""Synthetic issuer tests for bounded, resource-specific access-token verification."""
+"""Verify resource-specific tokens using locally generated keys and fake clocks.
+
+Injected JWKS responses exercise cryptographic and cache boundaries without
+claiming successful registration or login against an external identity provider.
+"""
 
 import asyncio
 import base64

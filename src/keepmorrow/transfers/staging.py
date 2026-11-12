@@ -172,8 +172,11 @@ class UploadStore:
         """Stage exactly the bytes read, rejecting a mismatched declared length.
 
         The caller must authorize intake before invoking this method. The
-        supplied stream remains open. Exceptions remove only this attempt's
-        owned staging object; completed uploads and source data are untouched.
+        supplied stream remains open. Admission reserves capacity before any
+        payload write; the receipt is available only after length, lifetime,
+        and caller checkpoints pass. Failure cleanup targets this attempt's
+        owned object and retains ambiguous state rather than deleting unrelated
+        paths. Cleanup errors can propagate in place of the original failure.
         """
         _text(owner_id, "owner identifier", 512)
         _text(display_name, "display name", 512)
@@ -258,7 +261,11 @@ class UploadStore:
             raise
 
     def resolve(self, owner_id: str, upload_id: str) -> UploadRecord:
-        """Read available metadata; opening a payload additionally verifies bytes."""
+        """Return unexpired owned metadata without reading or pinning the payload.
+
+        A receipt is not a promise of later availability. Open the upload to
+        pin it against cleanup and verify its bytes before consumption.
+        """
         with self._connection() as connection:
             return self._record(self._available(connection, owner_id, upload_id))
 
@@ -271,6 +278,8 @@ class UploadStore:
         Expiry prevents new consumers. An active consumer retains its pin until
         it exits and must separately enforce live consent and stream expiry at
         its delivery boundary. Already transmitted bytes cannot be recalled.
+        The yielded stream starts at offset zero and is closed on context exit.
+        Caller work may fail the final mutation check even after consuming bytes.
         """
         with self._connection() as connection:
             record = self._record(self._available(connection, owner_id, upload_id))
@@ -311,7 +320,11 @@ class UploadStore:
     def borrow_path(
         self, owner_id: str, upload_id: str, *, checkpoint: Checkpoint | None = None,
     ) -> Iterator[Path]:
-        """Expose a verified, pinned path only to trusted local worker code."""
+        """Borrow a verified, pinned path for trusted local work within this scope.
+
+        Do not retain or disclose the path after context exit. This method does
+        not extend expiry or replace the consumer's ongoing authorization checks.
+        """
         with self.open_upload(owner_id, upload_id, checkpoint=checkpoint):
             yield self._objects / upload_id / _PAYLOAD_NAME
 
@@ -328,8 +341,8 @@ class UploadStore:
             if row is None or row["pins"] or (row["state"] == "receiving" and not include_receiving):
                 return False
             connection.execute("UPDATE uploads SET state = 'deleting' WHERE upload_id = ?", (upload_id,))
-            # Hold the short metadata transaction across deletion of at most
-            # two files. Concurrent maintenance cannot claim the same object,
+            # Keep the metadata transaction open while deleting at most two
+            # owned files. Concurrent maintenance cannot claim the same object,
             # and a consumer cannot pin it between lookup and removal.
             directory = self._objects / upload_id
             if os.path.lexists(directory):
@@ -352,7 +365,11 @@ class UploadStore:
         return True
 
     def discard(self, owner_id: str, upload_id: str) -> None:
-        """Remove one unpinned owned upload; foreign handles reveal no metadata."""
+        """Remove a ready, unexpired, unpinned upload belonging to the caller.
+
+        Foreign or expired handles reveal no metadata. Expired objects belong
+        to maintenance, and ownership ambiguity prevents destructive cleanup.
+        """
         with self._connection() as connection:
             row = self._available(connection, owner_id, upload_id)
             if row["pins"]:
@@ -361,7 +378,11 @@ class UploadStore:
         self._remove(upload_id)
 
     def cleanup_expired(self) -> int:
-        """Remove expired ready objects and retry owned pending deletions."""
+        """Remove expired ready objects and retry owned pending deletions.
+
+        Live pins and receiving uploads remain reserved. Return the number of
+        ledger objects removed; filesystem or ownership failures propagate.
+        """
         now = self._now()
         with self._connection() as connection:
             handles = [row[0] for row in connection.execute(

@@ -46,6 +46,12 @@ def _check_binding(source: BinaryIO, path: Path, initial: os.stat_result) -> Non
 
 
 def _budgets(package: PackageLimits, archive: Limits | None) -> tuple[Limits, Limits]:
+    """Keep payload and wrapper limits independent while enforcing both profiles.
+
+    The wrapper accounts for manifest.json and payload/ in addition to the
+    archive inventory. Encoded-container allowance does not increase the
+    permitted aggregate expanded size.
+    """
     original = archive or Limits()
     payload = replace(
         original, max_total_bytes=min(original.max_total_bytes, package.max_expanded_bytes),
@@ -163,6 +169,7 @@ class _BoundedOutput:
 
 
 def _zip_info(path: str, *, directory: bool, size_bytes: int = 0) -> zipfile.ZipInfo:
+    """Fix container metadata so source timestamps and host modes cannot vary it."""
     info = zipfile.ZipInfo(path + "/" if directory else path, date_time=(1980, 1, 1, 0, 0, 0))
     info.create_system = 3
     info.compress_type = zipfile.ZIP_STORED
@@ -194,6 +201,10 @@ def pack_collection(
     fixed metadata; no compression, wall clock, or model influences the bytes.
     Independently extract and validate the staged package before publication.
     ``before_publish`` is the caller's final journal/authorization fence.
+    These verification passes require temporary space for both the encoded ZIP
+    and its extraction. Byte buffers are bounded, but inventory and decoded
+    catalog metadata have separate memory costs. The caller supplies authority;
+    producing a local package does not establish delivery or recipient consent.
     """
     package = limits or PackageLimits()
     payload_limits, wrapper_limits = _budgets(package, archive_limits)
@@ -248,8 +259,11 @@ def unpack_collection(
 
     The guarded ZIP intake rejects traversal, links, collisions, unsupported
     features, CRC failures, and declared/actual expansion overflow. Its temporary
-    extraction is copied into a same-filesystem staging directory, preserving
-    the original manifest bytes. Publication occurs after source revalidation.
+    extraction is copied into a private stage, preserving original manifest
+    bytes. The default stage shares the destination filesystem; an execution
+    scope that overrides temporary storage must preserve that requirement.
+    Publication follows source revalidation and the caller's final fence.
+    The input package stays unchanged, and the destination must not exist.
     """
     package = limits or PackageLimits()
     payload_limits, wrapper_limits = _budgets(package, archive_limits)

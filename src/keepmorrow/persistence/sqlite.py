@@ -129,6 +129,8 @@ class SQLiteDatabase:
             connection.row_factory = sqlite3.Row
             connection.execute("PRAGMA foreign_keys = ON")
             connection.execute(f"PRAGMA busy_timeout = {self._busy_timeout_ms}")
+            # This setting governs SQLite commits. It does not synchronize
+            # separately published payload files or establish host durability.
             connection.execute("PRAGMA synchronous = FULL")
             # SQL is application-owned, but a tampered schema must not turn
             # ordinary data access into evaluation of unsafe schema expressions.
@@ -148,8 +150,9 @@ class SQLiteDatabase:
         """Commit on success, roll back on every exception, and always close.
 
         The caller must not commit, roll back, or keep the connection after this
-        context. With immediate=False this is a snapshot read transaction; such
-        a connection cannot authorize a durable publication decision.
+        context. With immediate=False, SQLite begins a deferred transaction and
+        establishes its snapshot on the first read. This mode is not an enforced
+        read-only connection and cannot authorize a durable publication decision.
         """
         if type(immediate) is not bool:
             raise PersistenceError("Invalid transaction mode.", code="invalid_database_configuration")

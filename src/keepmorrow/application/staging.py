@@ -66,7 +66,11 @@ class OperationWorkspaces:
         }, sort_keys=True, separators=(",", ":")).encode("ascii")
 
     def create(self, operation_id: str, output_id: str) -> Path:
-        """Create one private workspace after recording its journal binding."""
+        """Create one private workspace after recording its journal binding.
+
+        Metadata and directory creation are separate steps. An interrupted or
+        ambiguous setup retains evidence for startup recovery or operator review.
+        """
         require_opaque_id(operation_id)
         require_opaque_id(output_id)
         directory = self.scratch_root / output_id
@@ -124,7 +128,12 @@ class OperationWorkspaces:
 
     @contextmanager
     def workspace(self, operation_id: str, output_id: str) -> Iterator[Path]:
-        """Retain ownership through execution, verification, and handled cleanup."""
+        """Retain ownership through execution, verification, and handled cleanup.
+
+        Classified filesystem and ownership failures propagate as
+        OperationCleanupRequired, causing the worker to retain its reservation.
+        Metadata transaction errors propagate separately.
+        """
         directory = self.create(operation_id, output_id)
         try:
             yield directory

@@ -27,11 +27,16 @@ class RegistryError(ValueError):
 
 
 def valid_collection_id(value: object) -> bool:
+    """Accept the opaque registry-token grammar without resolving any path."""
     return isinstance(value, str) and _COLLECTION_ID.fullmatch(value) is not None
 
 
 def validate_registry(registry: Mapping[str, Path]) -> dict[str, Path]:
-    """Copy inert path grants without inspecting or resolving registered content."""
+    """Copy bounded configuration grants without inspecting collection content.
+
+    Absolute paths are configuration references, not proof of existing or valid
+    collections. File opening and integrity checks belong to accepted requests.
+    """
     if not isinstance(registry, Mapping) or len(registry) > MAX_COLLECTIONS:
         raise RegistryError("The registry must contain at most 128 collection grants.")
     result: dict[str, Path] = {}

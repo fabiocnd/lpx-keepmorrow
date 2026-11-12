@@ -46,6 +46,8 @@ class _UnsupportedRecord(ValueError):
 
 @dataclass(slots=True)
 class _Budget:
+    """Charge attempted interpretation work without refunding rejected records."""
+
     limits: ImportLimits
     conversations: int = 0
     nodes: int = 0
@@ -90,6 +92,11 @@ def _identifier(value: object, limits: ImportLimits) -> str:
 
 
 def _canonical_digest(value: Any) -> str:
+    """Hash source identity using compact JSON without a trailing newline.
+
+    This framing is part of parser version 1 and differs from persisted catalog
+    serialization. Reusing another serializer would change existing identities.
+    """
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True,
                          separators=(",", ":"), allow_nan=False).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
@@ -170,6 +177,11 @@ def _read_document(root: Path, record: FileRecord, limits: ImportLimits) -> byte
 
 def _artifact(value: dict[str, Any], node_id: str, location: str,
               kind: str, context: _Context) -> None:
+    """Bind only an explicit safe path to the caller's preserved-file inventory.
+
+    Names and URIs remain descriptive evidence. They never authorize network
+    retrieval, filesystem probing, or a guessed match to an available file.
+    """
     context.budget.charge("artifact_references", 1)
     source_reference = next((value[key] for key in ("asset_pointer", "url", "id")
                              if isinstance(value.get(key), str)), None)
@@ -285,6 +297,12 @@ def _message(node_id: str, value: object, context: _Context) -> tuple[str | None
 
 
 def _nodes(mapping: object, context: _Context) -> tuple[MessageNode, ...]:
+    """Validate the complete declared mapping before interpreting message bodies.
+
+    Identifier sorting establishes repeatable output order, not chronology.
+    Graph reconciliation uses O(V + E) work for V nodes and E declared edges;
+    canonical sorting adds O(V log V) comparisons before that reconciliation.
+    """
     if not isinstance(mapping, dict):
         raise _UnsupportedRecord("unsupported_mapping", "The conversation has no supported message mapping.")
     context.budget.charge("nodes", len(mapping))
@@ -378,6 +396,8 @@ def _conversation(value: object, source_path: str, record_index: int,
         if current_node_id not in value["mapping"]:
             raise _UnsupportedRecord("missing_current_node", "The current node is absent from the supplied graph.")
     project_id = value.get("project_id")
+    # An omitted or null project field carries no affirmative evidence that a
+    # conversation was standalone. Preserve that uncertainty in the derivative.
     association_state, evidence = "association_unknown", "insufficient_source_metadata"
     if project_id is not None:
         try:
@@ -406,7 +426,11 @@ def parse_chatgpt_export(
     capture_id: str,
     limits: ImportLimits | None = None,
 ) -> ParsedCapture:
-    """Interpret verified source files without changing or fetching any content.
+    """Interpret preserved source files without changing or fetching any content.
+
+    The caller supplies the verified file inventory. Candidate conversation
+    documents are reread and checked against their recorded byte identities;
+    artifact bindings use that inventory rather than reopening every binary.
 
     Recognize conversations.json and numbered variants sharing one directory.
     A wrapper directory is supported; multiple candidate roots are ambiguous.
@@ -514,7 +538,8 @@ def parse_chatgpt_export(
             accepted += 1
         documents.append(SourceDocument(candidate.path, candidate.sha256, candidate.size_bytes,
                                         "parsed", len(document), accepted, rejected))
-        # Release each decoded source tree before reading the next numbered file.
+        # Release the document container before reading the next numbered file.
+        # The final record can remain referenced until reassignment or return.
         del document
     status = "partial" if issues else "complete"
     if documents and all(document.status == "unsupported" for document in documents):

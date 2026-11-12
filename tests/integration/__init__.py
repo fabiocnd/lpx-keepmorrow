@@ -1,1 +1,1 @@
-"""Local preservation and recovery journey tests."""
+"""Integrated storage, access, worker, transfer, and optional MCP contracts."""

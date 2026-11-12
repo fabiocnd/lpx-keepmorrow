@@ -96,7 +96,7 @@ async def receive_stream(
         return await asyncio.shield(worker)
     except BaseException:
         source.aborted.set()
-        # Cancelling a to_thread future does not stop its thread. Keep the task
+        # Canceling a to_thread future does not stop its thread. Keep the task
         # live and await its cleanup so its reservation cannot be reused early.
         while not worker.done():
             try:
@@ -111,7 +111,13 @@ async def receive_stream(
 
 
 class VerifiedDownloadResponse(StreamingResponse):
-    """Close an entered download context even if response startup is cancelled."""
+    """Stream an already-entered download context and always release its owner.
+
+    Recheck authorization around each bounded disk read. A failed checkpoint
+    ends transmission without appending exception details to the ZIP body;
+    callers may receive an incomplete response and must verify delivered bytes.
+    Closing also runs when response startup is canceled.
+    """
 
     def __init__(
         self,

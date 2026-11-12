@@ -39,6 +39,11 @@ class ResourceRegistry:
         self, principal_id: str, *, output_id: str, generation: str, kind: str,
         operation_id: str, expires_at: int | None, stored_bytes: int,
     ) -> Resource:
+        """Record a previously verified output, allowing only exact replay.
+
+        Verification and filesystem publication belong to the caller. Reusing
+        an output ID with changed ownership, provenance, size, or expiry fails.
+        """
         resource = Resource(output_id, generation, principal_id, self.output_root / output_id, kind)
         validate_token(operation_id)
         if type(stored_bytes) is not int or not 0 <= stored_bytes <= 2**63 - 1:
@@ -58,6 +63,11 @@ class ResourceRegistry:
         return resource
 
     def resolve(self, principal: Principal, resource_id: str, generation: str) -> Resource:
+        """Resolve exact ownership and generation without inspecting content.
+
+        Managed package expiry is enforced here. Processing still requires a
+        current consent decision and independent validation of stored bytes.
+        """
         validate_token(resource_id)
         configured = self._configured.get(resource_id)
         if configured is not None:
@@ -74,6 +84,11 @@ class ResourceRegistry:
         return Resource(resource_id, generation, principal.principal_id, self.output_root / resource_id, row["kind"])
 
     def list_owned(self, principal: Principal, *, offset: int = 0, limit: int = 50) -> list[dict[str, object]]:
+        """List consent candidates, with configured entries before managed outputs.
+
+        Each group is ordered by resource ID. Offset pagination is not a frozen
+        snapshot across requests, and ownership alone does not permit content I/O.
+        """
         if type(offset) is not int or not 0 <= offset <= 100_000 or type(limit) is not int or not 1 <= limit <= 50:
             raise AccessDenied()
         # At most 256 configured entries are admitted. SQL applies the managed
@@ -100,6 +115,7 @@ class ResourceRegistry:
         return result
 
     def origin_operation(self, resource_id: str, connection: sqlite3.Connection | None = None) -> str | None:
+        """Look up internal lineage; the caller must authorize the returned job."""
         if connection is not None:
             self.database.validate_connection(connection)
         with (nullcontext(connection) if connection is not None else self.database.transaction(immediate=False)) as current:
@@ -107,10 +123,12 @@ class ResourceRegistry:
         return row["operation_id"] if row else None
 
     def stored_bytes(self, connection: sqlite3.Connection) -> int:
+        """Sum managed-output charges, excluding configured sources and uploads."""
         self.database.validate_connection(connection)
         return connection.execute("SELECT COALESCE(SUM(stored_bytes), 0) FROM km_resources").fetchone()[0]
 
     def expired_packages(self, *, limit: int = 20) -> list[dict[str, object]]:
+        """Return internal cleanup candidates whose byte charge remains retained."""
         with self.database.transaction(immediate=False) as connection:
             rows = connection.execute(
                 "SELECT resource_id, generation FROM km_resources WHERE kind = 'package' "
@@ -119,6 +137,11 @@ class ResourceRegistry:
         return [dict(row) for row in rows]
 
     def mark_removed(self, resource_id: str, generation: str) -> None:
+        """Clear a removed expired package's byte charge while retaining lineage.
+
+        The caller must first establish filesystem removal. This metadata update
+        neither deletes bytes nor erases the resource or its operation history.
+        """
         with self.database.transaction() as connection:
             connection.execute("UPDATE km_resources SET stored_bytes = 0 WHERE resource_id = ? AND generation = ? "
                                "AND kind = 'package' AND expires_at <= ?", (resource_id, generation, int(time.time())))

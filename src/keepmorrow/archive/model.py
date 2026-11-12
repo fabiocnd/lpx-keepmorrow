@@ -46,6 +46,8 @@ class Limits:
 
 @dataclass(frozen=True, slots=True)
 class FileRecord:
+    """Declared byte identity for one payload path; validate before trusting it."""
+
     path: str
     size_bytes: int
     sha256: str
@@ -56,10 +58,17 @@ class FileRecord:
 
 @dataclass(frozen=True, slots=True)
 class Manifest:
+    """Archive inventory whose ordering and path contract are checked explicitly."""
+
     directories: tuple[str, ...]
     files: tuple[FileRecord, ...]
 
     def to_bytes(self) -> bytes:
+        """Serialize the current inventory without reordering its entry sequences.
+
+        Writers establish canonical path order before calling this method.
+        Serialization alone does not validate paths, limits, or file contents.
+        """
         document = {
             "format": FORMAT,
             "version": VERSION,
@@ -79,6 +88,8 @@ class VerificationIssue:
 
 @dataclass(frozen=True, slots=True)
 class VerificationReport:
+    """Local comparison findings; counts describe the declared file inventory."""
+
     file_count: int
     total_bytes: int
     issues: tuple[VerificationIssue, ...]
@@ -130,7 +141,13 @@ def validate_relative_path(value: object) -> str:
 
 
 def validate_inventory(directories: list[str], records: list[FileRecord], limits: Limits) -> None:
-    """Validate path topology and resource bounds in O(n) additional space."""
+    """Reject unsafe topology, duplicate identities, and excessive declared sizes.
+
+    Hash-based indexes use O(N + P) additional memory for N entries and P total
+    path characters. Path validation and hashing also process those characters.
+    No filesystem contents are read, and entry ordering is checked separately
+    by the manifest parser.
+    """
     paths = directories + [record.path for record in records]
     if len(paths) > limits.max_entries:
         raise ArchiveError("The archive exceeds the configured entry limit.")

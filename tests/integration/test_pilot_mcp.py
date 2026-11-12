@@ -1,4 +1,9 @@
-"""Authenticated HTTP protocol tests with explicitly synthetic credentials."""
+"""Exercise MCP authorization through an in-process ASGI transport.
+
+Fixed synthetic bearer tokens isolate SDK middleware and resource permissions.
+Cryptographic verification is tested separately; no live OAuth issuer or actual
+ChatGPT account participates in these protocol sessions.
+"""
 
 from __future__ import annotations
 

@@ -1,3 +1,5 @@
+// Run the built resource in Chromium through the official synthetic SDK host.
+// Browser and visual evidence here excludes live OAuth and account installation.
 import { test, expect } from "@playwright/test";
 
 async function connect(page, suffix = "") {
