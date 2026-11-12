@@ -1,7 +1,7 @@
 # LPX Keepmorrow Terms of Use
 
 **DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
-**Terms version:** `2026-11-12-draft.3`
+**Terms version:** `2026-11-12-draft.4`
 **Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
@@ -186,11 +186,14 @@ or silence is not that confirmation.
 
 ## 9. Software Ownership and Free Use
 
-LPX Keepmorrow is intended to be free to use. Its source code is proprietary.
-Use of a lawfully supplied release is subject to its accompanying license and
-these reviewed terms when effective. Free use does not grant ownership of the
-software, permission to redistribute private source code, or permission to use
-the Company's or developer's names as an endorsement.
+Project-owned source and documentation in this revision are licensed under the
+accompanying Apache License 2.0. That license governs the software rights it
+grants. These draft processing terms do not add restrictions to, replace, or
+condition those rights. Earlier private records and user-supplied content are
+not relicensed. The maintained product's free, nonmonetized direction does not
+restrict downstream commercial uses permitted by the source license. Source
+licensing does not authorize account access or processing of personal data,
+approve a hosted-service launch, or grant endorsement or trademark rights.
 
 The Company may describe documented operating limits. No indefinite hosting,
 storage, maintenance, or support commitment is created by the free product

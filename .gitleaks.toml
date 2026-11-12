@@ -1,0 +1,14 @@
+title = "LPX Keepmorrow source-release secret scan"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Reviewed historical source SHA-256, not a credential; preserve the measured benchmark unchanged."
+condition = "AND"
+paths = ['''(^|/)benchmarks/results/2026-11-12-private-service-reference\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"src/keepmorrow/integrations/chatgpt/authentication\.py":\s*"b21d1cc8553f74fcd72cf18567cf8232d2971b293cbb7a8797c8f4cbfdd61266",?\s*$''']

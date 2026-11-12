@@ -17,9 +17,10 @@ that requires the intended deployment host, identity provider, ChatGPT account,
 or a user-authorized representative export. Passing synthetic tests is not a
 substitute for those observations.
 
-An open-source transition is planned. The release license has not yet been
-selected or adopted, and the current source license remains in effect. Source
-publication is a separate decision from deploying or connecting the service.
+At the time of the historical runs below, source-license adoption was pending.
+The subsequent source-release preparation adopts Apache-2.0 for the new revision.
+That decision does not rewrite the original source hashes, policy versions,
+counts, or artifacts measured here. Revalidate the exact publication candidate.
 
 The [source comment review](source-comment-review.md) records the subsequent
 comment/docstring validation. The later

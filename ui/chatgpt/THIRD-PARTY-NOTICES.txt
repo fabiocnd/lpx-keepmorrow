@@ -1,6 +1,6 @@
 LPX Keepmorrow ChatGPT Interface — Third-Party Notices
 
-Project source: proprietary, Copyright 2026 Lopix Neural Inc. All rights reserved.
+Project source: Apache-2.0, Copyright 2026 Lopix Neural Inc.
 The generated interface includes the following separately licensed packages.
 
 ========================================================================
