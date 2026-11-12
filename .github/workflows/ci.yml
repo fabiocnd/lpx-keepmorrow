@@ -73,7 +73,7 @@ jobs:
       - name: Retain sanitized HTTP pilot evidence
         # Never upload the initialized instance, operator key, or state stores.
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: keepmorrow-synthetic-http-evidence
           path: ${{ runner.temp }}/keepmorrow-http-smoke.json
@@ -86,7 +86,7 @@ jobs:
       - name: Build the distributable wheel
         run: python -m pip wheel --no-deps . --wheel-dir dist
       - name: Retain the source build
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lpx-keepmorrow-wheel
           path: dist/*.whl
@@ -125,7 +125,7 @@ jobs:
         run: npm run test:browser
       - name: Retain browser evidence
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: keepmorrow-synthetic-browser-evidence
           path: ui/chatgpt/test-results/
@@ -148,7 +148,7 @@ jobs:
         run: |
           python scripts/export_public_source.py "$RUNNER_TEMP/LPX-Keepmorrow-Source.zip"
           git rev-parse HEAD > "$RUNNER_TEMP/source-revision.txt"
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: keepmorrow-reviewed-source
           path: |
