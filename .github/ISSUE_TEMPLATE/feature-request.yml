@@ -1,0 +1,16 @@
+name: Feature request
+description: Describe a concrete need, scope, and acceptance criteria.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and proposed behavior
+      description: Explain the use case without including private user content.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria, alternatives, and data-handling impact
+    validations:
+      required: true
