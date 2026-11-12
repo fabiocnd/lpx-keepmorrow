@@ -8,6 +8,7 @@
 - [x] Define engineering, performance, and AI standards.
 - [x] Verify private GitHub repository creation and the remote source commit.
 - [x] Complete reference-core and consent-boundary validation (42 local tests passed).
+- [x] Verify the Linux and Windows CI matrix with Python 3.11 and 3.14.
 - [x] Record initial benchmark methodology and measured results.
 - [ ] Obtain qualified legal review before public use of the draft terms.
 

@@ -1,7 +1,7 @@
 # Foundation Verification Record
 
 **Date:** 2026-11-12  
-**Status:** Private source upload verified; Windows portability correction awaiting CI verification
+**Status:** Private source upload, local validation, and configured CI matrix verified
 
 **Environment:** Linux x86_64, Python 3.12.14
 
@@ -56,12 +56,34 @@ Regressions cover incomplete directory-entry metadata, divergent timestamp and
 mode semantics, replacement during and after inventory, staging cleanup, and
 byte-preserving round trips for executable filename extensions without executing
 their contents. The full local command above passed **42 tests with no failures
-or skips** after these corrections. Complete remote verification of this revision
-remains pending.
+or skips** after these corrections. The remote matrix results are recorded below.
 
 The Windows inventory requires one additional metadata-only open/stat/close
 cycle per regular file per scan, with one additional handle at a time. The Linux
 metadata path is unchanged. No Windows performance measurement is claimed.
+
+## Verified CI matrix
+
+[Reference Core run 43209022326](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43209022326)
+completed successfully for source commit
+[`9f8cd88826e1d57fcb1c48a47752a05a64fbe166`](https://github.com/fabiocnd/lpx-keepmorrow/commit/9f8cd88826e1d57fcb1c48a47752a05a64fbe166).
+All four jobs passed Python syntax validation and behavioral tests.
+
+| Runner | Python | Passed | Skipped | Outcome |
+| --- | --- | --- | --- | --- |
+| Ubuntu | 3.11 | 42 | 0 | Success |
+| Ubuntu | 3.14 | 42 | 0 | Success |
+| Windows | 3.11 | 40 | 2 | Success |
+| Windows | 3.14 | 40 | 2 | Success |
+
+Each job enumerated 42 tests. The Windows logs identify two expected platform
+skips: named pipes were unavailable, and the filesystem was case insensitive,
+preventing construction of the case-sensitive filename-collision scenario.
+These scenarios executed successfully on Ubuntu. The skipped Windows scenarios
+are not reported as executed or passed.
+
+The result applies to the exact source revision and hosted environments above.
+Subsequent documentation updates do not expand its platform or workload scope.
 
 ## Measured performance
 
@@ -82,9 +104,8 @@ established.
 
 ## Reviewed limitations
 
-- Windows publication behavior is implemented but has not been executed locally.
-- Windows with Python 3.11 passed the intermediate CI run. Verification of the
-  complete correction across the configured matrix remains pending.
+- Local execution used Linux; Windows execution evidence comes from the hosted
+  CI matrix and includes the two documented platform skips.
 - No hostile concurrent ancestor-replacement defense or fsync crash-durability
   guarantee is implemented.
 - Source conversations and native project relationships are not semantically
