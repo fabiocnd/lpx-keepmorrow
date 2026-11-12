@@ -1,8 +1,8 @@
 # LPX Keepmorrow Terms of Use
 
-**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**  
-**Terms version:** `2026-11-12-draft.1`  
-**Prepared:** 2026-11-12  
+**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
+**Terms version:** `2026-11-12-draft.2`
+**Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
 These are proposed terms for a reviewed release. They are not an approved or
@@ -44,10 +44,24 @@ analytics, or other processing unnecessary for that operation.
 
 ## 3. What the Current Reference Application Does
 
-The reference application reads supported regular files and directories that you
-select, creates a portable directory archive with a manifest, verifies recorded
-file bytes and inventory, and restores supported files into a new destination.
-It is designed to leave the supplied source content unchanged.
+The application reads supported regular files, directories, and ZIP exports that
+you select. It preserves original files, builds a catalog under an experimental
+source profile, retains conversation revisions and available branch structure,
+records explicitly supported artifact relationships, and provides local browse,
+search, and recovery operations. Original ZIP containers are retained alongside
+their supported extracted contents. File bytes and inventory are verified against
+a manifest. Source content and previous archive generations remain unchanged.
+
+An explicit association decision creates a new local generation and records the
+operator's reason without rewriting historical source evidence. Selected recovery
+contains derived conversation records and available bound files. It excludes whole
+recognized conversation export documents to avoid including unrelated conversations;
+it does not inspect or redact the internal contents of arbitrary selected attachments.
+
+An optional MCP development adapter can return deliberately requested catalog
+information to a locally connected client. It is restricted to loopback operation,
+configured collection identifiers, and read operations. It is not an authenticated
+hosted product or an installed ChatGPT connection.
 
 This release does not enumerate a ChatGPT account, recreate native ChatGPT
 Projects, perform model inference, upload content, or delete source files.
@@ -89,11 +103,11 @@ restore is a recovery of files into a separate directory. It is not a promise to
 reconstruct the original application's accounts, workspace layout, permissions,
 automations, interface, or consolidated knowledge structures.
 
-When a future parser or organization feature is introduced, it must identify
-unsupported or unresolved relationships and keep derived views separate from
-originals. A missing project identifier cannot, by itself, establish that a
-conversation is standalone. A generated summary or reconstructed view must not
-be represented as a missing original.
+The experimental parser reports unsupported or unresolved relationships and keeps
+derived views separate from originals. Its current compatibility has been tested
+with synthetic material, not a representative real account export. A missing
+project identifier cannot, by itself, establish that a conversation is standalone.
+A derived view must not be represented as a missing original.
 
 A defect, incomplete export, interrupted operation, storage failure, incompatible
 format, or action by another application can result in incomplete recovery,
@@ -138,8 +152,9 @@ use it for undisclosed purposes, or ignore security duties.
 
 ## 8. Optional Services and Destructive Actions
 
-Cloud storage, AI assistance, third-party integrations, and telemetry are not
-enabled in this reference release. Before introducing such processing, the
+Cloud storage, AI assistance, a production ChatGPT connection, and telemetry are
+not enabled in this release. The local MCP development adapter is not permission
+to expose private collections through a public endpoint. Before introducing remote processing, the
 Company must disclose its purpose, selected information, recipients, material
 retention consequences, and relevant risks and obtain the required separate
 authorization.

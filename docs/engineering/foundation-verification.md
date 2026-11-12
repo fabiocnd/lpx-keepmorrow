@@ -1,6 +1,10 @@
 # Foundation Verification Record
 
-**Date:** 2026-11-12  
+This is the historical 0.1.0 record. Its counts, capability limits, commits, and
+measurements apply to that version. See the
+[collection verification record](collection-verification.md) for 0.2.0.
+
+**Date:** 2026-11-12
 **Status:** Private source upload, local validation, and configured CI matrix verified
 
 **Environment:** Linux x86_64, Python 3.12.14

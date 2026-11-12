@@ -39,3 +39,24 @@ jobs:
         run: python -m compileall -q src tests benchmarks
       - name: Run behavioral tests
         run: python -m unittest discover -s tests -v
+
+  chatgpt-development:
+    name: MCP and collection schema / Python 3.12
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: src
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install pinned development adapter
+        run: python -m pip install -c requirements/chatgpt-dev-py312.constraints.txt '.[chatgpt]'
+      - name: Validate MCP protocol and persisted collection schema
+        run: python -m unittest tests.integration.test_chatgpt_adapter tests.integration.test_catalog_schema -v

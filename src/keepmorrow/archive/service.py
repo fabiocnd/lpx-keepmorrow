@@ -103,6 +103,18 @@ def verify_archive(archive: Path, *, limits: Limits | None = None) -> Verificati
     return _verify(root, _load_manifest(root, active_limits), active_limits)
 
 
+def load_manifest(archive: Path, *, limits: Limits | None = None) -> Manifest:
+    """Read and validate bounded archive metadata without verifying payload bytes.
+
+    This is useful for inventory selection after an explicit integrity check.
+    It never establishes that the listed files exist or match their hashes;
+    callers needing that guarantee must also invoke verify_archive.
+    """
+    active_limits = limits or Limits()
+    root = safe_directory(archive)
+    return _load_manifest(root, active_limits)
+
+
 def create_archive(source: Path, destination: Path, *, limits: Limits | None = None) -> Manifest:
     """Preserve every supported supplied file and directory, then verify copies."""
     active_limits = limits or Limits()

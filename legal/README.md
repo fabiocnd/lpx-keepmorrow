@@ -1,8 +1,8 @@
 # Legal Documents and Release Status
 
-**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**  
-**Document set version:** `2026-11-12-draft.1`  
-**Prepared:** 2026-11-12  
+**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
+**Document set version:** `2026-11-12-draft.2`
+**Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
 These documents are an internal drafting package for LPX Keepmorrow. They are
@@ -34,11 +34,12 @@ requests, model inference, automatic telemetry, cloud connector, or source
 deletion operation. Storage synchronization performed by the user's operating
 system or another application is outside that description.
 
-Each `create`, `verify`, or `restore` CLI invocation requires both exact options:
+Every CLI operation that inspects selected content requires both exact options,
+including import, catalog queries, association review, and selected recovery:
 
 ```text
---accept-terms 2026-11-12-draft.1
---accept-privacy 2026-11-12-draft.1
+--accept-terms 2026-11-12-draft.2
+--accept-privacy 2026-11-12-draft.2
 ```
 
 Missing or mismatched acceptance must stop the command before selected user data

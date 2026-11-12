@@ -1,8 +1,8 @@
 # LPX Keepmorrow Privacy Notice
 
-**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**  
-**Privacy notice version:** `2026-11-12-draft.1`  
-**Prepared:** 2026-11-12  
+**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
+**Privacy notice version:** `2026-11-12-draft.2`
+**Prepared:** 2026-11-12
 **Production effective date:** Not assigned
 
 This draft describes the local reference application and proposed privacy
@@ -29,14 +29,21 @@ integrated version.
 
 | Information | Purpose and location |
 | --- | --- |
-| Selected file contents, including personal or confidential information they contain | Read locally to copy, hash, verify, or recover the material requested by the operator. |
+| Selected file contents, including personal or confidential information they contain | Read locally to copy, hash, verify, interpret supported export records, search, or recover the requested material. Original ZIPs and supported extracted contents are both preserved. |
 | Relative file and directory names, byte counts, hashes, and archive format fields | Written in the local manifest to describe the archive and support integrity checks. Names can reveal private information. |
 | Temporary file metadata and buffered bytes | Used in the running process and staging directory to perform and check the requested operation. |
 | Operation results, errors, and affected paths where reported | Returned locally so the operator can assess success and problems. A terminal, shell, or surrounding application may separately retain this output. |
 | Accepted document versions, UTC acceptance time, and requested operation | Returned as local acceptance metadata for the current CLI invocation. This does not identify or authenticate the person who supplied the command. |
+| Conversation identifiers, titles, message graphs, text, source references, and artifact availability | Stored in the local derived catalog and readable view so the operator can inspect supported records and retained revisions. |
+| Explicit account namespace and association decisions, including the operator's reason | Stored in the selected collection generation to distinguish source accounts and document classification history. A local label need not contain an email address. |
+| Requested browse, search, and revision results | Returned to the terminal or, when explicitly running the development adapter, the locally connected MCP client. These results can contain private conversation text. |
 
-The current application has no model inference, application network requests,
-automatic telemetry, account tracking, or automatic upload to the Company.
+The local preservation core has no model inference, outbound application network
+requests, automatic telemetry, account tracking, or automatic upload to the Company.
+The optional MCP development server accepts local loopback connections and returns
+requested results to that client. It does not authenticate users or implement a
+multi-user service. A remote ChatGPT connection, authenticated deployment, and
+provider-specific disclosure require a separate implemented and reviewed boundary.
 Reading or copying a file can still cause activity by the operating system,
 security software, backups, or independently configured synchronization tools.
 Choose the execution environment and destination with those settings in mind.
@@ -48,8 +55,9 @@ contents.
 
 ## 3. Purposes and Your Choices
 
-The core purpose is to perform the specific local archive, verification, or
-restore operation that you request. The application must obtain the required
+The core purpose is to perform the specific local preservation, import, catalog,
+search, reading, association, verification, or recovery operation that you request.
+The application must obtain the required
 document acceptance before inspecting selected data. You can decline and leave
 the operation unstarted.
 
@@ -68,6 +76,7 @@ rights or applicable confidentiality obligations.
 | --- | --- |
 | Original source material | Remains in its original location. The reference application provides no source-deletion operation. The source owner or provider controls its retention. |
 | Completed local archive or recovered directory | Remains in the chosen destination until the operator removes it through storage tools. There is no automatic archive expiration in this release. |
+| Derived catalogs, readable views, and association decision history | Remain with that archive generation. Extending or reclassifying a collection creates a separate generation and does not remove previous copies. |
 | Temporary staging files | Normal operation attempts cleanup after completion or handled failure. Abrupt termination or device failure can leave remnants requiring operator review. Cleanup is not a secure-erasure guarantee. |
 | CLI acceptance metadata and other command output | Not sent to a server or stored in an automatic consent database. It remains wherever the operator, shell, or surrounding system retains output. |
 | Independently synchronized, shared, or backed-up copies | Governed by the chosen environment and provider. Removing one copy does not establish that every copy has been removed. |

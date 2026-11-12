@@ -14,27 +14,37 @@
 
 ## Milestone 1 — preservation contract
 
-Select one supported source format using an authorized representative sample.
-Define the semantic catalog schema, source identifiers, revision rules,
-association evidence, unknown-field behavior, and missing-artifact statuses.
+- [x] Define the experimental mapping profile, versioned collection schema,
+  source identifiers, revision rules, association evidence, and artifact states.
+- [x] Validate the declared profile with paired synthetic exports, numbered files,
+  one wrapper directory, image bytes, opaque binaries, and explicit omissions.
+- [ ] Validate and revise the profile against an authorized representative real
+  export before claiming real-account compatibility.
 
 **Exit evidence:** All synthetic scenarios have explicit expected results;
 unsupported records cannot disappear silently.
 
 ## Milestone 2 — usable local archive
 
-Implement import, branch-aware conversation records, stable identity, readable
-views, catalog browsing, basic search, and manifests. Keep canonical originals
-separate from derived records and optional AI output.
+- [x] Preserve selected folders and supported ZIPs, including original containers.
+- [x] Interpret supported message graphs, namespaced identities, revision history,
+  occurrence provenance, and explicit relative-path artifact relationships.
+- [x] Provide a standalone readable view, catalog browsing, literal search, and
+  bounded revision reading.
+- [x] Record explicit local association decisions without changing source evidence.
+- [x] Recover selected derived conversations and available bound binary files.
+- [ ] Broaden source/attachment support only with representative evidence and
+  additional compatibility tests; unresolved URI-only bindings remain visible.
 
 **Exit evidence:** Repeated capture and renamed-conversation scenarios preserve
 identity without merging ambiguous records.
 
 ## Milestone 3 — recovery and operational resilience
 
-Add durable jobs, cancellation, restart behavior, large-corpus validation,
-resource budgets, and fault injection. Test restored archives in a different
-location and supported operating systems.
+- [x] Apply aggregate payload, JSON, semantic metadata, query, and MCP response limits.
+- [x] Exercise handled cancellation, source mutation, corruption, and staging cleanup.
+- [ ] Add durable checkpoints and a specified restart/resume protocol.
+- [ ] Validate larger representative corpora, crash durability, and storage pressure.
 
 **Exit evidence:** Recovery reconciles the inventory and detects tampering;
 partial work is distinguishable from success.
@@ -49,9 +59,15 @@ Google Drive remains a candidate. No provider is selected or integrated.
 
 ## Milestone 5 — ChatGPT interface
 
-Review the supported platform capabilities and current distribution rules.
-Expose the core's verified operations and status. Provide user-controlled
-association review and versioned consent.
+- [x] Review current OpenAI MCP/plugin documentation.
+- [x] Implement optional read-only MCP tools over explicit collection grants,
+  with acceptance before content I/O and loopback-only development transport.
+- [x] Exercise real SDK sessions and in-process Streamable HTTP using synthetic data.
+- [ ] Select and implement an authenticated deployment or supported secure tunnel,
+  per-user authorization, and hosted data-handling/consent behavior.
+- [ ] Connect and validate the plugin in the actual ChatGPT account/workspace.
+- [ ] Implement user-selected file intake, interaction review, and any embedded UI
+  against supported platform capabilities before exposing write operations.
 
 **Exit evidence:** The interface cannot imply broader account access or
 stronger integrity guarantees than the backend provides.
@@ -70,3 +86,8 @@ review. No public launch is authorized by the repository setup alone.
 Model selection, embeddings, vector databases, cloud orchestration, native
 extensions, parallel workers, and a public distribution channel remain deferred
 until a measured requirement justifies them.
+
+The optional MCP adapter runs one admitted verification job at a time; this is a
+bounded development transport, not a parallel preservation engine. The current
+implementation and its limits are recorded in
+[collection verification](../engineering/collection-verification.md).

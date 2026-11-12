@@ -1,5 +1,10 @@
 # Reference Preservation Core
 
+This document describes the byte-preservation component. Version 0.2.0 composes
+it with separate importers and collection services; see the
+[collection workflow](collection-workflow.md) and
+[import contract](import-contract.md) for those implemented capabilities.
+
 ## Status and Scope
 
 This reference implementation provides a narrow, executable slice of the preservation design: create a portable directory archive from an explicitly supplied local directory, verify its bytes and inventory, and restore it into a new destination. The runtime uses Python 3.11 or newer and the standard library. Selecting Python for this reference slice does not finalize the production stack.
@@ -17,6 +22,7 @@ The intended product entry point is `python -m keepmorrow`. It requires explicit
 | `src/keepmorrow/archive/model.py` | Define the manifest, limits, reports, portable paths, and strict schema validation |
 | `src/keepmorrow/archive/filesystem.py` | Inventory stable source trees, stream bytes, detect observed mutations, and publish without replacement |
 | `src/keepmorrow/archive/service.py` | Coordinate staging, local verification, creation, and recovery |
+| `src/keepmorrow/archive/assembly.py` | Assemble preserved and generated entries under one bounded, verified publication transaction |
 
 The archive feature owns its contracts and filesystem behavior together. The command-line boundary remains thin. No generic utilities layer, storage provider, model provider, or unused service framework is included.
 
@@ -29,23 +35,23 @@ keepmorrow_demo="$(mktemp -d)"
 
 PYTHONPATH=src python -m keepmorrow create \
   examples/synthetic-input "$keepmorrow_demo/archive" \
-  --accept-terms 2026-11-12-draft.1 \
-  --accept-privacy 2026-11-12-draft.1
+  --accept-terms 2026-11-12-draft.2 \
+  --accept-privacy 2026-11-12-draft.2
 
 PYTHONPATH=src python -m keepmorrow verify \
   "$keepmorrow_demo/archive" \
-  --accept-terms 2026-11-12-draft.1 \
-  --accept-privacy 2026-11-12-draft.1
+  --accept-terms 2026-11-12-draft.2 \
+  --accept-privacy 2026-11-12-draft.2
 
 PYTHONPATH=src python -m keepmorrow restore \
   "$keepmorrow_demo/archive" "$keepmorrow_demo/restored" \
-  --accept-terms 2026-11-12-draft.1 \
-  --accept-privacy 2026-11-12-draft.1
+  --accept-terms 2026-11-12-draft.2 \
+  --accept-privacy 2026-11-12-draft.2
 ```
 
 Read the referenced legal documents before supplying acceptance. Their current status is a development draft; including explicit acceptance does not represent legal approval of that draft or a public launch. The command does not remember agreement across operations. Existing destinations are rejected. The destination parent must already exist and must be outside the source directory.
 
-These commands do not require a package installation. `pyproject.toml` also provides an installable package and console entry point. `setuptools==84.2.1` is the selected build-only dependency; there are no third-party runtime dependencies. Build isolation may download the pinned backend when it is not already available.
+These commands do not require a package installation. `pyproject.toml` also provides an installable package and console entry point. `setuptools==84.2.1` is the selected build-only dependency; the preservation and collection core has no third-party runtime dependencies. The separate ChatGPT development adapter has an optional SDK dependency. Build isolation may download the pinned backend when it is not already available.
 
 | Exit status | Meaning |
 | --- | --- |
@@ -124,5 +130,9 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 
 Coverage includes byte-identical recovery, empty directories/files, deterministic manifests, same-size corruption, missing/unexpected entries, safe cancellation on corruption, existing-destination protection, publication collisions, symbolic links, non-regular files, portable path attacks, malformed JSON, duplicate records, resource ceilings, staging cleanup, CLI status, and acceptance enforcement. Test results must be recorded from an actual run; this document does not imply that every operating system was tested.
 
-The [synthetic fixture](../../examples/README.md) preserves two project associations, one confirmed standalone conversation, one unknown association, branching, repeated captures, and a missing artifact as source bytes. A future semantic parser must calculate and verify those expectations before claiming conversation-level preservation.
+The original [synthetic fixture](../../examples/README.md) remains an opaque
+byte-preservation example; its custom `catalog.json` is not an input to the
+experimental ChatGPT parser. The separate paired mapping fixtures in
+`tests/fixtures/chatgpt_exports.py` exercise the implemented semantic contract
+and calculate conversation, revision, branch, project, and artifact outcomes.
 

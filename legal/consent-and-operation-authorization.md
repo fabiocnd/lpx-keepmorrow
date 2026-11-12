@@ -1,8 +1,8 @@
 # Consent and Operation Authorization
 
-**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**  
-**Document version:** `2026-11-12-draft.1`  
-**Prepared:** 2026-11-12  
+**DRAFT FOR OWNER AND QUALIFIED ONTARIO COUNSEL REVIEW**
+**Document version:** `2026-11-12-draft.2`
+**Prepared:** 2026-11-12
 **Production approval:** Not granted by this document
 
 This document defines the internal consent-control behavior and proposed
@@ -15,7 +15,7 @@ production interaction. It does not certify the enforceability of the draft
 | --- | --- | --- |
 | Accept the stated Terms version | Deliberate agreement to the presented document, subject to mandatory law | Required CLI version flag; draft documents only. |
 | Acknowledge the stated Privacy Notice and authorize necessary local processing | Understanding of the described data handling and authorization for the requested local action | Required CLI version flag; no optional processing is bundled. |
-| Request an operation | Select `create`, `verify`, or `restore` and its source and destination arguments | Explicit CLI command and arguments. |
+| Request an operation | Select `create`, `verify`, `restore`, `import`, `catalog`, `search`, `read`, `associate`, or `recover` with its declared scope | Explicit CLI command and arguments; development MCP read tools use configured collection IDs. |
 | Authorize cloud transfer or model use | Approve a specified recipient, purpose, data selection, and consequences | Unavailable; requires separate future implementation and consent. |
 | Authorize a destructive source action | Approve named objects and a specific deletion, overwrite, move, or mutation | Unavailable; no current source-deletion operation. |
 
@@ -29,8 +29,8 @@ the mere presence of files, a previous operation, or continuation after an error
 Each operation requires these exact values:
 
 ```text
---accept-terms 2026-11-12-draft.1
---accept-privacy 2026-11-12-draft.1
+--accept-terms 2026-11-12-draft.2
+--accept-privacy 2026-11-12-draft.2
 ```
 
 The caller must be able to read the two versioned documents before supplying the
@@ -42,8 +42,8 @@ For an internal synthetic-data evaluation, an explicit command takes this form:
 
 ```bash
 python -m keepmorrow create ./synthetic-source ./new-archive \
-  --accept-terms 2026-11-12-draft.1 \
-  --accept-privacy 2026-11-12-draft.1
+  --accept-terms 2026-11-12-draft.2 \
+  --accept-privacy 2026-11-12-draft.2
 ```
 
 The source, destination, and operation arguments specify the current invocation.
@@ -52,10 +52,13 @@ an unrelated approval. A scheduled job would need a separately reviewed
 authorization describing its recurring scope, duration, and revocation behavior;
 these per-invocation flags do not supply that production workflow.
 
-The CLI is the implemented end-user boundary. Internal Python functions are
-engineering interfaces. Before exposing another entry point, its implementer
-must enforce equivalent acceptance and scope checks; the present CLI gate is not
-a claim that arbitrary direct calls to internal functions authenticate a user.
+The CLI is the local user boundary. The optional MCP development read tools
+likewise require exact document versions before resolving or inspecting a
+configured collection. They accept opaque collection IDs, not arbitrary paths.
+These declarations do not authenticate an end user or prove that a person, rather
+than a calling client, supplied them. Internal Python functions remain engineering
+interfaces. An authenticated deployment and graphical consent presentation are
+separate requirements before real hosted use.
 
 ## 3. What the Local Receipt Establishes
 

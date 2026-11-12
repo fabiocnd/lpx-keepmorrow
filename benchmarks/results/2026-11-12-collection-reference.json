@@ -1,0 +1,371 @@
+{
+  "command": "PYTHONPATH=src python benchmarks/benchmark_collection.py --conversations 100 --messages 12 --repetitions 3 --output benchmarks/results/2026-11-12-collection-reference.json",
+  "environment": {
+    "architecture": "x86_64",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "linux_cgroup_cpu_max": null,
+    "linux_cgroup_memory_max": null,
+    "logical_cpus_reported_by_os": 9,
+    "operating_system": "Linux",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python_build": [
+      "main",
+      "Aug 25 2026 14:00:49"
+    ],
+    "python_implementation": "CPython",
+    "python_version": "3.12.14",
+    "release": "6.18.57",
+    "temporary_storage": "Host default TemporaryDirectory storage; medium and cache residency are not characterized.",
+    "zlib_compile_version": "1.3.2",
+    "zlib_runtime_version": "1.3.2"
+  },
+  "format": "lpx-keepmorrow.collection-benchmark",
+  "measured_at_utc": "2026-11-12T12:44:13.506636+00:00",
+  "methodology": [
+    "Wall-clock timing includes tracemalloc overhead; gc.collect runs before each timed operation.",
+    "Python-traced allocation peaks are not process RSS and exclude OS caches and some native allocations.",
+    "Fixture generation, ZIP creation, and supplemental exact binary hash checks are outside timed regions.",
+    "Filesystem caches are not flushed; generation, earlier stages, and repeated reads warm the cache.",
+    "Initial import preserves one directory; extension preserves a second ZIP and copies prior captured payload into a new immutable generation.",
+    "Verified catalog search includes full archive byte verification through load_collection before literal text search.",
+    "Selected recovery includes the service's input and output verification; supplemental checks run afterward.",
+    "The ZIP is deliberately compressible synthetic data; its compression ratio is not representative of arbitrary media.",
+    "Three modest repetitions support medians and observed ranges, not percentile latency claims.",
+    "No earlier semantic-collection baseline exists; no comparative speed or production capacity claim is made.",
+    "If source_unchanged_during_run is false or implementation source changes later, rerun before attributing these results to that source."
+  ],
+  "source_after": {
+    "aggregate_sha256": "d9789f2f86ea858bca6255cbde1ff12e55b56228a23fef108ed17054e4deac44",
+    "files": {
+      "benchmarks/benchmark_collection.py": "e50b1b8cf07da5e0e149e0acbb4cb29d36affede408aca4fb2bc157cfbb559a9",
+      "src/keepmorrow/__init__.py": "7306a2d939d0f2fa37b2a31b2b8997c68785b29c06cca2d465336397bfa8ba38",
+      "src/keepmorrow/__main__.py": "989680b7c6cca1e4fb7599521ebc2ccc6c0310f63f30a89c5ba42be8d3d84612",
+      "src/keepmorrow/archive/__init__.py": "4a7288947f94b88eb160486f27ceb7ea3792c34f91e44f75d0f8f98b1044a16e",
+      "src/keepmorrow/archive/assembly.py": "aebab1aebb5c1f8edb9bd7699f10fea0b40f36590af61061950d87bc6e841eb9",
+      "src/keepmorrow/archive/filesystem.py": "c1ddd82a7504b9af732161c75462b038e8725b92eb388b81b6b431d8bcd8000e",
+      "src/keepmorrow/archive/model.py": "620b2ed020c1cf2cb6b48e66ca8e6bf458ad6471968a94430b19f58ae6cb79e7",
+      "src/keepmorrow/archive/service.py": "58b7eaffefd966a544a27a2d198568a15857c31a2909484fca4008c8998cab70",
+      "src/keepmorrow/catalog/__init__.py": "e39e0dca27804073b90e4d867d977b7806ad1050422bd68cb60aff45a7896498",
+      "src/keepmorrow/catalog/model.py": "cd546a4c01d794c54e79a8f4fdbe1b0b584ba8631f399128a9f8eb8373551140",
+      "src/keepmorrow/catalog/query.py": "39e50a7e1660e502915f61a49a0413c2bffc3bd9fed586e36c2fcaa49974132b",
+      "src/keepmorrow/catalog/service.py": "187d30864a32ac148deb26acf6c86caabcbb8f58c0c30db5577a36d4dca66488",
+      "src/keepmorrow/catalog/views.py": "a31a1715abaa8a4dc06da042c14e6b2be2fdae0596f48a9cf7c56a4eb625c601",
+      "src/keepmorrow/cli.py": "ffe9ba490381c62480e79c7025a2347fb2566805e2a01ff9a607ab0d03ee1e08",
+      "src/keepmorrow/consent.py": "4f606b5220eaf1c1ad6a5bcc0917adb3ade492b1715309da7f621a744fda8efb",
+      "src/keepmorrow/formats/__init__.py": "dbee112f7a03cf9eeb63e84ae35c896536e766b08d45d6130e6b7ac09d8297e2",
+      "src/keepmorrow/formats/json_document.py": "cae02cfc16a591830317cb446b67928c6e9f8f62eb844f616c9ea2864eb288b7",
+      "src/keepmorrow/importers/__init__.py": "18785c4fe6127c515bd4ba24c78290bb442d27f36dfb2fb6ac786bdafc1eae7f",
+      "src/keepmorrow/importers/chatgpt.py": "3075fd18649a1ffcd0d8008d320fddf4165dde06831fce86845f6b4de5e228c5",
+      "src/keepmorrow/importers/model.py": "b5c9ce12fb4b782e72d25800a73c7c0158eee42a0222700780366085fa3624c9",
+      "src/keepmorrow/importers/zip_intake.py": "627b461f17f6be1a2a0d5140b7052b94f682a1f14e1532988e89639eda9fc599",
+      "src/keepmorrow/integrations/chatgpt/__init__.py": "fb3090e571bbd0062e97c3a12bb39ac9e54c2919b106727a282a52d1acd537a5",
+      "src/keepmorrow/integrations/chatgpt/__main__.py": "d5e71e3828e48143753ce996c0546ee3ff3bc249433a5a8e0448a8f8ef3c5e9f",
+      "src/keepmorrow/integrations/chatgpt/registry.py": "7234ded494f48b3c9ba3f90010b495cc1abef6ce52d1972236abf454344bf656",
+      "src/keepmorrow/integrations/chatgpt/server.py": "851b02c867694c9ee8ad0ab469c1c3568f77368e534ce30b193d0f9f4c92d6ea"
+    },
+    "kind": "worktree_file_sha256"
+  },
+  "source_attribution": "Current worktree file digests; no commit equivalence is asserted.",
+  "source_before": {
+    "aggregate_sha256": "d9789f2f86ea858bca6255cbde1ff12e55b56228a23fef108ed17054e4deac44",
+    "files": {
+      "benchmarks/benchmark_collection.py": "e50b1b8cf07da5e0e149e0acbb4cb29d36affede408aca4fb2bc157cfbb559a9",
+      "src/keepmorrow/__init__.py": "7306a2d939d0f2fa37b2a31b2b8997c68785b29c06cca2d465336397bfa8ba38",
+      "src/keepmorrow/__main__.py": "989680b7c6cca1e4fb7599521ebc2ccc6c0310f63f30a89c5ba42be8d3d84612",
+      "src/keepmorrow/archive/__init__.py": "4a7288947f94b88eb160486f27ceb7ea3792c34f91e44f75d0f8f98b1044a16e",
+      "src/keepmorrow/archive/assembly.py": "aebab1aebb5c1f8edb9bd7699f10fea0b40f36590af61061950d87bc6e841eb9",
+      "src/keepmorrow/archive/filesystem.py": "c1ddd82a7504b9af732161c75462b038e8725b92eb388b81b6b431d8bcd8000e",
+      "src/keepmorrow/archive/model.py": "620b2ed020c1cf2cb6b48e66ca8e6bf458ad6471968a94430b19f58ae6cb79e7",
+      "src/keepmorrow/archive/service.py": "58b7eaffefd966a544a27a2d198568a15857c31a2909484fca4008c8998cab70",
+      "src/keepmorrow/catalog/__init__.py": "e39e0dca27804073b90e4d867d977b7806ad1050422bd68cb60aff45a7896498",
+      "src/keepmorrow/catalog/model.py": "cd546a4c01d794c54e79a8f4fdbe1b0b584ba8631f399128a9f8eb8373551140",
+      "src/keepmorrow/catalog/query.py": "39e50a7e1660e502915f61a49a0413c2bffc3bd9fed586e36c2fcaa49974132b",
+      "src/keepmorrow/catalog/service.py": "187d30864a32ac148deb26acf6c86caabcbb8f58c0c30db5577a36d4dca66488",
+      "src/keepmorrow/catalog/views.py": "a31a1715abaa8a4dc06da042c14e6b2be2fdae0596f48a9cf7c56a4eb625c601",
+      "src/keepmorrow/cli.py": "ffe9ba490381c62480e79c7025a2347fb2566805e2a01ff9a607ab0d03ee1e08",
+      "src/keepmorrow/consent.py": "4f606b5220eaf1c1ad6a5bcc0917adb3ade492b1715309da7f621a744fda8efb",
+      "src/keepmorrow/formats/__init__.py": "dbee112f7a03cf9eeb63e84ae35c896536e766b08d45d6130e6b7ac09d8297e2",
+      "src/keepmorrow/formats/json_document.py": "cae02cfc16a591830317cb446b67928c6e9f8f62eb844f616c9ea2864eb288b7",
+      "src/keepmorrow/importers/__init__.py": "18785c4fe6127c515bd4ba24c78290bb442d27f36dfb2fb6ac786bdafc1eae7f",
+      "src/keepmorrow/importers/chatgpt.py": "3075fd18649a1ffcd0d8008d320fddf4165dde06831fce86845f6b4de5e228c5",
+      "src/keepmorrow/importers/model.py": "b5c9ce12fb4b782e72d25800a73c7c0158eee42a0222700780366085fa3624c9",
+      "src/keepmorrow/importers/zip_intake.py": "627b461f17f6be1a2a0d5140b7052b94f682a1f14e1532988e89639eda9fc599",
+      "src/keepmorrow/integrations/chatgpt/__init__.py": "fb3090e571bbd0062e97c3a12bb39ac9e54c2919b106727a282a52d1acd537a5",
+      "src/keepmorrow/integrations/chatgpt/__main__.py": "d5e71e3828e48143753ce996c0546ee3ff3bc249433a5a8e0448a8f8ef3c5e9f",
+      "src/keepmorrow/integrations/chatgpt/registry.py": "7234ded494f48b3c9ba3f90010b495cc1abef6ce52d1972236abf454344bf656",
+      "src/keepmorrow/integrations/chatgpt/server.py": "851b02c867694c9ee8ad0ab469c1c3568f77368e534ce30b193d0f9f4c92d6ea"
+    },
+    "kind": "worktree_file_sha256"
+  },
+  "source_unchanged_during_run": true,
+  "stages": {
+    "extend_import": {
+      "samples": [
+        {
+          "python_traced_peak_bytes": 11318444,
+          "seconds": 1.051870120998501
+        },
+        {
+          "python_traced_peak_bytes": 11277295,
+          "seconds": 1.057551017998776
+        },
+        {
+          "python_traced_peak_bytes": 11277391,
+          "seconds": 1.0267652410002484
+        }
+      ],
+      "statistics": {
+        "maximum_python_traced_peak_bytes": 11318444,
+        "maximum_seconds": 1.057551017998776,
+        "median_python_traced_peak_bytes": 11277391,
+        "median_seconds": 1.051870120998501,
+        "minimum_seconds": 1.0267652410002484
+      }
+    },
+    "initial_import": {
+      "samples": [
+        {
+          "python_traced_peak_bytes": 4893062,
+          "seconds": 0.5806585350001114
+        },
+        {
+          "python_traced_peak_bytes": 4875228,
+          "seconds": 0.6227694009976403
+        },
+        {
+          "python_traced_peak_bytes": 4875114,
+          "seconds": 0.6174401900025259
+        }
+      ],
+      "statistics": {
+        "maximum_python_traced_peak_bytes": 4893062,
+        "maximum_seconds": 0.6227694009976403,
+        "median_python_traced_peak_bytes": 4875228,
+        "median_seconds": 0.6174401900025259,
+        "minimum_seconds": 0.5806585350001114
+      }
+    },
+    "selected_recovery": {
+      "samples": [
+        {
+          "python_traced_peak_bytes": 4491464,
+          "seconds": 0.41545333599788137
+        },
+        {
+          "python_traced_peak_bytes": 4490614,
+          "seconds": 0.4011016449985618
+        },
+        {
+          "python_traced_peak_bytes": 4490567,
+          "seconds": 0.41293712300102925
+        }
+      ],
+      "statistics": {
+        "maximum_python_traced_peak_bytes": 4491464,
+        "maximum_seconds": 0.41545333599788137,
+        "median_python_traced_peak_bytes": 4490614,
+        "median_seconds": 0.41293712300102925,
+        "minimum_seconds": 0.4011016449985618
+      }
+    },
+    "verified_catalog_search": {
+      "samples": [
+        {
+          "python_traced_peak_bytes": 4491014,
+          "seconds": 0.36909306600136915
+        },
+        {
+          "python_traced_peak_bytes": 4490616,
+          "seconds": 0.3416493320000882
+        },
+        {
+          "python_traced_peak_bytes": 4490721,
+          "seconds": 0.37551959399934276
+        }
+      ],
+      "statistics": {
+        "maximum_python_traced_peak_bytes": 4491014,
+        "maximum_seconds": 0.37551959399934276,
+        "median_python_traced_peak_bytes": 4490721,
+        "median_seconds": 0.36909306600136915,
+        "minimum_seconds": 0.3416493320000882
+      }
+    }
+  },
+  "validation": {
+    "deterministic_manifest_across_repetitions": true,
+    "exact_binary_hash_checks": 24,
+    "expected_summary_matched_every_repetition": true,
+    "final_generation_manifest_sha256": "877effb0624bc5b410924fd53a60998839c64834fdda42c64d557e685cb7d529",
+    "observed_summaries": [
+      {
+        "association_decision_count": 0,
+        "branched_revision_count": 50,
+        "capture_count": 2,
+        "conversation_count": 100,
+        "message_node_count": 2050,
+        "occurrence_count": 200,
+        "partial_capture_count": 0,
+        "revision_count": 150,
+        "source_bytes": 5021394,
+        "source_file_count": 7,
+        "stored_artifact_references": 400,
+        "unavailable_artifact_references": 0,
+        "unique_source_count": 2
+      },
+      {
+        "association_decision_count": 0,
+        "branched_revision_count": 50,
+        "capture_count": 2,
+        "conversation_count": 100,
+        "message_node_count": 2050,
+        "occurrence_count": 200,
+        "partial_capture_count": 0,
+        "revision_count": 150,
+        "source_bytes": 5021394,
+        "source_file_count": 7,
+        "stored_artifact_references": 400,
+        "unavailable_artifact_references": 0,
+        "unique_source_count": 2
+      },
+      {
+        "association_decision_count": 0,
+        "branched_revision_count": 50,
+        "capture_count": 2,
+        "conversation_count": 100,
+        "message_node_count": 2050,
+        "occurrence_count": 200,
+        "partial_capture_count": 0,
+        "revision_count": 150,
+        "source_bytes": 5021394,
+        "source_file_count": 7,
+        "stored_artifact_references": 400,
+        "unavailable_artifact_references": 0,
+        "unique_source_count": 2
+      }
+    ],
+    "parent_manifest_unchanged": true,
+    "selected_recovery_conversation_count": 1,
+    "selected_recovery_excludes_whole_source_json_and_zip": true
+  },
+  "version": 1,
+  "wide_branch_validation": {
+    "input_width_ratio": 4.0,
+    "interpretation": "A diagnostic size comparison, not a timing assertion or proof of asymptotic behavior.",
+    "observed_median_time_ratio": 3.9746948007803278,
+    "operation": "validate_collection over already parsed, verified catalogs; excludes import and file verification",
+    "results": [
+      {
+        "children_per_hub": 1000,
+        "graph_nodes": 1002,
+        "samples": [
+          {
+            "python_traced_peak_bytes": 354183,
+            "seconds": 0.06997744500040426
+          },
+          {
+            "python_traced_peak_bytes": 354183,
+            "seconds": 0.07134528800088447
+          },
+          {
+            "python_traced_peak_bytes": 354183,
+            "seconds": 0.07103267499769572
+          }
+        ],
+        "statistics": {
+          "maximum_python_traced_peak_bytes": 354183,
+          "maximum_seconds": 0.07134528800088447,
+          "median_python_traced_peak_bytes": 354183,
+          "median_seconds": 0.07103267499769572,
+          "minimum_seconds": 0.06997744500040426
+        }
+      },
+      {
+        "children_per_hub": 4000,
+        "graph_nodes": 4002,
+        "samples": [
+          {
+            "python_traced_peak_bytes": 1403015,
+            "seconds": 0.2790161269986129
+          },
+          {
+            "python_traced_peak_bytes": 1403015,
+            "seconds": 0.28233320399885997
+          },
+          {
+            "python_traced_peak_bytes": 1403015,
+            "seconds": 0.2854239039988897
+          }
+        ],
+        "statistics": {
+          "maximum_python_traced_peak_bytes": 1403015,
+          "maximum_seconds": 0.2854239039988897,
+          "median_python_traced_peak_bytes": 1403015,
+          "median_seconds": 0.28233320399885997,
+          "minimum_seconds": 0.2790161269986129
+        }
+      }
+    ]
+  },
+  "workload": {
+    "binary_payload_bytes_per_capture": 2097152,
+    "captures": 2,
+    "conversations": 100,
+    "evolved_conversations": 50,
+    "expanded_source_bytes": 5021394,
+    "expected_summary": {
+      "branched_revision_count": 50,
+      "capture_count": 2,
+      "conversation_count": 100,
+      "message_node_count": 2050,
+      "occurrence_count": 200,
+      "revision_count": 150,
+      "stored_artifact_references": 400,
+      "unavailable_artifact_references": 0
+    },
+    "generator_version": 1,
+    "messages_per_initial_conversation": 12,
+    "original_zip_bytes": 16484,
+    "original_zip_sha256": "fbb10003862e4928dd22926779beff17492d14119af6fb07f4945cd9110910c5",
+    "png_bytes_per_capture": 70,
+    "repetitions": 3,
+    "seed": "deterministic; no random generator",
+    "source_corpus_sha256": "260ee6cc10590d1e0e9d03a4e1f2d583cb3f7d05f9972607a3719b59fb13b2f1",
+    "source_file_count": 7,
+    "source_files": {
+      "first/assets/evidence.bin": {
+        "sha256": "91d3beb88a9b2f778a6c44a1c53b63d3c79931845a9aef84b3fb414610bd1938",
+        "size_bytes": 2097152
+      },
+      "first/assets/pixel.png": {
+        "sha256": "ca9cf2a6ea27541264c4fc55257fd9ebb835f204d73e66bda409d02a7c4474e9",
+        "size_bytes": 70
+      },
+      "first/conversations.json": {
+        "sha256": "8f9e3a99c60d212ffecd01b86c3f1f36542814e0bbda78c8200682fc1550d5e6",
+        "size_bytes": 400600
+      },
+      "second/assets/evidence.bin": {
+        "sha256": "7d38258cba17d4bac8e85ef448183f68cbae439934661657beb8babdac4c526d",
+        "size_bytes": 2097152
+      },
+      "second/assets/pixel.png": {
+        "sha256": "ca9cf2a6ea27541264c4fc55257fd9ebb835f204d73e66bda409d02a7c4474e9",
+        "size_bytes": 70
+      },
+      "second/conversations-1.json": {
+        "sha256": "5eaa75f6fd31bc30b35d565a037b148a064681e7f7dd1aa45f13ee921dc92193",
+        "size_bytes": 213175
+      },
+      "second/conversations-2.json": {
+        "sha256": "0f5856376eb4f2e6a8fcd0ab36e9085073caf9787b2db3b52267ef6e56727b76",
+        "size_bytes": 213175
+      }
+    },
+    "source_formats": [
+      "directory",
+      "zip_stored_or_deflated_profile"
+    ],
+    "submitted_input_bytes": 2514306
+  }
+}

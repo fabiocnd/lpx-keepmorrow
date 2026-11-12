@@ -1,6 +1,11 @@
 # Performance and Organization Review
 
-**Review date:** 2026-11-12  
+This foundation review records the 0.1.0 design. The 0.2.0 collection workflow,
+its immutable-generation costs, and its measured workload are documented in
+[ADR 0002](../architecture/decisions/0002-immutable-collections.md) and the
+[collection benchmark](../../benchmarks/COLLECTION_BENCHMARK.md).
+
+**Review date:** 2026-11-12
 **Scope:** Foundation design and local reference implementation.
 
 ## Engineering assessment

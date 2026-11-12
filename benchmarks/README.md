@@ -1,5 +1,10 @@
 # Reference Archive Benchmark
 
+For the version 0.2.0 import, history, query, and selective recovery workload,
+see the [Collection Reference Benchmark](COLLECTION_BENCHMARK.md). The archive
+benchmark below isolates the original byte-preservation component; the two
+workloads are not directly comparable performance baselines.
+
 Run from the repository root:
 
 ```bash

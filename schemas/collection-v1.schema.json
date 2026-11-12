@@ -1,0 +1,1081 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:lpx:keepmorrow:collection:1",
+  "title": "LPX Keepmorrow Collection Catalog v1",
+  "description": "Structural contract for emitted full collections and selected derivatives. Runtime validation additionally binds files to the verified archive, recomputes identities and summaries, checks graphs and decision chains, validates Unicode/path portability, and enforces configured byte and aggregate resource budgets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "provider",
+    "account_namespace",
+    "scope",
+    "parser_compatibility",
+    "captures",
+    "conversations",
+    "association_history",
+    "summary"
+  ],
+  "properties": {
+    "format": {
+      "const": "lpx-keepmorrow.collection"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "provider": {
+      "const": "openai.chatgpt"
+    },
+    "account_namespace": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]+$",
+      "description": "Stable operator-supplied account namespace. Runtime also rejects whitespace-only labels and enforces its UTF-8 byte ceiling."
+    },
+    "scope": {
+      "enum": [
+        "supplied_exports",
+        "selected_conversations"
+      ]
+    },
+    "parser_compatibility": {
+      "const": "experimental"
+    },
+    "captures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capture"
+      },
+      "minItems": 1
+    },
+    "conversations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/conversation"
+      }
+    },
+    "association_history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/associationDecision"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/collectionSummary"
+    },
+    "parent_manifest_sha256": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "const": "selected_conversations"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "parent_manifest_sha256"
+        ],
+        "properties": {
+          "captures": {
+            "items": {
+              "properties": {
+                "source_kind": {
+                  "const": "selection"
+                },
+                "original_zip": {
+                  "type": "null"
+                },
+                "source_documents": {
+                  "maxItems": 0
+                },
+                "status": {
+                  "const": "partial"
+                },
+                "summary": {
+                  "$ref": "#/$defs/selectionSummary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "required": [
+            "parent_manifest_sha256"
+          ]
+        },
+        "properties": {
+          "captures": {
+            "items": {
+              "properties": {
+                "source_kind": {
+                  "enum": [
+                    "directory",
+                    "zip"
+                  ]
+                },
+                "summary": {
+                  "$ref": "#/$defs/captureSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Source-defined identifier preserved without normalization; runtime applies the applicable UTF-8 byte and reference checks."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[/]$)[^<>:\"\\\\|?*\\u0000-\\u001f\\u007f-\\u009f]+$",
+      "description": "Relative POSIX-style NFC path. Runtime enforces at most 4096 UTF-8 bytes, 64 components, 240 UTF-8 bytes per component, no trailing dots/spaces, no reserved device names, no Unicode control/format/surrogate characters, and case-fold uniqueness."
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "size_bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "originalZip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "size_bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^captures/[0-9]{6}/original\\.zip$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "compatibility"
+      ],
+      "properties": {
+        "name": {
+          "const": "chatgpt-mapping"
+        },
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "compatibility": {
+          "const": "experimental"
+        }
+      }
+    },
+    "sourceDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes",
+        "status",
+        "record_count",
+        "accepted_records",
+        "rejected_records"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "enum": [
+            "parsed",
+            "malformed",
+            "unsupported"
+          ]
+        },
+        "record_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "accepted_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejected_records": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "parsed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "record_count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "record_count": {
+                "type": "null"
+              },
+              "accepted_records": {
+                "const": 0
+              },
+              "rejected_records": {
+                "const": 0
+              }
+            }
+          }
+        }
+      ],
+      "description": "For parsed documents, accepted plus rejected records must equal record_count. Runtime binds path, size, and digest to the capture inventory. Null record_count means the count is unknown."
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "source_path",
+        "record_index",
+        "node_id",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_path": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "record_index": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "node_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "captureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_document_count",
+        "parsed_documents",
+        "malformed_documents",
+        "unsupported_documents",
+        "source_records",
+        "accepted_records",
+        "rejected_records",
+        "message_nodes",
+        "artifact_references",
+        "supplied_files",
+        "issue_count"
+      ],
+      "properties": {
+        "source_document_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parsed_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "malformed_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupported_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accepted_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejected_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "message_nodes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "artifact_references": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "supplied_files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issue_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "selectionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "scope": {
+          "const": "selected_derived_records_and_bound_artifacts"
+        }
+      }
+    },
+    "collectionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_count",
+        "unique_source_count",
+        "conversation_count",
+        "revision_count",
+        "occurrence_count",
+        "message_node_count",
+        "branched_revision_count",
+        "stored_artifact_references",
+        "unavailable_artifact_references",
+        "source_file_count",
+        "source_bytes",
+        "partial_capture_count",
+        "association_decision_count"
+      ],
+      "properties": {
+        "capture_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unique_source_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "conversation_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revision_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "occurrence_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "message_node_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "branched_revision_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stored_artifact_references": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unavailable_artifact_references": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "partial_capture_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "association_decision_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_id",
+        "storage_id",
+        "source_kind",
+        "source_fingerprint",
+        "original_zip",
+        "parser",
+        "status",
+        "source_documents",
+        "files",
+        "issues",
+        "summary"
+      ],
+      "properties": {
+        "capture_id": {
+          "$ref": "#/$defs/digest"
+        },
+        "storage_id": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$",
+          "minLength": 6,
+          "maxLength": 6
+        },
+        "source_kind": {
+          "enum": [
+            "directory",
+            "zip",
+            "selection"
+          ]
+        },
+        "source_fingerprint": {
+          "$ref": "#/$defs/digest"
+        },
+        "original_zip": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/originalZip"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parser": {
+          "$ref": "#/$defs/parser"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "source_documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceDocument"
+          }
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file"
+          },
+          "uniqueItems": true
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          }
+        },
+        "summary": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/captureSummary"
+            },
+            {
+              "$ref": "#/$defs/selectionSummary"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source_kind": {
+                "const": "zip"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "original_zip": {
+                "$ref": "#/$defs/originalZip"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "original_zip": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sourceAssociationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "source_path",
+        "record_index",
+        "field"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_field",
+            "insufficient_source_metadata",
+            "unusable_source_field"
+          ]
+        },
+        "source_path": {
+          "$ref": "#/$defs/path"
+        },
+        "record_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "field": {
+          "const": "project_id"
+        }
+      }
+    },
+    "operatorAssociationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "const": "explicit_local_operator_decision"
+        }
+      }
+    },
+    "association": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "project_id",
+        "evidence"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "project_confirmed",
+            "standalone_confirmed",
+            "association_unknown"
+          ]
+        },
+        "project_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sourceAssociationEvidence"
+            },
+            {
+              "$ref": "#/$defs/operatorAssociationEvidence"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "project_confirmed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "project_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "project_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "messageNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "parent_id",
+        "children_ids",
+        "message_id",
+        "role",
+        "text",
+        "content_type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "parent_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "children_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "uniqueItems": true
+        },
+        "message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "content_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_path",
+        "record_index",
+        "record_sha256"
+      ],
+      "properties": {
+        "source_path": {
+          "$ref": "#/$defs/path"
+        },
+        "record_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "record_sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_id",
+        "node_id",
+        "kind",
+        "source_reference",
+        "original_name",
+        "media_type",
+        "relative_path",
+        "status",
+        "size_bytes",
+        "sha256"
+      ],
+      "properties": {
+        "reference_id": {
+          "$ref": "#/$defs/digest"
+        },
+        "node_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "attachment"
+          ]
+        },
+        "source_reference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 8192
+        },
+        "original_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4096
+        },
+        "media_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "relative_path": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "stored",
+            "not_supplied",
+            "unresolved",
+            "external_reference",
+            "unsupported_reference",
+            "excluded_by_selection"
+          ]
+        },
+        "size_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "stored",
+                  "excluded_by_selection"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "relative_path": {
+                "$ref": "#/$defs/path"
+              },
+              "size_bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "size_bytes": {
+                "type": "null"
+              },
+              "sha256": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_supplied"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "relative_path": {
+                "$ref": "#/$defs/path"
+              }
+            }
+          }
+        }
+      ],
+      "description": "Stored references must bind exactly to preserved file bytes at runtime. Excluded-by-selection references retain known metadata but deliberately omit the whole source document from the selected payload."
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_id",
+        "provenance",
+        "artifacts"
+      ],
+      "properties": {
+        "capture_id": {
+          "$ref": "#/$defs/digest"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_id",
+        "title",
+        "association",
+        "current_node_id",
+        "nodes",
+        "occurrences"
+      ],
+      "properties": {
+        "revision_id": {
+          "$ref": "#/$defs/digest"
+        },
+        "title": {
+          "type": "string"
+        },
+        "association": {
+          "$ref": "#/$defs/association"
+        },
+        "current_node_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/messageNode"
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/occurrence"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "conversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversation_key",
+        "source_id",
+        "revisions"
+      ],
+      "properties": {
+        "conversation_key": {
+          "$ref": "#/$defs/digest"
+        },
+        "source_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "revisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/revision"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "associationDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "conversation_key",
+        "association",
+        "reason",
+        "previous_decision_id",
+        "decision_id"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "conversation_key": {
+          "$ref": "#/$defs/digest"
+        },
+        "association": {
+          "$ref": "#/$defs/association"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Operator-supplied reason. Runtime also enforces non-whitespace content and the 2048 UTF-8 byte ceiling."
+        },
+        "previous_decision_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision_id": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    }
+  }
+}

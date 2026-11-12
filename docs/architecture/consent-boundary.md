@@ -1,13 +1,14 @@
 # Consent and Operation Boundary
 
-**Status:** Local reference implementation; internal legal drafts  
-**Terms version:** `2026-11-12-draft.1`  
-**Privacy version:** `2026-11-12-draft.1`  
-**Owner:** Lopix Neural Inc.  
+**Status:** Local reference implementation; internal legal drafts
+**Terms version:** `2026-11-12-draft.2`
+**Privacy version:** `2026-11-12-draft.2`
+**Owner:** Lopix Neural Inc.
 **Contact:** fabio@lopixneural.com
 
-The ordinary CLI must obtain explicit acceptance of both current policy versions
-before reading the selected source directory or archive. Missing, stale,
+The ordinary CLI and optional MCP adapter must obtain explicit acceptance of
+both current policy versions before reading selected source or collection
+content. Missing, stale,
 malformed, or unsupported declarations fail closed. Argument parsing and loading
 the application itself do not inspect selected user content.
 
@@ -20,7 +21,8 @@ them does not authorize public release.
 ## Boundary contract
 
 `keepmorrow.consent.require_acceptance(terms_version, privacy_version, operation)`
-accepts exact current version strings and one of `create`, `verify`, or `restore`.
+accepts exact current version strings and one of `create`, `verify`, `restore`,
+`import`, `catalog`, `search`, `read`, `associate`, or `recover`.
 It performs no file or network access. Any other value raises `ConsentError`.
 
 Acceptance is limited to the selected local operation and its explicit paths.
@@ -36,15 +38,32 @@ policy version therefore requires a new exact declaration.
 
 ```bash
 PYTHONPATH=src python -m keepmorrow create examples/synthetic-input /tmp/keepmorrow-example \
-  --accept-terms 2026-11-12-draft.1 \
-  --accept-privacy 2026-11-12-draft.1
+  --accept-terms 2026-11-12-draft.2 \
+  --accept-privacy 2026-11-12-draft.2
 ```
 
-The internal archive functions remain low-level implementation primitives.
+The internal archive, importer, and catalog functions remain implementation primitives.
 Direct Python calls are not an authenticated user-facing API and do not enforce
-acceptance themselves. Future applications must put an equivalent boundary
+acceptance themselves. Embedding applications must put an equivalent boundary
 before every user-content operation and must not expose these primitives as an
 ungated service.
+
+## MCP development boundary
+
+Every MCP tool requires `terms_version` and `privacy_version`.
+The server checks them before resolving the selected
+collection grant or inspecting registered content. Its registry uses explicit
+opaque IDs; request arguments cannot select arbitrary filesystem paths. Registry
+configuration loading does not inspect the contents of its registered paths.
+
+The adapter exposes only collection listing, browsing, search, revision reading,
+and verification. Results are returned to the calling client. Loopback transport
+is a development restriction, not remote authentication or authenticated proof
+of the user's agreement. The adapter does not implement a consent presentation
+UI or a durable acceptance ledger. A deployed ChatGPT interface must present the
+policies, record a deliberate user decision, enforce collection authorization,
+and describe that client's data handling before content access. See
+[ChatGPT integration](chatgpt-integration.md).
 
 ## Receipt and persistence
 
@@ -70,9 +89,9 @@ design and appropriate legal review; the CLI receipt is not its substitute.
 
 ## Verification scope
 
-Tests must establish refusal for missing or stale acceptance and unknown
-operations, exact version matching, receipt scope, and CLI rejection before
-archive functions or selected paths are inspected. They must also show that
+Tests establish refusal for missing or stale acceptance and unknown operations,
+exact version matching, receipt scope, and CLI and MCP rejection before services
+or selected content are inspected. They also show that
 explicit current acceptance allows the ordinary archive validation path to run.
 These tests establish the application boundary described here, not the legal
 enforceability of the draft terms.

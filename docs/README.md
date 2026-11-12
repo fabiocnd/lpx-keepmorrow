@@ -7,6 +7,7 @@ being reviewed.
 ## Product
 
 - [Product brief](product/product-brief.md)
+- [Official export comparison](product/export-comparison.md)
 - [Requirements and delivery status](product/requirements.md)
 - [Roadmap](product/roadmap.md)
 - [Ideas and naming](product/ideas-and-naming.md)
@@ -15,8 +16,12 @@ being reviewed.
 
 - [System overview](architecture/system-overview.md)
 - [Reference core](architecture/reference-core.md)
+- [Collection workflow](architecture/collection-workflow.md)
+- [Import contract](architecture/import-contract.md)
+- [ChatGPT development adapter](architecture/chatgpt-integration.md)
 - [Consent boundary](architecture/consent-boundary.md)
 - [ADR 0001: repository layout](architecture/decisions/0001-repository-layout.md)
+- [ADR 0002: immutable collections](architecture/decisions/0002-immutable-collections.md)
 
 ## Engineering
 
@@ -25,6 +30,7 @@ being reviewed.
 - [Performance and organization review](engineering/performance-review.md)
 - [Validation](engineering/validation.md)
 - [Foundation verification record](engineering/foundation-verification.md)
+- [Collection verification record](engineering/collection-verification.md)
 - [AI engineering standard](ai/ai-engineering-standard.md)
 - [AI evaluation plan](ai/evaluation-plan.md)
 

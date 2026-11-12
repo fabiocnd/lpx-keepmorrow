@@ -9,9 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-CURRENT_TERMS_VERSION = "2026-11-12-draft.1"
-CURRENT_PRIVACY_VERSION = "2026-11-12-draft.1"
-_SUPPORTED_OPERATIONS = frozenset({"create", "verify", "restore"})
+CURRENT_TERMS_VERSION = "2026-11-12-draft.2"
+CURRENT_PRIVACY_VERSION = "2026-11-12-draft.2"
+_SUPPORTED_OPERATIONS = frozenset({"create", "verify", "restore", "import", "catalog", "search", "read", "associate", "recover"})
 
 
 class ConsentError(ValueError):
@@ -49,7 +49,7 @@ def require_acceptance(
     a declaration is absent, stale, malformed, or outside that operation scope.
     """
     if not isinstance(operation, str) or operation not in _SUPPORTED_OPERATIONS:
-        raise ConsentError("Acceptance supports only create, verify, or restore operations.")
+        raise ConsentError("Acceptance supports only documented local preservation and collection operations.")
     if not isinstance(terms_version, str) or terms_version != CURRENT_TERMS_VERSION:
         raise ConsentError(
             "Review legal/terms-of-use.md and explicitly accept the current version "

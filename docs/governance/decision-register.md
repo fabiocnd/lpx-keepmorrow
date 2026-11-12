@@ -1,7 +1,7 @@
 # Decision Register
 
-**Recorded:** 2026-11-12  
-**Owner:** Fabio de Sousa Lopes  
+**Recorded:** 2026-11-12
+**Owner:** Fabio de Sousa Lopes
 **Publisher:** Lopix Neural Inc.
 
 Status values: **owner-confirmed**, **implementation choice**, **proposal**,
@@ -28,6 +28,11 @@ work, not a claim that the owner separately approved a permanent stack.
 | D016 | Publish or distribute the product | Open | Separate owner decision after engineering, privacy, and legal review |
 | D017 | Production hosting, retention, telemetry, and model provider | Open | Must be specified before relevant data processing is enabled |
 | D018 | Treat the retrieved Blueprint as a historical source snapshot | Implementation choice | Preserve its original open decisions while recording superseding instructions here |
+| D019 | Implement the recent preservation and product-differentiation recommendations | Owner-confirmed | Owner requested senior engineering refactoring and implementation after reviewing official export, binary, and image coverage |
+| D020 | Use immutable collection generations over the existing archive contract | Implementation choice | Preserve previous outputs, keep originals distinct from derived catalogs, and expose full-copy costs; see ADR 0002 |
+| D021 | Treat the ChatGPT mapping adapter as experimental until a representative real export is validated | Implementation choice | Synthetic compatibility evidence exists; no real account export has been supplied |
+| D022 | Add a read-only local MCP development adapter with explicit grants | Implementation choice | Supports the intended ChatGPT integration boundary without deployment, unrestricted history access, or premature write tools |
+| D023 | Revise legal drafts to version 2026-11-12-draft.2 for the changed local processing scope | Implementation choice | Catalogs, search results, association decisions, ZIP preservation, selection, and local MCP handling require accurate disclosure and fresh exact acceptance |
 
 ## Superseded historical items
 
