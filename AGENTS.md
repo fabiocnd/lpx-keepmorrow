@@ -25,6 +25,11 @@ request the same permission again for work already authorized.
 
 ## Engineering contract
 
+Use `develop` for routine development and integration. Target `develop` with
+ordinary pull requests, then promote reviewed and validated changes to `main`.
+Follow the branch workflow in [CONTRIBUTING.md](CONTRIBUTING.md); do not assume
+that repository protections enforce it.
+
 Follow [Golden Coding Standard](docs/engineering/golden-coding-standard.md),
 [Performance Policy](docs/engineering/performance-policy.md), and, for model
 features, [AI Engineering Standard](docs/ai/ai-engineering-standard.md).

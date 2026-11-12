@@ -23,11 +23,24 @@ engineering evidence and record subsequent decisions separately.
 All newly authored project content uses US English. Original imported material
 retains its original bytes and language. Use synthetic examples for development.
 
+## Branch workflow
+
+`develop` is the integration branch for active development. Create short-lived
+feature, fix, or documentation branches from `develop`, and target `develop`
+with routine pull requests.
+
+`main` contains the reviewed release baseline. Promote changes from `develop`
+to `main` through a pull request after review and successful validation.
+A merge does not automatically publish a release or deploy the service.
+
+CI validates pushes to both branches and pull requests. This workflow is a
+project convention; enforced branch rules are reported separately.
+
 ## Working on a change
 
 1. Inspect the current branch and working tree. Preserve unrelated changes.
-2. Make one coherent change with a clear purpose. Use a short descriptive branch
-   when a branch is appropriate to the task.
+2. Make one coherent change with a clear purpose on a short descriptive branch
+   based on `develop`.
 3. Keep public boundaries typed and validated. Name errors so callers can
    distinguish invalid input, unavailable material, and operational failure.
 4. Add meaningful tests for changed behavior and concrete failure modes. A
