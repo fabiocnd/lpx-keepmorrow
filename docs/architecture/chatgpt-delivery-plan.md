@@ -25,7 +25,7 @@ remains a separate synthetic development surface.
 
 | Phase | Implemented work | Evidence still required to close the phase |
 | --- | --- | --- |
-| P0 — Scope and platform | Explicit selected-input model, content eligibility gate, identity/host configuration, current documentation | Actual account/workspace capability, permitted content, host/operator/region, provider and cost decisions |
+| P0 — Scope and platform | Explicit selected-input model, content eligibility gate, identity/host configuration, current documentation; authenticated account exposes custom MCP creation | Running endpoint and completed account connection, permitted content, host/operator/region, provider and cost decisions |
 | P1 — Actual ChatGPT connection | Official SDK tool server, resource metadata, bounded responses, MCP Apps resource, protocol tests | Installation and invocation in the intended signed-in ChatGPT account; reconnect and permission behavior |
 | P2 — Real-export compatibility | Experimental parser, provenance, coverage reports, synthetic graphs/binaries/revisions | An authorized representative export and independently reconciled coverage expectations |
 | P3 — Authenticated pilot | JWT resource validation, principal allowlist, exact grants, human consent, withdrawal, CSRF, generation and ancestor checks | Live IdP discovery/client registration, actual OAuth flow, eligible real collection, approved disclosures |
@@ -136,7 +136,7 @@ local service workflow and does not establish HTTP, IdP, tunnel, or ChatGPT late
 
 | Work item | Completion evidence | Current blocker or decision |
 | --- | --- | --- |
-| Actual account connection | Discover tools, open UI, perform an authorized query, reject unsupported scope, and recover from interruption in ChatGPT | Target signed-in account/workspace and permitted connection capability |
+| Actual account connection | Discover tools, open UI, perform an authorized query, reject unsupported scope, and recover from interruption in ChatGPT | Authenticated custom-MCP creation form verified; a running endpoint and live OAuth are still required before creation and installation |
 | Representative export | Inventory and graph expectations reconcile; byte hashes and unsupported cases are recorded | Explicitly supplied authorized sample; no user archive is committed to source |
 | Live OAuth | Issuer metadata, clients/callbacks, resource audience, token rotation, wrong-user rejection, and browser flow pass | Selected IdP and registered clients |
 | Reachable service | Configured authentication survives the selected proxy or tunnel; limits and timeouts are observed | Host/operator/region or supported private tunnel |
@@ -145,9 +145,14 @@ local service workflow and does not establish HTTP, IdP, tunnel, or ChatGPT late
 | Legal release | Approved final terms, privacy notices, retention, and support obligations | Owner and qualified counsel review |
 | Open-source release | Exact license, current dependency notices, sanitized source artifact, and reviewed publication history | License adoption and public destination decision |
 
-The signed-in ChatGPT acceptance flow has not been demonstrated. Local
-DOM/protocol tests and successful synthetic Chromium CI are separate from that
-live gate. No credentials are requested through chat or stored in source.
+The authenticated ChatGPT account exposed the custom-MCP creation form on
+November 12, 2026. A local form draft contains the product name, description,
+and OAuth selection; no server URL or tunnel identity has been provisioned, and
+the plugin has not been created or installed. No account identifier or browser
+session evidence is retained in source. The full signed-in acceptance flow
+remains open. Local DOM/protocol tests and successful synthetic Chromium CI are
+separate from that live gate. No credentials are requested through chat or
+stored in source.
 
 ## 8. Connectivity and product policy
 

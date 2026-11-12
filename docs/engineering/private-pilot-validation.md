@@ -139,6 +139,32 @@ live OAuth, the actual ChatGPT host, or real user content. The
 [runbook](../operations/private-service-runbook.md#reproduce-the-synthetic-http-pilot)
 contains the reproducible commands and the Linux child-launch restriction.
 
+### Hosted HTTP pilot confirmation
+
+[Workflow run 43256899441](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43256899441)
+completed successfully for commit
+`1a1783144849245a9574e4958054c10d73b3e271`; all six jobs passed. The optional
+service job executed all 331 Python tests in 8.236 seconds, then completed the
+new HTTP pilot with the same runner digest and all 16 checks passing. Its child
+service shut down gracefully. The observed HTTP workflow duration was 0.61027
+seconds, and the job retained the sanitized `keepmorrow-synthetic-http-evidence`
+artifact. These are results for the named commit, not a claim about any later
+documentation commit or a deployed service.
+
+## Authenticated ChatGPT setup checkpoint
+
+An authenticated account was observed on November 12, 2026 with the option to
+add a custom MCP server. The creation form accepted the project name and
+description and offered HTTPS or Tunnel connections with OAuth. The form is an
+unfinished browser draft: no server URL or tunnel identity was supplied, and
+the plugin was not created, installed, or invoked. Account identity, session
+information, and screenshots are excluded from repository evidence.
+
+This observation confirms access to the setup interface. It does not establish
+server discovery, user authorization against a live issuer, MCP calls, or
+embedded UI behavior. A reachable service and compatible OAuth configuration
+remain prerequisites for those tests.
+
 ## Historical initial CI and fixture correction
 
 [Workflow run 43244942226](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43244942226)
@@ -348,7 +374,7 @@ claiming a universal cancellation deadline.
 
 | Gate | Required evidence | Current evidence boundary |
 | --- | --- | --- |
-| Live ChatGPT distribution path | Account/plan capability, developer setup, private connection, resource rendering, actual tool behavior | Documentation and local implementation do not prove this account can connect |
+| Live ChatGPT distribution path | Account/plan capability, developer setup, private connection, resource rendering, actual tool behavior | Authenticated creation interface verified; endpoint discovery, creation, installation, rendering, and tool calls remain unverified |
 | Live identity provider | Registered clients, PKCE/browser flow, issuer/audience/JWKS validation, token expiry/rotation, session behavior | Synthetic verifier and protocol tests do not prove a deployed provider configuration |
 | Actual binary transfer | Host-supported upload selection and one authenticated output downloaded and independently verified | Local byte round trips are available; host-specific delivery must be observed |
 | Representative export | Explicit intake/review consent, inventory, actual images/binaries and missing-artifact report, branch/association findings | No user-authorized representative archive was supplied for this validation |
