@@ -151,6 +151,36 @@ seconds, and the job retained the sanitized `keepmorrow-synthetic-http-evidence`
 artifact. These are results for the named commit, not a claim about any later
 documentation commit or a deployed service.
 
+### Application-service fixture synchronization
+
+[Workflow run 43263331539](https://github.com/fabiocnd/lpx-keepmorrow/actions/runs/43263331539)
+executed documentation commit `89a7eec307dde46e99e92fb324b182ee7fad72fd`.
+Five jobs passed, including the authenticated service and HTTP pilot. The
+Windows/Python 3.14 job discovered 331 tests with 58 skips and one error in
+40.060 seconds. The completed-lineage test attempted a content read before the
+preceding executor had finished workspace cleanup, correctly receiving
+`OperationBusy` from the service.
+
+The isolated, serial application-service fixture now waits for both successful
+terminal status and zero retained operation reservations within its existing
+monotonic deadline. Completion is a publication fact; executor return is the
+resource-release boundary. This correction does not change production admission,
+authorization, cleanup, or worker ownership. Existing event-controlled lifecycle
+tests cover completion before cleanup and retained reservations after cleanup
+failure.
+
+The focused correction check passed all **32 tests** in **1.200 seconds** on
+local CPython 3.12.14/Linux with this command:
+
+```sh
+PYTHONPATH=src python -m unittest \
+  tests.integration.test_application_service \
+  tests.integration.test_operations_lifecycle \
+  tests.integration.test_operations_workspaces -v
+```
+
+This local result does not replace the correction commit's hosted Windows check.
+
 ## Authenticated ChatGPT setup checkpoint
 
 An authenticated account was observed on November 12, 2026 with the option to

@@ -60,9 +60,13 @@ class ApplicationServiceTests(unittest.TestCase):
             result = self.service.status(self.owner, started["operation_id"])
             if result["state"] in {"completed", "partial", "failed", "cancelled", "interrupted"}:
                 self.assertIn(result["state"], {"completed", "partial"}, result)
-                return result
+                # Completion precedes workspace cleanup. This isolated fixture
+                # owns one operation, so a zero reservation establishes that
+                # its executor has returned before the next content request.
+                if self.service.operations.reserved_bytes() == 0:
+                    return result
             time.sleep(0.01)
-        self.fail("The bounded synthetic worker did not finish.")
+        self.fail("The bounded synthetic worker did not finish and release its reservation.")
 
     def test_no_content_io_before_acceptance_and_exact_generation_fencing(self) -> None:
         with patch("keepmorrow.application.service.load_collection", side_effect=AssertionError("Unexpected content read")):

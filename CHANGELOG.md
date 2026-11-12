@@ -10,6 +10,13 @@
 - A CI step that runs this isolated workflow and retains only sanitized JSON
   evidence, together with operating instructions and observed pilot results.
 
+### Fixed
+
+- The serial application-service fixture now waits for executor reservation
+  release after terminal status, preventing a Windows scheduling race between
+  workspace cleanup and the next content request. Service admission and cleanup
+  protections remain unchanged.
+
 ## 0.3.0 — Authenticated Preservation Service — 2026-11-12
 
 ### Added
